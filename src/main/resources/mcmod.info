@@ -1,0 +1,16 @@
+[
+{
+  "modid": "SimpleDimensions",
+  "name": "Simple Dimensions",
+  "description": "A simple mod that allows you to create additional dimensions.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["lumien"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
