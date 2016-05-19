@@ -8,7 +8,6 @@ import org.lwjgl.input.Keyboard;
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiCustomizeWorldScreen;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.gui.GuiTextField;

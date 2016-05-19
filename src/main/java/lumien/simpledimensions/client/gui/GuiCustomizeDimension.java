@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ChunkProviderSettings;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -304,16 +304,16 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
                 }
                 else
                 {
-                    BiomeGenBase biomegenbase;
+                    Biome biomegenbase;
 
-                    if ((int)p_175330_2_ >= BiomeGenBase.getIdForBiome(Biomes.HELL))
+                    if ((int)p_175330_2_ >= Biome.getIdForBiome(Biomes.HELL))
                     {
-                        biomegenbase = BiomeGenBase.getBiome((int)p_175330_2_ + 2);
+                        biomegenbase = Biome.getBiome((int)p_175330_2_ + 2);
                         return biomegenbase != null ? biomegenbase.getBiomeName() : "?";
                     }
                     else
                     {
-                        biomegenbase = BiomeGenBase.getBiome((int)p_175330_2_);
+                        biomegenbase = Biome.getBiome((int)p_175330_2_);
                         return biomegenbase != null ? biomegenbase.getBiomeName() : "?";
                     }
                 }

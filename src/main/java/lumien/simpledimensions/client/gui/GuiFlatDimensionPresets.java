@@ -12,7 +12,6 @@ import com.google.common.collect.Maps;
 import net.minecraft.block.BlockTallGrass;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiCreateFlatWorld;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.gui.GuiTextField;
@@ -27,7 +26,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.FlatGeneratorInfo;
 import net.minecraft.world.gen.FlatLayerInfo;
 import net.minecraftforge.fml.relauncher.Side;
@@ -163,17 +162,17 @@ public class GuiFlatDimensionPresets extends GuiScreen
         return this.field_146435_s.field_148175_k > -1 && this.field_146435_s.field_148175_k < FLAT_WORLD_PRESETS.size() || this.field_146433_u.getText().length() > 1;
     }
 
-    private static void registerPreset(String name, Item icon, BiomeGenBase biome, FlatLayerInfo... layers)
+    private static void registerPreset(String name, Item icon, Biome biome, FlatLayerInfo... layers)
     {
         registerPreset(name, icon, 0, biome, (List<String>)null, layers);
     }
 
-    private static void registerPreset(String name, Item icon, BiomeGenBase biome, List<String> features, FlatLayerInfo... layers)
+    private static void registerPreset(String name, Item icon, Biome biome, List<String> features, FlatLayerInfo... layers)
     {
         registerPreset(name, icon, 0, biome, features, layers);
     }
 
-    private static void registerPreset(String name, Item icon, int iconMetadata, BiomeGenBase biome, List<String> features, FlatLayerInfo... layers)
+    private static void registerPreset(String name, Item icon, int iconMetadata, Biome biome, List<String> features, FlatLayerInfo... layers)
     {
         FlatGeneratorInfo flatgeneratorinfo = new FlatGeneratorInfo();
 
@@ -182,7 +181,7 @@ public class GuiFlatDimensionPresets extends GuiScreen
             flatgeneratorinfo.getFlatLayers().add(layers[i]);
         }
 
-        flatgeneratorinfo.setBiome(BiomeGenBase.getIdForBiome(biome));
+        flatgeneratorinfo.setBiome(Biome.getIdForBiome(biome));
         flatgeneratorinfo.updateLayers();
 
         if (features != null)

@@ -8,7 +8,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.border.IBorderListener;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 
@@ -69,7 +68,7 @@ public class WorldCustom extends WorldServer
         this.worldScoreboard = this.delegate.getScoreboard();
         this.lootTable = this.delegate.getLootTableManager();
         String s = VillageCollection.fileNameForProvider(this.provider);
-        VillageCollection villagecollection = (VillageCollection)this.perWorldStorage.loadData(VillageCollection.class, s);
+        VillageCollection villagecollection = (VillageCollection)this.perWorldStorage.getOrLoadData(VillageCollection.class, s);
 
         if (villagecollection == null)
         {

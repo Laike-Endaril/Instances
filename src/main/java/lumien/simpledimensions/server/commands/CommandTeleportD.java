@@ -191,7 +191,7 @@ public class CommandTeleportD extends CommandBase
 						}
 
 						((Entity) object).dismountRidingEntity();
-						((EntityPlayerMP) object).playerNetServerHandler.setPlayerLocation(coordinatearg.getAmount(), coordinatearg1.getAmount(), coordinatearg2.getAmount(), f, f1, enumset);
+						((EntityPlayerMP) object).connection.setPlayerLocation(coordinatearg.getAmount(), coordinatearg1.getAmount(), coordinatearg2.getAmount(), f, f1, enumset);
 						((Entity) object).setRotationYawHead(f);
 					}
 					else
@@ -232,7 +232,7 @@ public class CommandTeleportD extends CommandBase
 
 				if (object instanceof EntityPlayerMP)
 				{
-					((EntityPlayerMP) object).playerNetServerHandler.setPlayerLocation(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
+					((EntityPlayerMP) object).connection.setPlayerLocation(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
 				}
 				else
 				{

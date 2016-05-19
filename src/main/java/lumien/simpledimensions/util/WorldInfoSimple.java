@@ -1,7 +1,6 @@
 package lumien.simpledimensions.util;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.WorldSettings;

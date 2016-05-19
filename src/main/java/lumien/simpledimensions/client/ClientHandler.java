@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import lumien.simpledimensions.SimpleDimensions;
-import lumien.simpledimensions.server.WorldProviderSimpleDimension;
 import net.minecraftforge.common.DimensionManager;
 
 public class ClientHandler

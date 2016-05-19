@@ -14,7 +14,6 @@ import lumien.simpledimensions.SimpleDimensions;
 import lumien.simpledimensions.network.PacketHandler;
 import lumien.simpledimensions.network.messages.MessageDimensionSync;
 import lumien.simpledimensions.server.WorldCustom;
-import lumien.simpledimensions.server.WorldProviderSimpleDimension;
 import lumien.simpledimensions.util.WorldInfoSimple;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
@@ -28,8 +27,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.ServerWorldEventHandler;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldManager;
 import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.ISaveHandler;
@@ -131,9 +130,7 @@ public class DimensionHandler extends WorldSavedData
 	public static DimensionHandler getInstance()
 	{
 		DimensionHandler INSTANCE;
-		INSTANCE = (DimensionHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().loadData(DimensionHandler.class, NAME);
-
-		
+		INSTANCE = (DimensionHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(DimensionHandler.class, NAME);
 		
 		if (INSTANCE == null)
 		{
@@ -168,7 +165,7 @@ public class DimensionHandler extends WorldSavedData
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt)
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
 		NBTTagList nbtList = new NBTTagList();
 
@@ -183,6 +180,8 @@ public class DimensionHandler extends WorldSavedData
 		}
 
 		nbt.setTag("dimensionInfo", nbtList);
+		
+		return nbt;
 	}
 
 	public void loadDimensions()
@@ -220,7 +219,7 @@ public class DimensionHandler extends WorldSavedData
 		EnumDifficulty difficulty = mcServer.getEntityWorld().getDifficulty();
 
 		WorldServer world = (WorldServer) (new WorldCustom(worldInfo, mcServer, savehandler, dimensionID, overworld, mcServer.theProfiler).init());
-		world.addEventListener(new WorldManager(mcServer, world));
+		world.addEventListener(new ServerWorldEventHandler(mcServer, world));
 		MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
 
 		if (!mcServer.isSinglePlayer())
