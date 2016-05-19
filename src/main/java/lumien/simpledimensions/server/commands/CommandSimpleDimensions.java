@@ -1,19 +1,17 @@
 package lumien.simpledimensions.server.commands;
 
 import java.util.List;
+
 import lumien.simpledimensions.dimensions.DimensionHandler;
 import lumien.simpledimensions.network.PacketHandler;
 import lumien.simpledimensions.network.messages.MessageOpenGui;
-import lumien.simpledimensions.util.TeleporterSimple;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.WorldServer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.util.FakePlayer;
 
 public class CommandSimpleDimensions extends CommandBase
@@ -38,11 +36,11 @@ public class CommandSimpleDimensions extends CommandBase
 	}
 
 	@Override
-	public void processCommand(ICommandSender sender, String[] args) throws CommandException
+	public void execute(MinecraftServer server,ICommandSender sender, String[] args) throws CommandException
 	{
 		if (args.length == 0)
 		{
-			sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
+			sender.addChatMessage(new TextComponentString(getCommandUsage(sender)));
 			return;
 		}
 
@@ -71,8 +69,8 @@ public class CommandSimpleDimensions extends CommandBase
 	}
 
 	@Override
-	public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
-	{
+	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+    {
 		if (args.length == 1)
 		{
 			return getListOfStringsMatchingLastWord(args, "create", "delete", "list");

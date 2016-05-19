@@ -4,6 +4,7 @@ import lumien.simpledimensions.dimensions.DimensionHandler;
 import lumien.simpledimensions.network.messages.MessageCreateDimension;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -14,7 +15,7 @@ public class HandlerCreateDimension implements IMessageHandler<MessageCreateDime
 	@Override
 	public IMessage onMessage(final MessageCreateDimension message, final MessageContext ctx)
 	{
-		MinecraftServer.getServer().addScheduledTask(new Runnable()
+		FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(new Runnable()
 		{
 			@Override
 			public void run()

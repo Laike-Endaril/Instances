@@ -22,11 +22,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldManager;
@@ -37,6 +37,7 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class DimensionHandler extends WorldSavedData
@@ -74,12 +75,11 @@ public class DimensionHandler extends WorldSavedData
 
 		dimensionInfo.put(dimensionID, worldInfo);
 
-		DimensionManager.registerProviderType(dimensionID, WorldProviderSimpleDimension.class, true);
-		DimensionManager.registerDimension(dimensionID, dimensionID);
+		DimensionManager.registerDimension(dimensionID, SimpleDimensions.INSTANCE.simpleDimensionType);
 
 		loadDimension(dimensionID, worldInfo);
 
-		playerEntity.addChatComponentMessage(new ChatComponentText(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GREEN)));
+		playerEntity.addChatComponentMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
 
 		syncWithClients();
 	}
@@ -103,13 +103,13 @@ public class DimensionHandler extends WorldSavedData
 		}
 	}
 
-	public IChatComponent generateList()
+	public ITextComponent generateList()
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 
 		if (dimensionInfo.isEmpty())
 		{
-			return new ChatComponentTranslation("simpleDimensions.nodimensions");
+			return new TextComponentTranslation("simpleDimensions.nodimensions");
 		}
 		else
 		{
@@ -124,19 +124,21 @@ public class DimensionHandler extends WorldSavedData
 				}
 			}
 
-			return new ChatComponentText(stringBuilder.toString());
+			return new TextComponentString(stringBuilder.toString());
 		}
 	}
 
 	public static DimensionHandler getInstance()
 	{
 		DimensionHandler INSTANCE;
-		INSTANCE = (DimensionHandler) MinecraftServer.getServer().getEntityWorld().getMapStorage().loadData(DimensionHandler.class, NAME);
+		INSTANCE = (DimensionHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().loadData(DimensionHandler.class, NAME);
 
+		
+		
 		if (INSTANCE == null)
 		{
 			INSTANCE = new DimensionHandler();
-			MinecraftServer.getServer().getEntityWorld().getMapStorage().setData(NAME, INSTANCE);
+			FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().setData(NAME, INSTANCE);
 		}
 
 		return INSTANCE;
@@ -175,7 +177,7 @@ public class DimensionHandler extends WorldSavedData
 			NBTTagCompound compound = new NBTTagCompound();
 
 			compound.setInteger("dimensionID", entry.getKey());
-			compound.setTag("worldInfo", entry.getValue().getNBTTagCompound());
+			compound.setTag("worldInfo", entry.getValue().cloneNBTCompound(null));
 
 			nbtList.appendTag(compound);
 		}
@@ -190,8 +192,7 @@ public class DimensionHandler extends WorldSavedData
 			int dimensionID = entry.getKey();
 			WorldInfo worldInfo = entry.getValue();
 
-			DimensionManager.registerProviderType(dimensionID, WorldProviderSimpleDimension.class, true);
-			DimensionManager.registerDimension(dimensionID, dimensionID);
+			DimensionManager.registerDimension(dimensionID, SimpleDimensions.INSTANCE.simpleDimensionType);
 
 			loadDimension(dimensionID, worldInfo);
 		}
@@ -199,7 +200,7 @@ public class DimensionHandler extends WorldSavedData
 
 	private void loadDimension(int dimensionID, WorldInfo worldInfo)
 	{
-		WorldServer overworld = (WorldServer) MinecraftServer.getServer().getEntityWorld();
+		WorldServer overworld = (WorldServer) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld();
 		if (overworld == null)
 		{
 			throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
@@ -213,12 +214,13 @@ public class DimensionHandler extends WorldSavedData
 			System.err.println("Cannot Hotload Dim: " + e.getMessage());
 			return;
 		}
+		
 		MinecraftServer mcServer = overworld.getMinecraftServer();
 		ISaveHandler savehandler = overworld.getSaveHandler();
 		EnumDifficulty difficulty = mcServer.getEntityWorld().getDifficulty();
 
 		WorldServer world = (WorldServer) (new WorldCustom(worldInfo, mcServer, savehandler, dimensionID, overworld, mcServer.theProfiler).init());
-		world.addWorldAccess(new WorldManager(mcServer, world));
+		world.addEventListener(new WorldManager(mcServer, world));
 		MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
 
 		if (!mcServer.isSinglePlayer())
@@ -233,7 +235,7 @@ public class DimensionHandler extends WorldSavedData
 	{
 		if (!dimensionInfo.containsKey(dimensionID))
 		{
-			sender.addChatMessage(new ChatComponentText("The dimension associated with that id is not from the SimpleDimensions mod").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
+			sender.addChatMessage(new TextComponentString("The dimension associated with that id is not from the SimpleDimensions mod").setStyle(new Style().setColor(TextFormatting.RED)));
 			return;
 		}
 
@@ -241,7 +243,7 @@ public class DimensionHandler extends WorldSavedData
 
 		if (worldObj.playerEntities.size() > 0)
 		{
-			sender.addChatMessage(new ChatComponentText("Can't delete a dimension with players inside it").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
+			sender.addChatMessage(new TextComponentString("Can't delete a dimension with players inside it").setStyle(new Style().setColor(TextFormatting.RED)));
 			return;
 		}
 
@@ -257,7 +259,6 @@ public class DimensionHandler extends WorldSavedData
 		{
 			WorldInfo worldInfo = dimensionInfo.get(dimensionID);
 
-			DimensionManager.unregisterProviderType(dimensionID);
 			DimensionManager.unregisterDimension(dimensionID);
 		}
 
@@ -274,7 +275,7 @@ public class DimensionHandler extends WorldSavedData
 			EntityPlayerMP player = null;
 			if (uniqueID != null)
 			{
-				player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUUID(uniqueID);
+				player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(uniqueID);
 			}
 
 			try
@@ -286,14 +287,14 @@ public class DimensionHandler extends WorldSavedData
 				e.printStackTrace();
 				if (player != null)
 				{
-					player.addChatComponentMessage(new ChatComponentText("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
+					player.addChatComponentMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
 				}
 			}
 			finally
 			{
 				if (player != null)
 				{
-					player.addChatComponentMessage(new ChatComponentText("Completely deleted dimension " + dimensionID).setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GREEN)));
+					player.addChatComponentMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
 				}
 			}
 

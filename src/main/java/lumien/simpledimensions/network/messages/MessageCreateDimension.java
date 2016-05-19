@@ -1,6 +1,7 @@
 package lumien.simpledimensions.network.messages;
 
 import io.netty.buffer.ByteBuf;
+import lumien.simpledimensions.SimpleDimensions;
 import lumien.simpledimensions.util.WorldInfoSimple;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -29,7 +30,7 @@ public class MessageCreateDimension implements IMessage
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		ByteBufUtils.writeTag(buf, worldInfo.getNBTTagCompound());
+		ByteBufUtils.writeTag(buf, worldInfo.cloneNBTCompound(null));
 	}
 	
 	public WorldInfoSimple getWorldInfo()

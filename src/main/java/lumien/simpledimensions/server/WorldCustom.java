@@ -8,6 +8,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.border.IBorderListener;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 
@@ -15,7 +16,6 @@ public class WorldCustom extends WorldServer
 {
     private WorldServer delegate;
     private IBorderListener borderListener;
-    private static final String __OBFID = "CL_00001430";
 
     public WorldCustom(WorldInfo worldInfo,MinecraftServer server, ISaveHandler saveHandlerIn, int dimensionId, WorldServer delegate, Profiler profilerIn)
     {
@@ -23,39 +23,31 @@ public class WorldCustom extends WorldServer
         this.delegate = delegate;
         this.borderListener = new IBorderListener()
         {
-            private static final String __OBFID = "CL_00002273";
-            @Override
-			public void onSizeChanged(WorldBorder border, double newSize)
+            public void onSizeChanged(WorldBorder border, double newSize)
             {
                 WorldCustom.this.getWorldBorder().setTransition(newSize);
             }
-            @Override
-			public void onTransitionStarted(WorldBorder border, double oldSize, double newSize, long time)
+            public void onTransitionStarted(WorldBorder border, double oldSize, double newSize, long time)
             {
                 WorldCustom.this.getWorldBorder().setTransition(oldSize, newSize, time);
             }
-            @Override
-			public void onCenterChanged(WorldBorder border, double x, double z)
+            public void onCenterChanged(WorldBorder border, double x, double z)
             {
                 WorldCustom.this.getWorldBorder().setCenter(x, z);
             }
-            @Override
-			public void onWarningTimeChanged(WorldBorder border, int newTime)
+            public void onWarningTimeChanged(WorldBorder border, int newTime)
             {
                 WorldCustom.this.getWorldBorder().setWarningTime(newTime);
             }
-            @Override
-			public void onWarningDistanceChanged(WorldBorder border, int newDistance)
+            public void onWarningDistanceChanged(WorldBorder border, int newDistance)
             {
                 WorldCustom.this.getWorldBorder().setWarningDistance(newDistance);
             }
-            @Override
-			public void onDamageAmountChanged(WorldBorder border, double newAmount)
+            public void onDamageAmountChanged(WorldBorder border, double newAmount)
             {
                 WorldCustom.this.getWorldBorder().setDamageAmount(newAmount);
             }
-            @Override
-			public void onDamageBufferChanged(WorldBorder border, double newSize)
+            public void onDamageBufferChanged(WorldBorder border, double newSize)
             {
                 WorldCustom.this.getWorldBorder().setDamageBuffer(newSize);
             }
@@ -66,17 +58,16 @@ public class WorldCustom extends WorldServer
     /**
      * Saves the chunks to disk.
      */
-    @Override
-	protected void saveLevel() throws MinecraftException
+    protected void saveLevel() throws MinecraftException
     {
         this.perWorldStorage.saveAllData();
     }
 
-    @Override
-	public World init()
+    public World init()
     {
         this.mapStorage = this.delegate.getMapStorage();
         this.worldScoreboard = this.delegate.getScoreboard();
+        this.lootTable = this.delegate.getLootTableManager();
         String s = VillageCollection.fileNameForProvider(this.provider);
         VillageCollection villagecollection = (VillageCollection)this.perWorldStorage.loadData(VillageCollection.class, s);
 
@@ -103,5 +94,14 @@ public class WorldCustom extends WorldServer
     {
         super.flush();
         this.delegate.getWorldBorder().removeListener(this.borderListener); // Unlink ourselves, to prevent world leak.
+    }
+
+    /**
+     * Called during saving of a world to give children worlds a chance to save additional data. Only used to save
+     * WorldProviderEnd's data in Vanilla.
+     */
+    public void saveAdditionalData()
+    {
+        this.provider.onWorldSave();
     }
 }

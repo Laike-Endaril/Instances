@@ -1,22 +1,21 @@
 package lumien.simpledimensions;
 
 import lumien.simpledimensions.client.ClientHandler;
-import lumien.simpledimensions.client.models.ItemModels;
 import lumien.simpledimensions.config.SimpleDimensionsConfig;
 import lumien.simpledimensions.dimensions.DimensionHandler;
 import lumien.simpledimensions.item.ModItems;
 import lumien.simpledimensions.lib.Reference;
 import lumien.simpledimensions.modcomp.oc.OpenComputers;
 import lumien.simpledimensions.network.PacketHandler;
+import lumien.simpledimensions.server.WorldProviderSimpleDimension;
 import lumien.simpledimensions.server.commands.CommandSimpleDimensions;
 import lumien.simpledimensions.server.commands.CommandTeleportD;
 import lumien.simpledimensions.server.commands.CommandTimeD;
 import lumien.simpledimensions.server.commands.CommandWeatherD;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -41,6 +40,8 @@ public class SimpleDimensions
 	public SimpleDimensionsConfig config;
 
 	public CreativeTabs creativeTab;
+	
+	public DimensionType simpleDimensionType;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
@@ -56,6 +57,8 @@ public class SimpleDimensions
 		ModItems.preInit(event);
 
 		proxy.registerModels();
+		
+		simpleDimensionType = DimensionType.register("SimpleDimensions", "Simple", "SimpleDimensions".hashCode(), WorldProviderSimpleDimension.class, true);
 	}
 
 	@EventHandler
@@ -83,24 +86,24 @@ public class SimpleDimensions
 	@SubscribeEvent
 	public void worldUnload(WorldEvent.Unload event)
 	{
-		int dimensionID = event.world.provider.getDimensionId();
+		int dimensionID = event.getWorld().provider.getDimension();
 
-		if (!event.world.isRemote)
+		if (!event.getWorld().isRemote)
 		{
-			DimensionHandler.getInstance().unload(event.world, dimensionID);
+			DimensionHandler.getInstance().unload(event.getWorld(), dimensionID);
 		}
 	}
 
 	@SubscribeEvent
 	public void clientConnect(ServerConnectionFromClientEvent event)
 	{
-		event.manager.sendPacket(PacketHandler.INSTANCE.getPacketFrom(DimensionHandler.getInstance().constructSyncMessage()));
+		event.getManager().sendPacket(PacketHandler.INSTANCE.getPacketFrom(DimensionHandler.getInstance().constructSyncMessage()));
 	}
 
 	@SubscribeEvent
 	public void clientDisconnect(ClientDisconnectionFromServerEvent event)
 	{
-		if (!event.manager.isLocalChannel())
+		if (!event.getManager().isLocalChannel())
 		{
 			ClientHandler.getInstance().cleanUp();
 		}

@@ -15,10 +15,11 @@ import net.minecraft.client.gui.GuiSlider;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.MathHelper;
+import net.minecraft.init.Biomes;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.ChunkProviderSettings;
 import net.minecraftforge.fml.relauncher.Side;
@@ -141,7 +142,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
     }
 
     @Override
-	public void func_175319_a(int p_175319_1_, String p_175319_2_)
+	public void setEntryValue(int p_175319_1_, String p_175319_2_)
     {
         float f = 0.0F;
 
@@ -209,10 +210,10 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
 
         if (f1 != f && f != 0.0F)
         {
-            ((GuiTextField)this.field_175349_r.func_178061_c(p_175319_1_)).setText(this.func_175330_b(p_175319_1_, f1));
+            ((GuiTextField)this.field_175349_r.getComponent(p_175319_1_)).setText(this.func_175330_b(p_175319_1_, f1));
         }
 
-        ((GuiSlider)this.field_175349_r.func_178061_c(p_175319_1_ - 132 + 100)).func_175218_a(f1, false);
+        ((GuiSlider)this.field_175349_r.getComponent(p_175319_1_ - 132 + 100)).setSliderValue(f1, false);
 
         if (!this.field_175336_F.equals(this.field_175334_E))
         {
@@ -305,22 +306,22 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
                 {
                     BiomeGenBase biomegenbase;
 
-                    if ((int)p_175330_2_ >= BiomeGenBase.hell.biomeID)
+                    if ((int)p_175330_2_ >= BiomeGenBase.getIdForBiome(Biomes.HELL))
                     {
-                        biomegenbase = BiomeGenBase.getBiomeGenArray()[(int)p_175330_2_ + 2];
-                        return biomegenbase != null ? biomegenbase.biomeName : "?";
+                        biomegenbase = BiomeGenBase.getBiome((int)p_175330_2_ + 2);
+                        return biomegenbase != null ? biomegenbase.getBiomeName() : "?";
                     }
                     else
                     {
-                        biomegenbase = BiomeGenBase.getBiomeGenArray()[(int)p_175330_2_];
-                        return biomegenbase != null ? biomegenbase.biomeName : "?";
+                        biomegenbase = BiomeGenBase.getBiome((int)p_175330_2_);
+                        return biomegenbase != null ? biomegenbase.getBiomeName() : "?";
                     }
                 }
         }
     }
 
     @Override
-	public void func_175321_a(int p_175321_1_, boolean p_175321_2_)
+	public void setEntryValue(int p_175321_1_, boolean p_175321_2_)
     {
         switch (p_175321_1_)
         {
@@ -365,7 +366,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
     }
 
     @Override
-	public void onTick(int p_175320_1_, float p_175320_2_)
+	public void setEntryValue(int p_175320_1_, float p_175320_2_)
     {
         switch (p_175320_1_)
         {
@@ -617,7 +618,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
 
         if (p_175320_1_ >= 100 && p_175320_1_ < 116)
         {
-            Gui gui = this.field_175349_r.func_178061_c(p_175320_1_ - 100 + 132);
+            Gui gui = this.field_175349_r.getComponent(p_175320_1_ - 100 + 132);
 
             if (gui != null)
             {
@@ -646,7 +647,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
                     for (int i = 0; i < this.field_175349_r.getSize(); ++i)
                     {
                         GuiPageButtonList.GuiEntry guientry = this.field_175349_r.getListEntry(i);
-                        Gui gui = guientry.func_178022_a();
+                        Gui gui = guientry.getComponent1();
 
                         if (gui instanceof GuiButton)
                         {
@@ -654,16 +655,16 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
 
                             if (guibutton1 instanceof GuiSlider)
                             {
-                                float f = ((GuiSlider)guibutton1).func_175217_d() * (0.75F + this.random.nextFloat() * 0.5F) + (this.random.nextFloat() * 0.1F - 0.05F);
-                                ((GuiSlider)guibutton1).func_175219_a(MathHelper.clamp_float(f, 0.0F, 1.0F));
+                                float f = ((GuiSlider)guibutton1).getSliderPosition() * (0.75F + this.random.nextFloat() * 0.5F) + (this.random.nextFloat() * 0.1F - 0.05F);
+                                ((GuiSlider)guibutton1).setSliderPosition(MathHelper.clamp_float(f, 0.0F, 1.0F));
                             }
                             else if (guibutton1 instanceof GuiListButton)
                             {
-                                ((GuiListButton)guibutton1).func_175212_b(this.random.nextBoolean());
+                                ((GuiListButton)guibutton1).setValue(this.random.nextBoolean());
                             }
                         }
 
-                        Gui gui1 = guientry.func_178021_b();
+                        Gui gui1 = guientry.getComponent2();
 
                         if (gui1 instanceof GuiButton)
                         {
@@ -671,23 +672,23 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
 
                             if (guibutton2 instanceof GuiSlider)
                             {
-                                float f1 = ((GuiSlider)guibutton2).func_175217_d() * (0.75F + this.random.nextFloat() * 0.5F) + (this.random.nextFloat() * 0.1F - 0.05F);
-                                ((GuiSlider)guibutton2).func_175219_a(MathHelper.clamp_float(f1, 0.0F, 1.0F));
+                                float f1 = ((GuiSlider)guibutton2).getSliderPosition() * (0.75F + this.random.nextFloat() * 0.5F) + (this.random.nextFloat() * 0.1F - 0.05F);
+                                ((GuiSlider)guibutton2).setSliderPosition(MathHelper.clamp_float(f1, 0.0F, 1.0F));
                             }
                             else if (guibutton2 instanceof GuiListButton)
                             {
-                                ((GuiListButton)guibutton2).func_175212_b(this.random.nextBoolean());
+                                ((GuiListButton)guibutton2).setValue(this.random.nextBoolean());
                             }
                         }
                     }
 
                     return;
                 case 302:
-                    this.field_175349_r.func_178071_h();
+                    this.field_175349_r.previousPage();
                     this.func_175328_i();
                     break;
                 case 303:
-                    this.field_175349_r.func_178064_i();
+                    this.field_175349_r.nextPage();
                     this.func_175328_i();
                     break;
                 case 304:
@@ -712,7 +713,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
 
     private void func_175326_g()
     {
-        this.field_175336_F.func_177863_a();
+        this.field_175336_F.setDefaults();
         this.func_175325_f();
     }
 
@@ -727,7 +728,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
         switch (this.field_175339_B)
         {
             case 300:
-                this.actionPerformed((GuiListButton)this.field_175349_r.func_178061_c(300));
+                this.actionPerformed((GuiListButton)this.field_175349_r.getComponent(300));
                 break;
             case 304:
                 this.func_175326_g();
@@ -752,11 +753,11 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
 
     private void func_175328_i()
     {
-        this.field_175345_v.enabled = this.field_175349_r.func_178059_e() != 0;
-        this.field_175344_w.enabled = this.field_175349_r.func_178059_e() != this.field_175349_r.func_178057_f() - 1;
-        this.field_175333_f = I18n.format("book.pageIndicator", new Object[] {Integer.valueOf(this.field_175349_r.func_178059_e() + 1), Integer.valueOf(this.field_175349_r.func_178057_f())});
-        this.field_175335_g = this.field_175342_h[this.field_175349_r.func_178059_e()];
-        this.field_175347_t.enabled = this.field_175349_r.func_178059_e() != this.field_175349_r.func_178057_f() - 1;
+        this.field_175345_v.enabled = this.field_175349_r.getPage() != 0;
+        this.field_175344_w.enabled = this.field_175349_r.getPage() != this.field_175349_r.getPageCount() - 1;
+        this.field_175333_f = I18n.format("book.pageIndicator", new Object[] {Integer.valueOf(this.field_175349_r.getPage() + 1), Integer.valueOf(this.field_175349_r.getPageCount())});
+        this.field_175335_g = this.field_175342_h[this.field_175349_r.getPage()];
+        this.field_175347_t.enabled = this.field_175349_r.getPage() != this.field_175349_r.getPageCount() - 1;
     }
 
     /**
@@ -779,14 +780,14 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
                     this.func_175327_a(-1.0F);
                     break;
                 default:
-                    this.field_175349_r.func_178062_a(typedChar, keyCode);
+                    this.field_175349_r.onKeyPressed(typedChar, keyCode);
             }
         }
     }
 
     private void func_175327_a(float p_175327_1_)
     {
-        Gui gui = this.field_175349_r.func_178056_g();
+        Gui gui = this.field_175349_r.getFocusedControl();
 
         if (gui instanceof GuiTextField)
         {
@@ -820,7 +821,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
                 int i = guitextfield.getId();
                 String s = this.func_175330_b(guitextfield.getId(), f2.floatValue());
                 guitextfield.setText(s);
-                this.func_175319_a(i, s);
+                this.setEntryValue(i, s);
             }
         }
     }
@@ -882,14 +883,14 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
             GlStateManager.disableLighting();
             GlStateManager.disableFog();
             Tessellator tessellator = Tessellator.getInstance();
-            WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-            this.mc.getTextureManager().bindTexture(optionsBackground);
+            VertexBuffer vertexBuffer = tessellator.getBuffer();
+            this.mc.getTextureManager().bindTexture(OPTIONS_BACKGROUND);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-            worldrenderer.pos((double)(this.width / 2 - 90), 185.0D, 0.0D).tex(0.0D, 2.65625D).color(64, 64, 64, 64).endVertex();
-            worldrenderer.pos((double)(this.width / 2 + 90), 185.0D, 0.0D).tex(5.625D, 2.65625D).color(64, 64, 64, 64).endVertex();
-            worldrenderer.pos((double)(this.width / 2 + 90), 100.0D, 0.0D).tex(5.625D, 0.0D).color(64, 64, 64, 64).endVertex();
-            worldrenderer.pos((double)(this.width / 2 - 90), 100.0D, 0.0D).tex(0.0D, 0.0D).color(64, 64, 64, 64).endVertex();
+            vertexBuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+            vertexBuffer.pos((double)(this.width / 2 - 90), 185.0D, 0.0D).tex(0.0D, 2.65625D).color(64, 64, 64, 64).endVertex();
+            vertexBuffer.pos((double)(this.width / 2 + 90), 185.0D, 0.0D).tex(5.625D, 2.65625D).color(64, 64, 64, 64).endVertex();
+            vertexBuffer.pos((double)(this.width / 2 + 90), 100.0D, 0.0D).tex(5.625D, 0.0D).color(64, 64, 64, 64).endVertex();
+            vertexBuffer.pos((double)(this.width / 2 - 90), 100.0D, 0.0D).tex(0.0D, 0.0D).color(64, 64, 64, 64).endVertex();
             tessellator.draw();
             this.drawCenteredString(this.fontRendererObj, I18n.format("createWorld.customize.custom.confirmTitle", new Object[0]), this.width / 2, 105, 16777215);
             this.drawCenteredString(this.fontRendererObj, I18n.format("createWorld.customize.custom.confirm1", new Object[0]), this.width / 2, 125, 16777215);

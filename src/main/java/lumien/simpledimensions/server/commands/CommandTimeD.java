@@ -7,7 +7,8 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandResultStats;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
-import net.minecraft.util.BlockPos;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
@@ -34,7 +35,7 @@ public class CommandTimeD extends CommandBase
 	}
 
 	@Override
-	public void processCommand(ICommandSender sender, String[] args) throws CommandException
+	public void execute(MinecraftServer server,ICommandSender sender, String[] args) throws CommandException
 	{
 		if (args.length > 2)
 		{
@@ -57,7 +58,7 @@ public class CommandTimeD extends CommandBase
 				}
 
 				this.setTime(sender, dimension, i);
-				notifyOperators(sender, this, "commands.time.set", new Object[] { Integer.valueOf(i) });
+				notifyCommandListener(sender, this, "commands.time.set", new Object[] { Integer.valueOf(i) });
 				return;
 			}
 
@@ -65,7 +66,7 @@ public class CommandTimeD extends CommandBase
 			{
 				i = parseInt(args[2], 0);
 				this.addTime(sender, dimension, i);
-				notifyOperators(sender, this, "commands.time.added", new Object[] { Integer.valueOf(i) });
+				notifyCommandListener(sender, this, "commands.time.added", new Object[] { Integer.valueOf(i) });
 				return;
 			}
 
@@ -75,7 +76,7 @@ public class CommandTimeD extends CommandBase
 				{
 					i = (int) (sender.getEntityWorld().getWorldTime() % 2147483647L);
 					sender.setCommandStat(CommandResultStats.Type.QUERY_RESULT, i);
-					notifyOperators(sender, this, "commands.time.query", new Object[] { Integer.valueOf(i) });
+					notifyCommandListener(sender, this, "commands.time.query", new Object[] { Integer.valueOf(i) });
 					return;
 				}
 
@@ -83,7 +84,7 @@ public class CommandTimeD extends CommandBase
 				{
 					i = (int) (sender.getEntityWorld().getTotalWorldTime() % 2147483647L);
 					sender.setCommandStat(CommandResultStats.Type.QUERY_RESULT, i);
-					notifyOperators(sender, this, "commands.time.query", new Object[] { Integer.valueOf(i) });
+					notifyCommandListener(sender, this, "commands.time.query", new Object[] { Integer.valueOf(i) });
 					return;
 				}
 			}
@@ -93,8 +94,8 @@ public class CommandTimeD extends CommandBase
 	}
 
 	@Override
-	public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
-	{
+	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+    {
 		return args.length == 2 ? getListOfStringsMatchingLastWord(args, new String[] { "set", "add", "query" }) : (args.length == 3 && args[1].equals("set") ? getListOfStringsMatchingLastWord(args, new String[] { "day", "night" }) : (args.length == 3 && args[1].equals("query") ? getListOfStringsMatchingLastWord(args, new String[] { "daytime", "gametime" }) : null));
 	}
 

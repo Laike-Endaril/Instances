@@ -1,5 +1,7 @@
 package lumien.simpledimensions.server.commands;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -11,16 +13,30 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.play.server.S08PacketPlayerPosLook;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.Teleporter;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 public class CommandTeleportD extends CommandBase
 {
+	static Method copyDataFromOld;
+
+	static
+	{
+		try
+		{
+			copyDataFromOld = Entity.class.getDeclaredMethod((Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment")?"copyDataFromOld":"func_180432_n", Entity.class);
+			copyDataFromOld.setAccessible(true);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 	public String getCommandName()
 	{
@@ -37,7 +53,7 @@ public class CommandTeleportD extends CommandBase
 		return "simpleDimensions.commands.tpd.usage";
 	}
 
-	public void processCommand(ICommandSender sender, String[] args) throws CommandException
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
 	{
 		if (args.length < 1)
 		{
@@ -74,7 +90,7 @@ public class CommandTeleportD extends CommandBase
 
 						if (player.dimension != dimensionID)
 						{
-							teleportEntityToDimension(player, dimensionID);
+							teleportEntityToDimension(server, player, dimensionID);
 						}
 
 						return;
@@ -83,7 +99,7 @@ public class CommandTeleportD extends CommandBase
 
 				if (args.length == 5 || args.length == 7)
 				{
-					object = getEntity(sender, args[1]);
+					object = getEntity(server, sender, args[1]);
 					b0 = 2;
 				}
 				else
@@ -100,7 +116,7 @@ public class CommandTeleportD extends CommandBase
 				}
 				else if (args.length == 2)
 				{
-					object = getEntity(sender, args[0]);
+					object = getEntity(server, sender, args[0]);
 				}
 			}
 
@@ -122,96 +138,97 @@ public class CommandTeleportD extends CommandBase
 
 					if (((Entity) object).dimension != dimensionID)
 					{
-						object = teleportEntityToDimension((Entity) object, dimensionID);
+						object = teleportEntityToDimension(server, (Entity) object, dimensionID);
 					}
 
 					if (object instanceof EntityPlayerMP)
 					{
-						EnumSet enumset = EnumSet.noneOf(S08PacketPlayerPosLook.EnumFlags.class);
+						EnumSet enumset = EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class);
 
-						if (coordinatearg.func_179630_c())
+						if (coordinatearg.isRelative())
 						{
-							enumset.add(S08PacketPlayerPosLook.EnumFlags.X);
+							enumset.add(SPacketPlayerPosLook.EnumFlags.X);
 						}
 
-						if (coordinatearg1.func_179630_c())
+						if (coordinatearg1.isRelative())
 						{
-							enumset.add(S08PacketPlayerPosLook.EnumFlags.Y);
+							enumset.add(SPacketPlayerPosLook.EnumFlags.Y);
 						}
 
-						if (coordinatearg2.func_179630_c())
+						if (coordinatearg2.isRelative())
 						{
-							enumset.add(S08PacketPlayerPosLook.EnumFlags.Z);
+							enumset.add(SPacketPlayerPosLook.EnumFlags.Z);
 						}
 
-						if (coordinatearg4.func_179630_c())
+						if (coordinatearg4.isRelative())
 						{
-							enumset.add(S08PacketPlayerPosLook.EnumFlags.X_ROT);
+							enumset.add(SPacketPlayerPosLook.EnumFlags.X_ROT);
 						}
 
-						if (coordinatearg3.func_179630_c())
+						if (coordinatearg3.isRelative())
 						{
-							enumset.add(S08PacketPlayerPosLook.EnumFlags.Y_ROT);
+							enumset.add(SPacketPlayerPosLook.EnumFlags.Y_ROT);
 						}
 
-						f = (float) coordinatearg3.func_179629_b();
+						f = (float) coordinatearg3.getAmount();
 
-						if (!coordinatearg3.func_179630_c())
+						if (!coordinatearg3.isRelative())
 						{
-							f = MathHelper.wrapAngleTo180_float(f);
+							f = MathHelper.wrapDegrees(f);
 						}
 
-						float f1 = (float) coordinatearg4.func_179629_b();
+						float f1 = (float) coordinatearg4.getAmount();
 
-						if (!coordinatearg4.func_179630_c())
+						if (!coordinatearg4.isRelative())
 						{
-							f1 = MathHelper.wrapAngleTo180_float(f1);
+							f1 = MathHelper.wrapDegrees(f1);
 						}
 
 						if (f1 > 90.0F || f1 < -90.0F)
 						{
-							f1 = MathHelper.wrapAngleTo180_float(180.0F - f1);
-							f = MathHelper.wrapAngleTo180_float(f + 180.0F);
+							f1 = MathHelper.wrapDegrees(180.0F - f1);
+							f = MathHelper.wrapDegrees(f + 180.0F);
 						}
 
-						((Entity) object).mountEntity((Entity) null);
-						((EntityPlayerMP) object).playerNetServerHandler.setPlayerLocation(coordinatearg.func_179629_b(), coordinatearg1.func_179629_b(), coordinatearg2.func_179629_b(), f, f1, enumset);
+						((Entity) object).dismountRidingEntity();
+						((EntityPlayerMP) object).playerNetServerHandler.setPlayerLocation(coordinatearg.getAmount(), coordinatearg1.getAmount(), coordinatearg2.getAmount(), f, f1, enumset);
 						((Entity) object).setRotationYawHead(f);
 					}
 					else
 					{
-						float f2 = (float) MathHelper.wrapAngleTo180_double(coordinatearg3.func_179628_a());
-						f = (float) MathHelper.wrapAngleTo180_double(coordinatearg4.func_179628_a());
+						float f2 = (float) MathHelper.wrapDegrees(coordinatearg3.getResult());
+						f = (float) MathHelper.wrapDegrees(coordinatearg4.getResult());
 
 						if (f > 90.0F || f < -90.0F)
 						{
-							f = MathHelper.wrapAngleTo180_float(180.0F - f);
-							f2 = MathHelper.wrapAngleTo180_float(f2 + 180.0F);
+							f = MathHelper.wrapDegrees(180.0F - f);
+							f2 = MathHelper.wrapDegrees(f2 + 180.0F);
 						}
 
-						((Entity) object).setLocationAndAngles(coordinatearg.func_179628_a(), coordinatearg1.func_179628_a(), coordinatearg2.func_179628_a(), f2, f);
+						((Entity) object).setLocationAndAngles(coordinatearg.getResult(), coordinatearg1.getResult(), coordinatearg2.getResult(), f2, f);
 						((Entity) object).setRotationYawHead(f2);
 
 						((Entity) object).worldObj.updateEntityWithOptionalForce((Entity) object, false);
 					}
 
-					notifyOperators(sender, this, "commands.tp.success.coordinates", new Object[] { ((Entity) object).getName(), Double.valueOf(coordinatearg.func_179628_a()), Double.valueOf(coordinatearg1.func_179628_a()), Double.valueOf(coordinatearg2.func_179628_a()) });
+					notifyCommandListener(sender, this, "commands.tp.success.coordinates", new Object[] { ((Entity) object).getName(), Double.valueOf(coordinatearg.getResult()), Double.valueOf(coordinatearg1.getResult()), Double.valueOf(coordinatearg2.getResult()) });
 				}
 			}
 			else
 			{
-				Entity entity = getEntity(sender, args[args.length - 1]);
+				Entity entity = getEntity(server, sender, args[args.length - 1]);
 
 				if (entity.worldObj != ((Entity) object).worldObj)
 				{
 					Entity toTeleport = (Entity) object;
 					if (entity.dimension != toTeleport.dimension)
 					{
-						object = teleportEntityToDimension(toTeleport, entity.dimension);
+						object = teleportEntityToDimension(server, toTeleport, entity.dimension);
 					}
 				}
 
-				((Entity) object).mountEntity((Entity) null);
+				((Entity) object).dismountRidingEntity();
+				;
 
 				if (object instanceof EntityPlayerMP)
 				{
@@ -222,14 +239,14 @@ public class CommandTeleportD extends CommandBase
 					((Entity) object).setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
 				}
 
-				notifyOperators(sender, this, "commands.tp.success", new Object[] { ((Entity) object).getName(), entity.getName() });
+				notifyCommandListener(sender, this, "commands.tp.success", new Object[] { ((Entity) object).getName(), entity.getName() });
 			}
 		}
 	}
 
-	private Entity teleportEntityToDimension(Entity entity, int dimension) throws CommandException
+	private Entity teleportEntityToDimension(MinecraftServer server, Entity entity, int dimension) throws CommandException
 	{
-		World worldObj = MinecraftServer.getServer().worldServerForDimension(dimension);
+		World worldObj = server.worldServerForDimension(dimension);
 
 		if (worldObj == null)
 		{
@@ -238,31 +255,38 @@ public class CommandTeleportD extends CommandBase
 
 		if (entity instanceof EntityPlayerMP)
 		{
-			MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension((EntityPlayerMP) entity, dimension, new TeleporterSimple((WorldServer) MinecraftServer.getServer().getEntityWorld()));
+			server.getPlayerList().transferPlayerToDimension((EntityPlayerMP) entity, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
 			return entity;
 		}
 		else
 		{
-			return travelEntity(entity, dimension);
+			return travelEntity(server, entity, dimension);
 		}
 	}
 
-	private Entity travelEntity(Entity entity, int dimensionId)
+	private Entity travelEntity(MinecraftServer server, Entity entity, int dimensionId)
 	{
 		if (!entity.worldObj.isRemote && !entity.isDead)
 		{
 			entity.worldObj.theProfiler.startSection("changeDimension");
-			MinecraftServer minecraftserver = MinecraftServer.getServer();
 			int j = entity.dimension;
-			WorldServer worldserver = minecraftserver.worldServerForDimension(j);
-			WorldServer worldserver1 = minecraftserver.worldServerForDimension(dimensionId);
+			WorldServer worldserver = server.worldServerForDimension(j);
+			WorldServer worldserver1 = server.worldServerForDimension(dimensionId);
 			entity.dimension = dimensionId;
 
 			Entity newEntity = EntityList.createEntityByName(EntityList.getEntityString(entity), worldserver1);
 
 			if (newEntity != null)
 			{
-				newEntity.copyDataFromOld(entity);
+				try
+				{
+					copyDataFromOld.invoke(newEntity, entity);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+				
 				entity.worldObj.removeEntity(entity);
 
 				newEntity.forceSpawn = true;
@@ -283,9 +307,9 @@ public class CommandTeleportD extends CommandBase
 		return entity;
 	}
 
-	public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
 	{
-		return args.length != 1 && args.length != 2 ? null : getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
+		return args.length != 1 && args.length != 2 ? null : getListOfStringsMatchingLastWord(args, server.getAllUsernames());
 	}
 
 	public boolean isUsernameIndex(String[] args, int index)

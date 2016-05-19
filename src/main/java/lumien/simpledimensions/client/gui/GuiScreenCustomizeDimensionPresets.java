@@ -8,13 +8,13 @@ import org.lwjgl.input.Keyboard;
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiCustomizeWorldScreen;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiScreenCustomizePresets;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
@@ -25,26 +25,25 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class GuiScreenCustomizeDimensionPresets extends GuiScreen
 {
-    private static final List field_175310_f = Lists.newArrayList();
+    private static final List<GuiScreenCustomizeDimensionPresets.Info> field_175310_f = Lists.<GuiScreenCustomizeDimensionPresets.Info>newArrayList();
     private GuiScreenCustomizeDimensionPresets.ListPreset field_175311_g;
     private GuiButton field_175316_h;
     private GuiTextField field_175317_i;
-    private GuiCustomizeDimension field_175314_r;
+    private GuiCustomizeDimension customizeDimensionGui;
     protected String field_175315_a = "Customize World Presets";
     private String field_175313_s;
     private String field_175312_t;
-    private static final String __OBFID = "CL_00001937";
 
-    public GuiScreenCustomizeDimensionPresets(GuiCustomizeDimension p_i45524_1_)
+    public GuiScreenCustomizeDimensionPresets(GuiCustomizeDimension customizeDimensionGui)
     {
-        this.field_175314_r = p_i45524_1_;
+        this.customizeDimensionGui = customizeDimensionGui;
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
-    @Override
-	public void initGui()
+    public void initGui()
     {
         this.buttonList.clear();
         Keyboard.enableRepeatEvents(true);
@@ -54,7 +53,7 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
         this.field_175317_i = new GuiTextField(2, this.fontRendererObj, 50, 40, this.width - 100, 20);
         this.field_175311_g = new GuiScreenCustomizeDimensionPresets.ListPreset();
         this.field_175317_i.setMaxStringLength(2000);
-        this.field_175317_i.setText(this.field_175314_r.func_175323_a());
+        this.field_175317_i.setText(this.customizeDimensionGui.func_175323_a());
         this.buttonList.add(this.field_175316_h = new GuiButton(0, this.width / 2 - 102, this.height - 27, 100, 20, I18n.format("createWorld.customize.presets.select", new Object[0])));
         this.buttonList.add(new GuiButton(1, this.width / 2 + 3, this.height - 27, 100, 20, I18n.format("gui.cancel", new Object[0])));
         this.func_175304_a();
@@ -63,8 +62,7 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
     /**
      * Handles mouse input.
      */
-    @Override
-	public void handleMouseInput() throws IOException
+    public void handleMouseInput() throws IOException
     {
         super.handleMouseInput();
         this.field_175311_g.handleMouseInput();
@@ -73,8 +71,7 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
     /**
      * Called when the screen is unloaded. Used to disable keyboard repeat events
      */
-    @Override
-	public void onGuiClosed()
+    public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
     }
@@ -82,19 +79,17 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
-    @Override
-	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         this.field_175317_i.mouseClicked(mouseX, mouseY, mouseButton);
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    @Override
-	protected void keyTyped(char typedChar, int keyCode) throws IOException
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
     {
         if (!this.field_175317_i.textboxKeyTyped(typedChar, keyCode))
         {
@@ -102,25 +97,30 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
         }
     }
 
-    @Override
-	protected void actionPerformed(GuiButton button) throws IOException
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
+    protected void actionPerformed(GuiButton button) throws IOException
     {
         switch (button.id)
         {
             case 0:
-                this.field_175314_r.func_175324_a(this.field_175317_i.getText());
-                this.mc.displayGuiScreen(this.field_175314_r);
+                this.customizeDimensionGui.func_175324_a(this.field_175317_i.getText());
+                this.mc.displayGuiScreen(this.customizeDimensionGui);
                 break;
             case 1:
-                this.mc.displayGuiScreen(this.field_175314_r);
+                this.mc.displayGuiScreen(this.customizeDimensionGui);
         }
     }
 
     /**
-     * Draws the screen and all the components in it. Args : mouseX, mouseY, renderPartialTicks
+     * Draws the screen and all the components in it.
+     *  
+     * @param mouseX Mouse x coordinate
+     * @param mouseY Mouse y coordinate
+     * @param partialTicks How far into the current tick (1/20th of a second) the game is
      */
-    @Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         this.drawDefaultBackground();
         this.field_175311_g.drawScreen(mouseX, mouseY, partialTicks);
@@ -134,8 +134,7 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
     /**
      * Called from the main game loop to update the screen.
      */
-    @Override
-	public void updateScreen()
+    public void updateScreen()
     {
         this.field_175317_i.updateCursorCounter();
         super.updateScreen();
@@ -182,7 +181,6 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
             public String field_178955_a;
             public ResourceLocation field_178953_b;
             public ChunkProviderSettings.Factory field_178954_c;
-            private static final String __OBFID = "CL_00001936";
 
             public Info(String p_i45523_1_, ResourceLocation p_i45523_2_, ChunkProviderSettings.Factory p_i45523_3_)
             {
@@ -196,15 +194,13 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
     class ListPreset extends GuiSlot
     {
         public int field_178053_u = -1;
-        private static final String __OBFID = "CL_00001935";
 
         public ListPreset()
         {
             super(GuiScreenCustomizeDimensionPresets.this.mc, GuiScreenCustomizeDimensionPresets.this.width, GuiScreenCustomizeDimensionPresets.this.height, 80, GuiScreenCustomizeDimensionPresets.this.height - 32, 38);
         }
 
-        @Override
-		protected int getSize()
+        protected int getSize()
         {
             return GuiScreenCustomizeDimensionPresets.field_175310_f.size();
         }
@@ -212,8 +208,7 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
         /**
          * The element in the slot that was clicked, boolean for whether it was double clicked or not
          */
-        @Override
-		protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY)
+        protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY)
         {
             this.field_178053_u = slotIndex;
             GuiScreenCustomizeDimensionPresets.this.func_175304_a();
@@ -223,14 +218,14 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
         /**
          * Returns true if the element passed in is currently selected
          */
-        @Override
-		protected boolean isSelected(int slotIndex)
+        protected boolean isSelected(int slotIndex)
         {
             return slotIndex == this.field_178053_u;
         }
 
-        @Override
-		protected void drawBackground() {}
+        protected void drawBackground()
+        {
+        }
 
         private void func_178051_a(int p_178051_1_, int p_178051_2_, ResourceLocation p_178051_3_)
         {
@@ -244,21 +239,20 @@ public class GuiScreenCustomizeDimensionPresets extends GuiScreen
             int j = 32;
             int k = 32;
             Tessellator tessellator = Tessellator.getInstance();
-            WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-            worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-            worldrenderer.pos((double)(i + 0), (double)(p_178051_2_ + 32), 0.0D).tex(0.0D, 1.0D).endVertex();
-            worldrenderer.pos((double)(i + 32), (double)(p_178051_2_ + 32), 0.0D).tex(1.0D, 1.0D).endVertex();
-            worldrenderer.pos((double)(i + 32), (double)(p_178051_2_ + 0), 0.0D).tex(1.0D, 0.0D).endVertex();
-            worldrenderer.pos((double)(i + 0), (double)(p_178051_2_ + 0), 0.0D).tex(0.0D, 0.0D).endVertex();
+            VertexBuffer vertexbuffer = tessellator.getBuffer();
+            vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+            vertexbuffer.pos((double)(i + 0), (double)(p_178051_2_ + 32), 0.0D).tex(0.0D, 1.0D).endVertex();
+            vertexbuffer.pos((double)(i + 32), (double)(p_178051_2_ + 32), 0.0D).tex(1.0D, 1.0D).endVertex();
+            vertexbuffer.pos((double)(i + 32), (double)(p_178051_2_ + 0), 0.0D).tex(1.0D, 0.0D).endVertex();
+            vertexbuffer.pos((double)(i + 0), (double)(p_178051_2_ + 0), 0.0D).tex(0.0D, 0.0D).endVertex();
             tessellator.draw();
         }
 
-        @Override
-		protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int p_180791_5_, int p_180791_6_)
+        protected void drawSlot(int entryID, int insideLeft, int yPos, int insideSlotHeight, int mouseXIn, int mouseYIn)
         {
-            GuiScreenCustomizeDimensionPresets.Info info = (GuiScreenCustomizeDimensionPresets.Info)GuiScreenCustomizeDimensionPresets.field_175310_f.get(entryID);
-            this.func_178051_a(p_180791_2_, p_180791_3_, info.field_178953_b);
-            GuiScreenCustomizeDimensionPresets.this.fontRendererObj.drawString(info.field_178955_a, p_180791_2_ + 32 + 10, p_180791_3_ + 14, 16777215);
+            GuiScreenCustomizeDimensionPresets.Info guiscreencustomizepresets$info = (GuiScreenCustomizeDimensionPresets.Info)GuiScreenCustomizeDimensionPresets.field_175310_f.get(entryID);
+            this.func_178051_a(insideLeft, yPos, guiscreencustomizepresets$info.field_178953_b);
+            GuiScreenCustomizeDimensionPresets.this.fontRendererObj.drawString(guiscreencustomizepresets$info.field_178955_a, insideLeft + 32 + 10, yPos + 14, 16777215);
         }
     }
 }
