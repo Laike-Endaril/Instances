@@ -15,6 +15,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ChatAllowedCharacters;
+import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.ISaveFormat;
@@ -210,7 +211,7 @@ public class GuiCreateDimension extends GuiScreen
 
 				WorldType.WORLD_TYPES[this.selectedIndex].onGUICreateWorldPress();
 
-				WorldSettings.GameType gametype = WorldSettings.GameType.getByName(this.gameType);
+				GameType gametype = GameType.getByName(this.gameType);
 				WorldSettings worldsettings = new WorldSettings(i, gametype, this.generateStructures, this.hardcore, WorldType.WORLD_TYPES[this.selectedIndex]);
 				worldsettings.setGeneratorOptions(this.chunkProviderSettingsJson);
 				

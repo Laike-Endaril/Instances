@@ -3,6 +3,7 @@ package lumien.simpledimensions.util;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -39,7 +40,7 @@ public class WorldInfoSimple extends WorldInfo
 	}
 
 	@Override
-	public WorldSettings.GameType getGameType()
+	public GameType getGameType()
 	{
 		return superInfo.getGameType();
 	}
