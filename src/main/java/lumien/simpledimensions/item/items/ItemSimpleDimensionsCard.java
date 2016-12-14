@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Optional;
 
 public class ItemSimpleDimensionsCard extends Item
@@ -19,6 +20,7 @@ public class ItemSimpleDimensionsCard extends Item
 	{
 		this.setCreativeTab(SimpleDimensions.INSTANCE.creativeTab);
 		this.setUnlocalizedName("simpledimensions.card");
+		this.setRegistryName(new ResourceLocation("simpledimensions","simpleDimensionsCard"));
 	}
 
 	@Override

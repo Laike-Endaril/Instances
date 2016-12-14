@@ -1,6 +1,6 @@
 [
 {
-  "modid": "SimpleDimensions",
+  "modid": "simpledimensions",
   "name": "Simple Dimensions",
   "description": "A simple mod that allows you to create additional dimensions.",
   "version": "${version}",

@@ -274,7 +274,7 @@ public class CommandTeleportD extends CommandBase
 			WorldServer worldserver1 = server.worldServerForDimension(dimensionId);
 			entity.dimension = dimensionId;
 
-			Entity newEntity = EntityList.createEntityByName(EntityList.getEntityString(entity), worldserver1);
+			Entity newEntity = EntityList.createEntityByIDFromName(EntityList.func_191306_a(entity.getClass()), worldserver1);
 
 			if (newEntity != null)
 			{

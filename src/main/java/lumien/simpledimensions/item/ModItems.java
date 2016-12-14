@@ -12,6 +12,6 @@ public class ModItems
 	public static void preInit(FMLPreInitializationEvent event)
 	{
 		simpleDimensionsCard = new ItemSimpleDimensionsCard();
-		GameRegistry.registerItem(simpleDimensionsCard, "simpleDimensionsCard");
+		GameRegistry.register(simpleDimensionsCard);
 	}
 }

@@ -78,7 +78,7 @@ public class DimensionHandler extends WorldSavedData
 
 		loadDimension(dimensionID, worldInfo);
 
-		playerEntity.addChatComponentMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
+		playerEntity.addChatMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
 
 		syncWithClients();
 	}
@@ -286,14 +286,14 @@ public class DimensionHandler extends WorldSavedData
 				e.printStackTrace();
 				if (player != null)
 				{
-					player.addChatComponentMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
+					player.addChatMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
 				}
 			}
 			finally
 			{
 				if (player != null)
 				{
-					player.addChatComponentMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
+					player.addChatMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
 				}
 			}
 
