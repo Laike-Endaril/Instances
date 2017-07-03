@@ -15,10 +15,10 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Biomes;
@@ -61,7 +61,7 @@ public class GuiFlatDimensionPresets extends GuiScreen
         this.presetsTitle = I18n.format("createWorld.customize.presets.title", new Object[0]);
         this.presetsShare = I18n.format("createWorld.customize.presets.share", new Object[0]);
         this.field_146436_r = I18n.format("createWorld.customize.presets.list", new Object[0]);
-        this.field_146433_u = new GuiTextField(2, this.fontRendererObj, 50, 40, this.width - 100, 20);
+        this.field_146433_u = new GuiTextField(2, this.fontRenderer, 50, 40, this.width - 100, 20);
         this.field_146435_s = new GuiFlatDimensionPresets.ListSlot();
         this.field_146433_u.setMaxStringLength(1230);
         this.field_146433_u.setText(this.parentScreen.getPreset());
@@ -135,9 +135,9 @@ public class GuiFlatDimensionPresets extends GuiScreen
     {
         this.drawDefaultBackground();
         this.field_146435_s.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.fontRendererObj, this.presetsTitle, this.width / 2, 8, 16777215);
-        this.drawString(this.fontRendererObj, this.presetsShare, 50, 30, 10526880);
-        this.drawString(this.fontRendererObj, this.field_146436_r, 50, 70, 10526880);
+        this.drawCenteredString(this.fontRenderer, this.presetsTitle, this.width / 2, 8, 16777215);
+        this.drawString(this.fontRenderer, this.presetsShare, 50, 30, 10526880);
+        this.drawString(this.fontRenderer, this.field_146436_r, 50, 70, 10526880);
         this.field_146433_u.drawTextBox();
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
@@ -259,7 +259,7 @@ public class GuiFlatDimensionPresets extends GuiScreen
             int i = 18;
             int j = 18;
             Tessellator tessellator = Tessellator.getInstance();
-            VertexBuffer vertexbuffer = tessellator.getBuffer();
+            BufferBuilder vertexbuffer = tessellator.getBuffer();
             vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
             vertexbuffer.pos((double)(p_148171_1_ + 0), (double)(p_148171_2_ + 18), (double)GuiFlatDimensionPresets.this.zLevel).tex((double)((float)(p_148171_3_ + 0) * 0.0078125F), (double)((float)(p_148171_4_ + 18) * 0.0078125F)).endVertex();
             vertexbuffer.pos((double)(p_148171_1_ + 18), (double)(p_148171_2_ + 18), (double)GuiFlatDimensionPresets.this.zLevel).tex((double)((float)(p_148171_3_ + 18) * 0.0078125F), (double)((float)(p_148171_4_ + 18) * 0.0078125F)).endVertex();
@@ -295,11 +295,11 @@ public class GuiFlatDimensionPresets extends GuiScreen
         {
         }
 
-        protected void drawSlot(int entryID, int insideLeft, int yPos, int insideSlotHeight, int mouseXIn, int mouseYIn)
+        protected void drawSlot(int entryID, int insideLeft, int yPos, int insideSlotHeight, int mouseXIn, int mouseYIn, float partialTicks)
         {
             GuiFlatDimensionPresets.LayerItem guiflatpresets$layeritem = (GuiFlatDimensionPresets.LayerItem)GuiFlatDimensionPresets.FLAT_WORLD_PRESETS.get(entryID);
             this.renderIcon(insideLeft, yPos, guiflatpresets$layeritem.icon, guiflatpresets$layeritem.iconMetadata);
-            GuiFlatDimensionPresets.this.fontRendererObj.drawString(guiflatpresets$layeritem.name, insideLeft + 18 + 5, yPos + 6, 16777215);
+            GuiFlatDimensionPresets.this.fontRenderer.drawString(guiflatpresets$layeritem.name, insideLeft + 18 + 5, yPos + 6, 16777215);
         }
     }
 }

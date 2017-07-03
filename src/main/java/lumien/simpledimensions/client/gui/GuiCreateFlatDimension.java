@@ -8,10 +8,10 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
@@ -159,10 +159,10 @@ public class GuiCreateFlatDimension extends GuiScreen
     {
         this.drawDefaultBackground();
         this.createFlatWorldListSlotGui.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.fontRendererObj, this.flatWorldTitle, this.width / 2, 8, 16777215);
+        this.drawCenteredString(this.fontRenderer, this.flatWorldTitle, this.width / 2, 8, 16777215);
         int i = this.width / 2 - 92 - 16;
-        this.drawString(this.fontRendererObj, this.materialText, i, 32, 16777215);
-        this.drawString(this.fontRendererObj, this.heightText, i + 2 + 213 - this.fontRendererObj.getStringWidth(this.heightText), 32, 16777215);
+        this.drawString(this.fontRenderer, this.materialText, i, 32, 16777215);
+        this.drawString(this.fontRenderer, this.heightText, i + 2 + 213 - this.fontRenderer.getStringWidth(this.heightText), 32, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
@@ -233,7 +233,7 @@ public class GuiCreateFlatDimension extends GuiScreen
             int i = 18;
             int j = 18;
             Tessellator tessellator = Tessellator.getInstance();
-            VertexBuffer vertexbuffer = tessellator.getBuffer();
+            BufferBuilder vertexbuffer = tessellator.getBuffer();
             vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
             vertexbuffer.pos((double)(x + 0), (double)(z + 18), (double)GuiCreateFlatDimension.this.zLevel).tex((double)((float)(textureX + 0) * 0.0078125F), (double)((float)(textureY + 18) * 0.0078125F)).endVertex();
             vertexbuffer.pos((double)(x + 18), (double)(z + 18), (double)GuiCreateFlatDimension.this.zLevel).tex((double)((float)(textureX + 18) * 0.0078125F), (double)((float)(textureY + 18) * 0.0078125F)).endVertex();
@@ -268,7 +268,7 @@ public class GuiCreateFlatDimension extends GuiScreen
         {
         }
 
-        protected void drawSlot(int entryID, int insideLeft, int yPos, int insideSlotHeight, int mouseXIn, int mouseYIn)
+        protected void drawSlot(int entryID, int insideLeft, int yPos, int insideSlotHeight, int mouseXIn, int mouseYIn, float partialTicks)
         {
             FlatLayerInfo flatlayerinfo = (FlatLayerInfo)GuiCreateFlatDimension.this.theFlatGeneratorInfo.getFlatLayers().get(GuiCreateFlatDimension.this.theFlatGeneratorInfo.getFlatLayers().size() - entryID - 1);
             IBlockState iblockstate = flatlayerinfo.getLayerMaterial();
@@ -299,7 +299,7 @@ public class GuiCreateFlatDimension extends GuiScreen
             }
 
             this.drawItem(insideLeft, yPos, itemstack);
-            GuiCreateFlatDimension.this.fontRendererObj.drawString(s, insideLeft + 18 + 5, yPos + 3, 16777215);
+            GuiCreateFlatDimension.this.fontRenderer.drawString(s, insideLeft + 18 + 5, yPos + 3, 16777215);
             String s1;
 
             if (entryID == 0)
@@ -315,7 +315,7 @@ public class GuiCreateFlatDimension extends GuiScreen
                 s1 = I18n.format("createWorld.customize.flat.layer", new Object[] {Integer.valueOf(flatlayerinfo.getLayerCount())});
             }
 
-            GuiCreateFlatDimension.this.fontRendererObj.drawString(s1, insideLeft + 2 + 213 - GuiCreateFlatDimension.this.fontRendererObj.getStringWidth(s1), yPos + 3, 16777215);
+            GuiCreateFlatDimension.this.fontRenderer.drawString(s1, insideLeft + 2 + 213 - GuiCreateFlatDimension.this.fontRenderer.getStringWidth(s1), yPos + 3, 16777215);
         }
 
         protected int getScrollBarX()

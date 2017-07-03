@@ -19,7 +19,7 @@ public class CommandWeatherD extends CommandBase
 	 * Get the name of the command
 	 */
 	@Override
-	public String getCommandName()
+	public String getName()
 	{
 		return "weatherd";
 	}
@@ -34,7 +34,7 @@ public class CommandWeatherD extends CommandBase
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender)
+	public String getUsage(ICommandSender sender)
 	{
 		return "simpleDimensions.commands.weatherd.usage";
 	}
@@ -103,7 +103,7 @@ public class CommandWeatherD extends CommandBase
 	}
 
 	@Override
-	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
 		return args.length == 2 ? getListOfStringsMatchingLastWord(args, new String[] { "clear", "rain", "thunder" }) : null;
 	}

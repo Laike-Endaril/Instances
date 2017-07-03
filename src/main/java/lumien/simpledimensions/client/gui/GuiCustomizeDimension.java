@@ -13,15 +13,15 @@ import net.minecraft.client.gui.GuiPageButtonList;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlider;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.ChunkProviderSettings;
+import net.minecraft.world.gen.ChunkGeneratorSettings;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -63,8 +63,8 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
             return this.tryParseValidFloat((String)p_apply_1_);
         }
     };
-    private ChunkProviderSettings.Factory field_175334_E = new ChunkProviderSettings.Factory();
-    private ChunkProviderSettings.Factory field_175336_F;
+    private ChunkGeneratorSettings.Factory field_175334_E = new ChunkGeneratorSettings.Factory();
+    private ChunkGeneratorSettings.Factory field_175336_F;
     /** A Random instance for this world customization */
     private Random random = new Random();
     private static final String __OBFID = "CL_00001934";
@@ -133,11 +133,11 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
     {
     	 if (p_175324_1_ != null && p_175324_1_.length() != 0)
          {
-             this.field_175336_F = ChunkProviderSettings.Factory.jsonToFactory(p_175324_1_);
+             this.field_175336_F = ChunkGeneratorSettings.Factory.jsonToFactory(p_175324_1_);
          }
          else
          {
-             this.field_175336_F = new ChunkProviderSettings.Factory();
+             this.field_175336_F = new ChunkGeneratorSettings.Factory();
          }
     }
 
@@ -160,52 +160,52 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
         switch (p_175319_1_)
         {
             case 132:
-                f1 = this.field_175336_F.mainNoiseScaleX = MathHelper.clamp_float(f, 1.0F, 5000.0F);
+                f1 = this.field_175336_F.mainNoiseScaleX = MathHelper.clamp(f, 1.0F, 5000.0F);
                 break;
             case 133:
-                f1 = this.field_175336_F.mainNoiseScaleY = MathHelper.clamp_float(f, 1.0F, 5000.0F);
+                f1 = this.field_175336_F.mainNoiseScaleY = MathHelper.clamp(f, 1.0F, 5000.0F);
                 break;
             case 134:
-                f1 = this.field_175336_F.mainNoiseScaleZ = MathHelper.clamp_float(f, 1.0F, 5000.0F);
+                f1 = this.field_175336_F.mainNoiseScaleZ = MathHelper.clamp(f, 1.0F, 5000.0F);
                 break;
             case 135:
-                f1 = this.field_175336_F.depthNoiseScaleX = MathHelper.clamp_float(f, 1.0F, 2000.0F);
+                f1 = this.field_175336_F.depthNoiseScaleX = MathHelper.clamp(f, 1.0F, 2000.0F);
                 break;
             case 136:
-                f1 = this.field_175336_F.depthNoiseScaleZ = MathHelper.clamp_float(f, 1.0F, 2000.0F);
+                f1 = this.field_175336_F.depthNoiseScaleZ = MathHelper.clamp(f, 1.0F, 2000.0F);
                 break;
             case 137:
-                f1 = this.field_175336_F.depthNoiseScaleExponent = MathHelper.clamp_float(f, 0.01F, 20.0F);
+                f1 = this.field_175336_F.depthNoiseScaleExponent = MathHelper.clamp(f, 0.01F, 20.0F);
                 break;
             case 138:
-                f1 = this.field_175336_F.baseSize = MathHelper.clamp_float(f, 1.0F, 25.0F);
+                f1 = this.field_175336_F.baseSize = MathHelper.clamp(f, 1.0F, 25.0F);
                 break;
             case 139:
-                f1 = this.field_175336_F.coordinateScale = MathHelper.clamp_float(f, 1.0F, 6000.0F);
+                f1 = this.field_175336_F.coordinateScale = MathHelper.clamp(f, 1.0F, 6000.0F);
                 break;
             case 140:
-                f1 = this.field_175336_F.heightScale = MathHelper.clamp_float(f, 1.0F, 6000.0F);
+                f1 = this.field_175336_F.heightScale = MathHelper.clamp(f, 1.0F, 6000.0F);
                 break;
             case 141:
-                f1 = this.field_175336_F.stretchY = MathHelper.clamp_float(f, 0.01F, 50.0F);
+                f1 = this.field_175336_F.stretchY = MathHelper.clamp(f, 0.01F, 50.0F);
                 break;
             case 142:
-                f1 = this.field_175336_F.upperLimitScale = MathHelper.clamp_float(f, 1.0F, 5000.0F);
+                f1 = this.field_175336_F.upperLimitScale = MathHelper.clamp(f, 1.0F, 5000.0F);
                 break;
             case 143:
-                f1 = this.field_175336_F.lowerLimitScale = MathHelper.clamp_float(f, 1.0F, 5000.0F);
+                f1 = this.field_175336_F.lowerLimitScale = MathHelper.clamp(f, 1.0F, 5000.0F);
                 break;
             case 144:
-                f1 = this.field_175336_F.biomeDepthWeight = MathHelper.clamp_float(f, 1.0F, 20.0F);
+                f1 = this.field_175336_F.biomeDepthWeight = MathHelper.clamp(f, 1.0F, 20.0F);
                 break;
             case 145:
-                f1 = this.field_175336_F.biomeDepthOffset = MathHelper.clamp_float(f, 0.0F, 20.0F);
+                f1 = this.field_175336_F.biomeDepthOffset = MathHelper.clamp(f, 0.0F, 20.0F);
                 break;
             case 146:
-                f1 = this.field_175336_F.biomeScaleWeight = MathHelper.clamp_float(f, 1.0F, 20.0F);
+                f1 = this.field_175336_F.biomeScaleWeight = MathHelper.clamp(f, 1.0F, 20.0F);
                 break;
             case 147:
-                f1 = this.field_175336_F.biomeScaleOffset = MathHelper.clamp_float(f, 0.0F, 20.0F);
+                f1 = this.field_175336_F.biomeScaleOffset = MathHelper.clamp(f, 0.0F, 20.0F);
         }
 
         if (f1 != f && f != 0.0F)
@@ -656,7 +656,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
                             if (guibutton1 instanceof GuiSlider)
                             {
                                 float f = ((GuiSlider)guibutton1).getSliderPosition() * (0.75F + this.random.nextFloat() * 0.5F) + (this.random.nextFloat() * 0.1F - 0.05F);
-                                ((GuiSlider)guibutton1).setSliderPosition(MathHelper.clamp_float(f, 0.0F, 1.0F));
+                                ((GuiSlider)guibutton1).setSliderPosition(MathHelper.clamp(f, 0.0F, 1.0F));
                             }
                             else if (guibutton1 instanceof GuiListButton)
                             {
@@ -673,7 +673,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
                             if (guibutton2 instanceof GuiSlider)
                             {
                                 float f1 = ((GuiSlider)guibutton2).getSliderPosition() * (0.75F + this.random.nextFloat() * 0.5F) + (this.random.nextFloat() * 0.1F - 0.05F);
-                                ((GuiSlider)guibutton2).setSliderPosition(MathHelper.clamp_float(f1, 0.0F, 1.0F));
+                                ((GuiSlider)guibutton2).setSliderPosition(MathHelper.clamp(f1, 0.0F, 1.0F));
                             }
                             else if (guibutton2 instanceof GuiListButton)
                             {
@@ -866,9 +866,9 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
     {
         this.drawDefaultBackground();
         this.field_175349_r.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.fontRendererObj, this.field_175341_a, this.width / 2, 2, 16777215);
-        this.drawCenteredString(this.fontRendererObj, this.field_175333_f, this.width / 2, 12, 16777215);
-        this.drawCenteredString(this.fontRendererObj, this.field_175335_g, this.width / 2, 22, 16777215);
+        this.drawCenteredString(this.fontRenderer, this.field_175341_a, this.width / 2, 2, 16777215);
+        this.drawCenteredString(this.fontRenderer, this.field_175333_f, this.width / 2, 12, 16777215);
+        this.drawCenteredString(this.fontRenderer, this.field_175335_g, this.width / 2, 22, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         if (this.field_175339_B != 0)
@@ -883,7 +883,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
             GlStateManager.disableLighting();
             GlStateManager.disableFog();
             Tessellator tessellator = Tessellator.getInstance();
-            VertexBuffer vertexBuffer = tessellator.getBuffer();
+            BufferBuilder vertexBuffer = tessellator.getBuffer();
             this.mc.getTextureManager().bindTexture(OPTIONS_BACKGROUND);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             vertexBuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
@@ -892,11 +892,11 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
             vertexBuffer.pos((double)(this.width / 2 + 90), 100.0D, 0.0D).tex(5.625D, 0.0D).color(64, 64, 64, 64).endVertex();
             vertexBuffer.pos((double)(this.width / 2 - 90), 100.0D, 0.0D).tex(0.0D, 0.0D).color(64, 64, 64, 64).endVertex();
             tessellator.draw();
-            this.drawCenteredString(this.fontRendererObj, I18n.format("createWorld.customize.custom.confirmTitle", new Object[0]), this.width / 2, 105, 16777215);
-            this.drawCenteredString(this.fontRendererObj, I18n.format("createWorld.customize.custom.confirm1", new Object[0]), this.width / 2, 125, 16777215);
-            this.drawCenteredString(this.fontRendererObj, I18n.format("createWorld.customize.custom.confirm2", new Object[0]), this.width / 2, 135, 16777215);
-            this.field_175352_x.drawButton(this.mc, mouseX, mouseY);
-            this.field_175351_y.drawButton(this.mc, mouseX, mouseY);
+            this.drawCenteredString(this.fontRenderer, I18n.format("createWorld.customize.custom.confirmTitle", new Object[0]), this.width / 2, 105, 16777215);
+            this.drawCenteredString(this.fontRenderer, I18n.format("createWorld.customize.custom.confirm1", new Object[0]), this.width / 2, 125, 16777215);
+            this.drawCenteredString(this.fontRenderer, I18n.format("createWorld.customize.custom.confirm2", new Object[0]), this.width / 2, 135, 16777215);
+            this.field_175352_x.drawButton(this.mc, mouseX, mouseY, partialTicks);
+            this.field_175351_y.drawButton(this.mc, mouseX, mouseY, partialTicks);
         }
     }
 }

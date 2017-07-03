@@ -58,7 +58,7 @@ public class SimpleDimensions
 
 		proxy.registerModels();
 		
-		simpleDimensionType = DimensionType.register("SimpleDimensions", "Simple", "SimpleDimensions".hashCode(), WorldProviderSimpleDimension.class, true);
+		simpleDimensionType = DimensionType.register("SimpleDimensions", "Simple", "SimpleDimensions".hashCode(), WorldProviderSimpleDimension.class, false);
 	}
 
 	@EventHandler

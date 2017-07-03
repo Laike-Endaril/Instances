@@ -1,5 +1,6 @@
 package lumien.simpledimensions.server.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lumien.simpledimensions.dimensions.DimensionHandler;
@@ -18,13 +19,13 @@ public class CommandSimpleDimensions extends CommandBase
 {
 
 	@Override
-	public String getCommandName()
+	public String getName()
 	{
 		return "simpledimensions";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender)
+	public String getUsage(ICommandSender sender)
 	{
 		return "Usage: /simpledimensions <create:delete:list>";
 	}
@@ -40,7 +41,7 @@ public class CommandSimpleDimensions extends CommandBase
 	{
 		if (args.length == 0)
 		{
-			sender.addChatMessage(new TextComponentString(getCommandUsage(sender)));
+			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
 
@@ -64,12 +65,12 @@ public class CommandSimpleDimensions extends CommandBase
 		}
 		else if (args[0].equals("list"))
 		{
-			sender.addChatMessage(DimensionHandler.getInstance().generateList());
+			sender.sendMessage(DimensionHandler.getInstance().generateList());
 		}
 	}
 
 	@Override
-	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
 		if (args.length == 1)
 		{
@@ -77,7 +78,7 @@ public class CommandSimpleDimensions extends CommandBase
 		}
 		else
 		{
-			return null;
+			return new ArrayList<String>();
 		}
 	}
 }

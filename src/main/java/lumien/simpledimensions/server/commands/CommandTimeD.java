@@ -17,7 +17,7 @@ public class CommandTimeD extends CommandBase
 	private static final String __OBFID = "CL_00001183";
 
 	@Override
-	public String getCommandName()
+	public String getName()
 	{
 		return "timed";
 	}
@@ -29,7 +29,7 @@ public class CommandTimeD extends CommandBase
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender)
+	public String getUsage(ICommandSender sender)
 	{
 		return "simpleDimensions.commands.timed.usage";
 	}
@@ -94,7 +94,7 @@ public class CommandTimeD extends CommandBase
 	}
 
 	@Override
-	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
 		return args.length == 2 ? getListOfStringsMatchingLastWord(args, new String[] { "set", "add", "query" }) : (args.length == 3 && args[1].equals("set") ? getListOfStringsMatchingLastWord(args, new String[] { "day", "night" }) : (args.length == 3 && args[1].equals("query") ? getListOfStringsMatchingLastWord(args, new String[] { "daytime", "gametime" }) : null));
 	}

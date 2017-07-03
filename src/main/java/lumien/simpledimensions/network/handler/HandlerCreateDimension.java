@@ -22,9 +22,9 @@ public class HandlerCreateDimension implements IMessageHandler<MessageCreateDime
 			{
 				NetHandlerPlayServer netHandler = (NetHandlerPlayServer) ctx.netHandler;
 
-				if (netHandler.playerEntity.canCommandSenderUseCommand(3, "simpledimensions"))
+				if (netHandler.player.canUseCommand(3, "simpledimensions"))
 				{
-					DimensionHandler.getInstance().createDimension(((NetHandlerPlayServer) ctx.netHandler).playerEntity, message.getWorldInfo());
+					DimensionHandler.getInstance().createDimension(((NetHandlerPlayServer) ctx.netHandler).player, message.getWorldInfo());
 				}
 			}
 		});

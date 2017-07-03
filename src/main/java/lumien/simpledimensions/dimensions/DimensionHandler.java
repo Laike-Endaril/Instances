@@ -29,10 +29,10 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.ServerWorldEventHandler;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
@@ -78,7 +78,7 @@ public class DimensionHandler extends WorldSavedData
 
 		loadDimension(dimensionID, worldInfo);
 
-		playerEntity.addChatMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
+		playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
 
 		syncWithClients();
 	}
@@ -218,7 +218,7 @@ public class DimensionHandler extends WorldSavedData
 		ISaveHandler savehandler = overworld.getSaveHandler();
 		EnumDifficulty difficulty = mcServer.getEntityWorld().getDifficulty();
 
-		WorldServer world = (WorldServer) (new WorldCustom(worldInfo, mcServer, savehandler, dimensionID, overworld, mcServer.theProfiler).init());
+		WorldServer world = (WorldServer) (new WorldCustom(worldInfo, mcServer, savehandler, dimensionID, overworld, mcServer.profiler).init());
 		world.addEventListener(new ServerWorldEventHandler(mcServer, world));
 		MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
 
@@ -234,7 +234,7 @@ public class DimensionHandler extends WorldSavedData
 	{
 		if (!dimensionInfo.containsKey(dimensionID))
 		{
-			sender.addChatMessage(new TextComponentString("The dimension associated with that id is not from the SimpleDimensions mod").setStyle(new Style().setColor(TextFormatting.RED)));
+			sender.sendMessage(new TextComponentString("The dimension associated with that id is not from the SimpleDimensions mod").setStyle(new Style().setColor(TextFormatting.RED)));
 			return;
 		}
 
@@ -242,7 +242,7 @@ public class DimensionHandler extends WorldSavedData
 
 		if (worldObj.playerEntities.size() > 0)
 		{
-			sender.addChatMessage(new TextComponentString("Can't delete a dimension with players inside it").setStyle(new Style().setColor(TextFormatting.RED)));
+			sender.sendMessage(new TextComponentString("Can't delete a dimension with players inside it").setStyle(new Style().setColor(TextFormatting.RED)));
 			return;
 		}
 
@@ -286,14 +286,14 @@ public class DimensionHandler extends WorldSavedData
 				e.printStackTrace();
 				if (player != null)
 				{
-					player.addChatMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
+					player.sendMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
 				}
 			}
 			finally
 			{
 				if (player != null)
 				{
-					player.addChatMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
+					player.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
 				}
 			}
 

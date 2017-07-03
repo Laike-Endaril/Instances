@@ -72,13 +72,13 @@ public class WorldCustom extends WorldServer
 
         if (villagecollection == null)
         {
-            this.villageCollectionObj = new VillageCollection(this);
-            this.perWorldStorage.setData(s, this.villageCollectionObj);
+            this.villageCollection = new VillageCollection(this);
+            this.perWorldStorage.setData(s, this.villageCollection);
         }
         else
         {
-            this.villageCollectionObj = villagecollection;
-            this.villageCollectionObj.setWorldsForAll(this);
+            this.villageCollection = villagecollection;
+            this.villageCollection.setWorldsForAll(this);
         }
 
         return this;

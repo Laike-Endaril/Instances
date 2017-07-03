@@ -88,10 +88,10 @@ public class GuiCreateDimension extends GuiScreen
 		this.btnDimensionType.visible = false;
 		this.buttonList.add(this.btnCustomizeType = new GuiButton(8, this.width / 2 + 5, 120, 150, 20, I18n.format("selectWorld.customizeType", new Object[0])));
 		this.btnCustomizeType.visible = false;
-		this.dimensionNameTextField = new GuiTextField(9, this.fontRendererObj, this.width / 2 - 100, 60, 200, 20);
+		this.dimensionNameTextField = new GuiTextField(9, this.fontRenderer, this.width / 2 - 100, 60, 200, 20);
 		this.dimensionNameTextField.setFocused(true);
 		this.dimensionNameTextField.setText(this.field_146330_J);
-		this.seedTextField = new GuiTextField(10, this.fontRendererObj, this.width / 2 - 100, 60, 200, 20);
+		this.seedTextField = new GuiTextField(10, this.fontRenderer, this.width / 2 - 100, 60, 200, 20);
 		this.seedTextField.setText(this.field_146329_I);
 		this.showMoreWorldOptions(this.userInMoreOptions);
 		this.func_146314_g();
@@ -133,7 +133,7 @@ public class GuiCreateDimension extends GuiScreen
 		{
 			this.btnStructures.displayString = this.btnStructures.displayString + I18n.format("options.off", new Object[0]);
 		}
-		this.btnDimensionType.displayString = I18n.format("selectWorld.mapType", new Object[0]) + " " + I18n.format(WorldType.WORLD_TYPES[this.selectedIndex].getTranslateName(), new Object[0]);
+		this.btnDimensionType.displayString = I18n.format("selectWorld.mapType", new Object[0]) + " " + I18n.format(WorldType.WORLD_TYPES[this.selectedIndex].getTranslationKey(), new Object[0]);
 	}
 
 	public static String func_146317_a(ISaveFormat p_146317_0_, String p_146317_1_)
@@ -279,7 +279,7 @@ public class GuiCreateDimension extends GuiScreen
 	private boolean func_175299_g()
 	{
 		WorldType worldtype = WorldType.WORLD_TYPES[this.selectedIndex];
-		return worldtype != null && worldtype.getCanBeCreated() ? (worldtype == WorldType.DEBUG_WORLD ? isShiftKeyDown() : true) : false;
+		return worldtype != null && worldtype.canBeCreated() ? (worldtype == WorldType.DEBUG_ALL_BLOCK_STATES ? isShiftKeyDown() : true) : false;
 	}
 
 	private void func_146315_i()
@@ -291,7 +291,7 @@ public class GuiCreateDimension extends GuiScreen
 	{
 		this.userInMoreOptions = toggle;
 
-		if (WorldType.WORLD_TYPES[this.selectedIndex] == WorldType.DEBUG_WORLD)
+		if (WorldType.WORLD_TYPES[this.selectedIndex] == WorldType.DEBUG_ALL_BLOCK_STATES)
 		{
 			if (this.field_175300_s == null)
 			{
@@ -383,29 +383,29 @@ public class GuiCreateDimension extends GuiScreen
 	public void drawScreen(int mouseX, int mouseY, float partialTicks)
 	{
 		this.drawDefaultBackground();
-		this.drawCenteredString(this.fontRendererObj, I18n.format("simpleDimensions.create", new Object[0]), this.width / 2, 20, -1);
+		this.drawCenteredString(this.fontRenderer, I18n.format("simpleDimensions.create", new Object[0]), this.width / 2, 20, -1);
 
 		if (this.userInMoreOptions)
 		{
-			this.drawString(this.fontRendererObj, I18n.format("selectWorld.enterSeed", new Object[0]), this.width / 2 - 100, 47, -6250336);
-			this.drawString(this.fontRendererObj, I18n.format("selectWorld.seedInfo", new Object[0]), this.width / 2 - 100, 85, -6250336);
+			this.drawString(this.fontRenderer, I18n.format("selectWorld.enterSeed", new Object[0]), this.width / 2 - 100, 47, -6250336);
+			this.drawString(this.fontRenderer, I18n.format("selectWorld.seedInfo", new Object[0]), this.width / 2 - 100, 85, -6250336);
 
 			if (this.btnStructures.visible)
 			{
-				this.drawString(this.fontRendererObj, I18n.format("selectWorld.mapFeatures.info", new Object[0]), this.width / 2 - 150, 122, -6250336);
+				this.drawString(this.fontRenderer, I18n.format("selectWorld.mapFeatures.info", new Object[0]), this.width / 2 - 150, 122, -6250336);
 			}
 
 			this.seedTextField.drawTextBox();
 
-			if (WorldType.WORLD_TYPES[this.selectedIndex].showWorldInfoNotice())
+			if (WorldType.WORLD_TYPES[this.selectedIndex].hasInfoNotice())
 			{
-				this.fontRendererObj.drawSplitString(I18n.format(WorldType.WORLD_TYPES[this.selectedIndex].getTranslatedInfo(), new Object[0]), this.btnDimensionType.xPosition + 2, this.btnDimensionType.yPosition + 22, this.btnDimensionType.getButtonWidth(), 10526880);
+				this.fontRenderer.drawSplitString(I18n.format(WorldType.WORLD_TYPES[this.selectedIndex].getInfoTranslationKey(), new Object[0]), this.btnDimensionType.x + 2, this.btnDimensionType.y + 22, this.btnDimensionType.getButtonWidth(), 10526880);
 			}
 		}
 		else
 		{
-			this.drawString(this.fontRendererObj, I18n.format("simpleDimensions.enterName", new Object[0]), this.width / 2 - 100, 47, -6250336);
-			this.drawString(this.fontRendererObj, I18n.format("selectWorld.resultFolder", new Object[0]) + " " + this.field_146336_i, this.width / 2 - 100, 85, -6250336);
+			this.drawString(this.fontRenderer, I18n.format("simpleDimensions.enterName", new Object[0]), this.width / 2 - 100, 47, -6250336);
+			this.drawString(this.fontRenderer, I18n.format("selectWorld.resultFolder", new Object[0]) + " " + this.field_146336_i, this.width / 2 - 100, 85, -6250336);
 			this.dimensionNameTextField.drawTextBox();
 		}
 
@@ -416,7 +416,7 @@ public class GuiCreateDimension extends GuiScreen
 	{
 		this.field_146330_J = I18n.format("selectWorld.newWorld.copyOf", new Object[] { p_146318_1_.getWorldName() });
 		this.field_146329_I = p_146318_1_.getSeed() + "";
-		this.selectedIndex = p_146318_1_.getTerrainType().getWorldTypeID();
+		this.selectedIndex = p_146318_1_.getTerrainType().getId();
 		this.chunkProviderSettingsJson = p_146318_1_.getGeneratorOptions();
 		this.generateStructures = p_146318_1_.isMapFeaturesEnabled();
 		this.allowCheats = p_146318_1_.areCommandsAllowed();

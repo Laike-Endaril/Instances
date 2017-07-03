@@ -38,7 +38,7 @@ public class CommandTeleportD extends CommandBase
 		}
 	}
 
-	public String getCommandName()
+	public String getName()
 	{
 		return "tpd";
 	}
@@ -48,7 +48,7 @@ public class CommandTeleportD extends CommandBase
 		return 2;
 	}
 
-	public String getCommandUsage(ICommandSender sender)
+	public String getUsage(ICommandSender sender)
 	{
 		return "simpleDimensions.commands.tpd.usage";
 	}
@@ -126,7 +126,7 @@ public class CommandTeleportD extends CommandBase
 				{
 					throw new WrongUsageException("simpleDimensions.commands.tpd.usage", new Object[0]);
 				}
-				else if (((Entity) object).worldObj != null)
+				else if (((Entity) object).world != null)
 				{
 					int i = b0 + 1;
 					CommandBase.CoordinateArg coordinatearg = parseCoordinate(((Entity) object).posX, args[b0], true);
@@ -208,7 +208,7 @@ public class CommandTeleportD extends CommandBase
 						((Entity) object).setLocationAndAngles(coordinatearg.getResult(), coordinatearg1.getResult(), coordinatearg2.getResult(), f2, f);
 						((Entity) object).setRotationYawHead(f2);
 
-						((Entity) object).worldObj.updateEntityWithOptionalForce((Entity) object, false);
+						((Entity) object).world.updateEntityWithOptionalForce((Entity) object, false);
 					}
 
 					notifyCommandListener(sender, this, "commands.tp.success.coordinates", new Object[] { ((Entity) object).getName(), Double.valueOf(coordinatearg.getResult()), Double.valueOf(coordinatearg1.getResult()), Double.valueOf(coordinatearg2.getResult()) });
@@ -218,7 +218,7 @@ public class CommandTeleportD extends CommandBase
 			{
 				Entity entity = getEntity(server, sender, args[args.length - 1]);
 
-				if (entity.worldObj != ((Entity) object).worldObj)
+				if (entity.world != ((Entity) object).world)
 				{
 					Entity toTeleport = (Entity) object;
 					if (entity.dimension != toTeleport.dimension)
@@ -246,9 +246,9 @@ public class CommandTeleportD extends CommandBase
 
 	private Entity teleportEntityToDimension(MinecraftServer server, Entity entity, int dimension) throws CommandException
 	{
-		World worldObj = server.worldServerForDimension(dimension);
+		World world = server.getWorld(dimension);
 
-		if (worldObj == null)
+		if (world == null)
 		{
 			throw new CommandException("Couldn't find dimension " + dimension);
 		}
@@ -266,15 +266,15 @@ public class CommandTeleportD extends CommandBase
 
 	private Entity travelEntity(MinecraftServer server, Entity entity, int dimensionId)
 	{
-		if (!entity.worldObj.isRemote && !entity.isDead)
+		if (!entity.world.isRemote && !entity.isDead)
 		{
-			entity.worldObj.theProfiler.startSection("changeDimension");
+			entity.world.profiler.startSection("changeDimension");
 			int j = entity.dimension;
-			WorldServer worldserver = server.worldServerForDimension(j);
-			WorldServer worldserver1 = server.worldServerForDimension(dimensionId);
+			WorldServer worldserver = server.getWorld(j);
+			WorldServer worldserver1 = server.getWorld(dimensionId);
 			entity.dimension = dimensionId;
 
-			Entity newEntity = EntityList.createEntityByIDFromName(EntityList.func_191306_a(entity.getClass()), worldserver1);
+			Entity newEntity = EntityList.createEntityByIDFromName(EntityList.getKey(entity.getClass()), worldserver1);
 
 			if (newEntity != null)
 			{
@@ -287,29 +287,29 @@ public class CommandTeleportD extends CommandBase
 					e.printStackTrace();
 				}
 				
-				entity.worldObj.removeEntity(entity);
+				entity.world.removeEntity(entity);
 
 				newEntity.forceSpawn = true;
 
-				worldserver1.spawnEntityInWorld(newEntity);
+				worldserver1.spawnEntity(newEntity);
 			}
 
 			worldserver1.updateEntityWithOptionalForce(newEntity, true);
 
 			entity.isDead = true;
-			entity.worldObj.theProfiler.endSection();
+			entity.world.profiler.endSection();
 			worldserver.resetUpdateEntityTick();
 			worldserver1.resetUpdateEntityTick();
-			entity.worldObj.theProfiler.endSection();
+			entity.world.profiler.endSection();
 			return newEntity;
 		}
 
 		return entity;
 	}
 
-	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
 	{
-		return args.length != 1 && args.length != 2 ? null : getListOfStringsMatchingLastWord(args, server.getAllUsernames());
+		return args.length != 1 && args.length != 2 ? null : getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
 	}
 
 	public boolean isUsernameIndex(String[] args, int index)
