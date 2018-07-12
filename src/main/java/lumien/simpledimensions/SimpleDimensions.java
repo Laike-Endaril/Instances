@@ -3,16 +3,13 @@ package lumien.simpledimensions;
 import lumien.simpledimensions.client.ClientHandler;
 import lumien.simpledimensions.config.SimpleDimensionsConfig;
 import lumien.simpledimensions.dimensions.DimensionHandler;
-import lumien.simpledimensions.item.ModItems;
 import lumien.simpledimensions.lib.Reference;
-import lumien.simpledimensions.modcomp.oc.OpenComputers;
 import lumien.simpledimensions.network.PacketHandler;
 import lumien.simpledimensions.server.WorldProviderSimpleDimension;
 import lumien.simpledimensions.server.commands.CommandSimpleDimensions;
 import lumien.simpledimensions.server.commands.CommandTeleportD;
 import lumien.simpledimensions.server.commands.CommandTimeD;
 import lumien.simpledimensions.server.commands.CommandWeatherD;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
@@ -39,25 +36,17 @@ public class SimpleDimensions
 
 	public SimpleDimensionsConfig config;
 
-	public CreativeTabs creativeTab;
-	
 	public DimensionType simpleDimensionType;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		creativeTab = new CreativeTabSimpleDimensions();
-
 		MinecraftForge.EVENT_BUS.register(this);
 
 		config = new SimpleDimensionsConfig();
 
 		config.preInit(event);
 
-		ModItems.preInit(event);
-
-		proxy.registerModels();
-		
 		simpleDimensionType = DimensionType.register("SimpleDimensions", "Simple", "SimpleDimensions".hashCode(), WorldProviderSimpleDimension.class, false);
 	}
 
@@ -65,11 +54,6 @@ public class SimpleDimensions
 	public void init(FMLInitializationEvent event)
 	{
 		PacketHandler.init();
-
-		if (Loader.isModLoaded("OpenComputers"))
-		{
-			OpenComputers.init(event);
-		}
 	}
 
 	@EventHandler
