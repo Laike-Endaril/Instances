@@ -68,17 +68,6 @@ public class SimpleDimensions
 	}
 
 	@SubscribeEvent
-	public void worldUnload(WorldEvent.Unload event)
-	{
-		int dimensionID = event.getWorld().provider.getDimension();
-
-		if (!event.getWorld().isRemote)
-		{
-			DimensionHandler.getInstance().unload(event.getWorld(), dimensionID);
-		}
-	}
-
-	@SubscribeEvent
 	public void clientConnect(ServerConnectionFromClientEvent event)
 	{
 		event.getManager().sendPacket(PacketHandler.INSTANCE.getPacketFrom(DimensionHandler.getInstance().constructSyncMessage()));
