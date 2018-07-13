@@ -64,6 +64,7 @@ public class WorldCustom extends WorldServer
 
     public World init()
     {
+        super.init();
         this.mapStorage = this.delegate.getMapStorage();
         this.worldScoreboard = this.delegate.getScoreboard();
         this.lootTable = this.delegate.getLootTableManager();
