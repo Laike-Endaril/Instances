@@ -71,6 +71,9 @@ public class CommandSimpleDimensions extends CommandBase
 		{
 			sender.sendMessage(DimensionHandler.getInstance().generateList());
 		}
+		else {
+			sender.sendMessage(new TextComponentString(getUsage(sender)));
+		}
 	}
 
 	@Override
