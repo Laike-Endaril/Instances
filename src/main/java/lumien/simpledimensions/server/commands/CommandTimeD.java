@@ -14,7 +14,6 @@ import net.minecraftforge.common.DimensionManager;
 
 public class CommandTimeD extends CommandBase
 {
-	private static final String __OBFID = "CL_00001183";
 
 	@Override
 	public String getName()
@@ -42,6 +41,13 @@ public class CommandTimeD extends CommandBase
 			int dimension = Integer.parseInt(args[0]);
 			int i;
 
+			WorldServer worldserver = DimensionManager.getWorld(dimension);
+
+			if (worldserver == null) {
+				notifyCommandListener(sender, this, "No dimension found with the id %s", new Object[] { Integer.valueOf(dimension) });
+				return;
+			}
+
 			if (args[1].equals("set"))
 			{
 				if (args[2].equals("day"))
@@ -57,7 +63,7 @@ public class CommandTimeD extends CommandBase
 					i = parseInt(args[2], 0);
 				}
 
-				this.setTime(sender, dimension, i);
+				worldserver.setWorldTime(i);
 				notifyCommandListener(sender, this, "commands.time.set", new Object[] { Integer.valueOf(i) });
 				return;
 			}
@@ -65,7 +71,7 @@ public class CommandTimeD extends CommandBase
 			if (args[1].equals("add"))
 			{
 				i = parseInt(args[2], 0);
-				this.addTime(sender, dimension, i);
+				worldserver.setWorldTime(worldserver.getWorldTime() + i);
 				notifyCommandListener(sender, this, "commands.time.added", new Object[] { Integer.valueOf(i) });
 				return;
 			}
@@ -97,23 +103,5 @@ public class CommandTimeD extends CommandBase
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
 		return args.length == 2 ? getListOfStringsMatchingLastWord(args, new String[] { "set", "add", "query" }) : (args.length == 3 && args[1].equals("set") ? getListOfStringsMatchingLastWord(args, new String[] { "day", "night" }) : (args.length == 3 && args[1].equals("query") ? getListOfStringsMatchingLastWord(args, new String[] { "daytime", "gametime" }) : null));
-	}
-
-	/**
-	 * Set the time in the server object.
-	 */
-	protected void setTime(ICommandSender p_71552_1_, int dimension, int p_71552_2_)
-	{
-		WorldServer worldserver = DimensionManager.getWorld(dimension);
-		worldserver.setWorldTime(p_71552_2_);
-	}
-
-	/**
-	 * Adds (or removes) time in the server object.
-	 */
-	protected void addTime(ICommandSender p_71553_1_, int dimension, int p_71553_2_)
-	{
-		WorldServer worldserver = DimensionManager.getWorld(dimension);
-		worldserver.setWorldTime(worldserver.getWorldTime() + p_71553_2_);
 	}
 }

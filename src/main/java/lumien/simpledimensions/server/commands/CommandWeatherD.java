@@ -95,6 +95,9 @@ public class CommandWeatherD extends CommandBase
 					notifyCommandListener(sender, this, "commands.weather.thunder", new Object[0]);
 				}
 			}
+			else {
+				notifyCommandListener(sender, this, "No dimension found with the id %s", new Object[] { Integer.valueOf(dimension) });
+			}
 		}
 		else
 		{
