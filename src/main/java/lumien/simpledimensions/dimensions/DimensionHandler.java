@@ -249,6 +249,7 @@ public class DimensionHandler extends WorldSavedData
 			return;
 		}
 
+		MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(w));
 		w.flush();
 		DimensionManager.setWorld(dimensionID, null, w.getMinecraftServer());
 		DimensionManager.unregisterDimension(dimensionID);
