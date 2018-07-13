@@ -27,6 +27,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.MinecraftException;
 import net.minecraft.world.ServerWorldEventHandler;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -61,7 +62,7 @@ public class DimensionHandler extends WorldSavedData
 		dimensionInfo = new HashMap<Integer, WorldInfoSimple>();
 		toBeDeleted = new HashMap<Integer, UUID>();
 	}
-	
+
 	@Override
 	public boolean isDirty()
 	{
@@ -131,7 +132,7 @@ public class DimensionHandler extends WorldSavedData
 	{
 		DimensionHandler INSTANCE;
 		INSTANCE = (DimensionHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(DimensionHandler.class, NAME);
-		
+
 		if (INSTANCE == null)
 		{
 			INSTANCE = new DimensionHandler();
@@ -180,7 +181,7 @@ public class DimensionHandler extends WorldSavedData
 		}
 
 		nbt.setTag("dimensionInfo", nbtList);
-		
+
 		return nbt;
 	}
 
@@ -213,7 +214,7 @@ public class DimensionHandler extends WorldSavedData
 			System.err.println("Cannot Hotload Dim: " + e.getMessage());
 			return;
 		}
-		
+
 		MinecraftServer mcServer = overworld.getMinecraftServer();
 		ISaveHandler savehandler = overworld.getSaveHandler();
 		EnumDifficulty difficulty = mcServer.getEntityWorld().getDifficulty();
@@ -238,67 +239,38 @@ public class DimensionHandler extends WorldSavedData
 			return;
 		}
 
-		World worldObj = DimensionManager.getWorld(dimensionID);
-
-		if (worldObj.playerEntities.size() > 0)
+		WorldServer w = DimensionManager.getWorld(dimensionID);
+		
+		if (!w.playerEntities.isEmpty())
 		{
 			sender.sendMessage(new TextComponentString("Can't delete a dimension with players inside it").setStyle(new Style().setColor(TextFormatting.RED)));
 			return;
 		}
 
-		Entity entitySender = sender.getCommandSenderEntity();
-		toBeDeleted.put(dimensionID, entitySender != null ? entitySender.getUniqueID() : null);
+		w.flush();
+        DimensionManager.setWorld(dimensionID, null, w.getMinecraftServer());
+		DimensionManager.unregisterDimension(dimensionID);
 
-		DimensionManager.unloadWorld(dimensionID);
-	}
+		dimensionInfo.remove(dimensionID);
+		w.flush();
+		
+		File dimensionFolder = new File(DimensionManager.getCurrentSaveRootDirectory(), "DIM" + dimensionID);
 
-	public void unload(World world, int dimensionID)
-	{
-		if (dimensionInfo.containsKey(dimensionID))
+		try
 		{
-			WorldInfo worldInfo = dimensionInfo.get(dimensionID);
-
-			DimensionManager.unregisterDimension(dimensionID);
+			FileUtils.deleteDirectory(dimensionFolder);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			sender.sendMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
+		}
+		finally
+		{
+			sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
 		}
 
-		if (toBeDeleted.containsKey(dimensionID))
-		{
-			UUID uniqueID = toBeDeleted.get(dimensionID);
-
-			toBeDeleted.remove(dimensionID);
-			dimensionInfo.remove(dimensionID);
-
-			((WorldServer) world).flush();
-			File dimensionFolder = new File(DimensionManager.getCurrentSaveRootDirectory(), "DIM" + dimensionID);
-
-			EntityPlayerMP player = null;
-			if (uniqueID != null)
-			{
-				player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(uniqueID);
-			}
-
-			try
-			{
-				FileUtils.deleteDirectory(dimensionFolder);
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-				if (player != null)
-				{
-					player.sendMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
-				}
-			}
-			finally
-			{
-				if (player != null)
-				{
-					player.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
-				}
-			}
-
-			syncWithClients();
-		}
+		syncWithClients();
 	}
 
 	private void syncWithClients()
