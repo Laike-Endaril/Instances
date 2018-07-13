@@ -45,14 +45,12 @@ public class DimensionHandler extends WorldSavedData
 	static String NAME = "SimpleDimensionsHandler";
 
 	HashMap<Integer, WorldInfoSimple> dimensionInfo;
-	HashMap<Integer, UUID> toBeDeleted;
 
 	public DimensionHandler(String name)
 	{
 		super(name);
 
 		dimensionInfo = new HashMap<Integer, WorldInfoSimple>();
-		toBeDeleted = new HashMap<Integer, UUID>();
 	}
 
 	public DimensionHandler()
@@ -60,7 +58,6 @@ public class DimensionHandler extends WorldSavedData
 		super(NAME);
 
 		dimensionInfo = new HashMap<Integer, WorldInfoSimple>();
-		toBeDeleted = new HashMap<Integer, UUID>();
 	}
 
 	@Override
@@ -233,14 +230,19 @@ public class DimensionHandler extends WorldSavedData
 
 	public void deleteDimension(ICommandSender sender, int dimensionID)
 	{
+		WorldServer w = DimensionManager.getWorld(dimensionID);
+
+		if (w == null) {
+			sender.sendMessage(new TextComponentString("No dimension with that id exists").setStyle(new Style().setColor(TextFormatting.RED)));
+			return;
+		}
+
 		if (!dimensionInfo.containsKey(dimensionID))
 		{
 			sender.sendMessage(new TextComponentString("The dimension associated with that id is not from the SimpleDimensions mod").setStyle(new Style().setColor(TextFormatting.RED)));
 			return;
 		}
 
-		WorldServer w = DimensionManager.getWorld(dimensionID);
-		
 		if (!w.playerEntities.isEmpty())
 		{
 			sender.sendMessage(new TextComponentString("Can't delete a dimension with players inside it").setStyle(new Style().setColor(TextFormatting.RED)));
@@ -248,12 +250,12 @@ public class DimensionHandler extends WorldSavedData
 		}
 
 		w.flush();
-        DimensionManager.setWorld(dimensionID, null, w.getMinecraftServer());
+    DimensionManager.setWorld(dimensionID, null, w.getMinecraftServer());
 		DimensionManager.unregisterDimension(dimensionID);
 
 		dimensionInfo.remove(dimensionID);
 		w.flush();
-		
+
 		File dimensionFolder = new File(DimensionManager.getCurrentSaveRootDirectory(), "DIM" + dimensionID);
 
 		try

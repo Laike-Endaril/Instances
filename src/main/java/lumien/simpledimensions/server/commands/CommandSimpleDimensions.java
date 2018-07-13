@@ -50,12 +50,16 @@ public class CommandSimpleDimensions extends CommandBase
 			if (sender instanceof EntityPlayerMP && !(sender instanceof FakePlayer))
 			{
 				EntityPlayerMP player = (EntityPlayerMP) sender;
-				
+
 				PacketHandler.INSTANCE.sendTo(new MessageOpenGui().setGuiID(0), player);
 			}
 		}
 		else if (args[0].equals("delete"))
 		{
+			if (args.length == 1)
+			{
+				sender.sendMessage(new TextComponentString("Usage: /simpledimensions delete <id>"));
+			}
 			if (args.length == 2)
 			{
 				int dimensionID = Integer.parseInt(args[1]);
