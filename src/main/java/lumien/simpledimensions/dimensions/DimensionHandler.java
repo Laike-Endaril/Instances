@@ -250,7 +250,7 @@ public class DimensionHandler extends WorldSavedData
 		}
 
 		w.flush();
-    DimensionManager.setWorld(dimensionID, null, w.getMinecraftServer());
+		DimensionManager.setWorld(dimensionID, null, w.getMinecraftServer());
 		DimensionManager.unregisterDimension(dimensionID);
 
 		dimensionInfo.remove(dimensionID);
