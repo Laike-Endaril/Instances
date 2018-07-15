@@ -15,6 +15,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ChatAllowedCharacters;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
@@ -29,9 +30,9 @@ public class GuiCreateDimension extends GuiScreen
 	private Gui parentScreen;
 	private GuiTextField dimensionNameTextField;
 	private GuiTextField seedTextField;
-	private String field_146336_i;
+	private String saveDirName;
 	private String gameType = "survival";
-	private String field_175300_s;
+	private String savedGameMode;
 
 	private boolean generateStructures = true;
 	private boolean allowCheats;
@@ -44,21 +45,21 @@ public class GuiCreateDimension extends GuiScreen
 	private GuiButton btnStructures;
 	private GuiButton btnDimensionType;
 	private GuiButton btnCustomizeType;
+	private GuiButton btnEnvironmentType;
 
-	private String field_146323_G;
-	private String field_146328_H;
-	private String field_146329_I;
-	private String field_146330_J;
+	private String worldSeed;
+	private String worldName;
 	private int selectedIndex;
+	private int selectedEnvironmentIndex;
 	public String chunkProviderSettingsJson = "";
 	/** These filenames are known to be restricted on one or more OS's. */
 	private static final String[] disallowedFilenames = new String[] { "CON", "COM", "PRN", "AUX", "CLOCK$", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
 
-	public GuiCreateDimension(Gui p_i46320_1_)
+	public GuiCreateDimension(Gui parent)
 	{
-		this.parentScreen = p_i46320_1_;
-		this.field_146329_I = "";
-		this.field_146330_J = I18n.format("simpleDimensions.newDimension", new Object[0]);
+		this.parentScreen = parent;
+		this.worldSeed = "";
+		this.worldName = I18n.format("simpleDimensions.newDimension", new Object[0]);
 	}
 
 	/**
@@ -88,41 +89,58 @@ public class GuiCreateDimension extends GuiScreen
 		this.btnDimensionType.visible = false;
 		this.buttonList.add(this.btnCustomizeType = new GuiButton(8, this.width / 2 + 5, 120, 150, 20, I18n.format("selectWorld.customizeType", new Object[0])));
 		this.btnCustomizeType.visible = false;
+		this.buttonList.add(this.btnEnvironmentType = new GuiButton(11, this.width / 2 - 155, 151, 150, 20, I18n.format("simpleDimensions.environmentType", new Object[0])));
+		this.btnEnvironmentType.visible = false;
 		this.dimensionNameTextField = new GuiTextField(9, this.fontRenderer, this.width / 2 - 100, 60, 200, 20);
 		this.dimensionNameTextField.setFocused(true);
-		this.dimensionNameTextField.setText(this.field_146330_J);
+		this.dimensionNameTextField.setText(this.worldName);
 		this.seedTextField = new GuiTextField(10, this.fontRenderer, this.width / 2 - 100, 60, 200, 20);
-		this.seedTextField.setText(this.field_146329_I);
+		this.seedTextField.setText(this.worldSeed);
 		this.showMoreWorldOptions(this.userInMoreOptions);
-		this.func_146314_g();
+		this.calcSaveDirName();
 		this.updateDisplayState();
 	}
 
-	private void func_146314_g()
+	private void calcSaveDirName()
 	{
-		this.field_146336_i = this.dimensionNameTextField.getText().trim();
+		this.saveDirName = this.dimensionNameTextField.getText().trim();
 		char[] achar = ChatAllowedCharacters.ILLEGAL_FILE_CHARACTERS;
 		int i = achar.length;
 
 		for (int j = 0; j < i; ++j)
 		{
 			char c0 = achar[j];
-			this.field_146336_i = this.field_146336_i.replace(c0, '_');
+			this.saveDirName = this.saveDirName.replace(c0, '_');
 		}
 
-		if (StringUtils.isEmpty(this.field_146336_i))
+		if (StringUtils.isEmpty(this.saveDirName))
 		{
-			this.field_146336_i = "World";
+			this.saveDirName = "World";
 		}
 
-		this.field_146336_i = func_146317_a(this.mc.getSaveLoader(), this.field_146336_i);
+		this.saveDirName = getUncollidingSaveDirName(this.mc.getSaveLoader(), this.saveDirName);
 	}
+	
+	private static String getDisplayableName(String input) {
+	    StringBuilder titleCase = new StringBuilder();
+	    boolean nextTitleCase = true;
 
+	    for (char c : input.replace("_", " ").toCharArray()) {
+	        if (Character.isSpaceChar(c)) {
+	            nextTitleCase = true;
+	        } else if (nextTitleCase) {
+	            c = Character.toTitleCase(c);
+	            nextTitleCase = false;
+	        }
+
+	        titleCase.append(c);
+	    }
+
+	    return titleCase.toString();
+	}
+	
 	private void updateDisplayState()
 	{
-		this.field_146323_G = I18n.format("selectWorld.gameMode." + this.gameType + ".line1", new Object[0]);
-		this.field_146328_H = I18n.format("selectWorld.gameMode." + this.gameType + ".line2", new Object[0]);
-
 		this.btnStructures.displayString = I18n.format("selectWorld.mapFeatures", new Object[0]) + " ";
 
 		if (this.generateStructures)
@@ -133,12 +151,14 @@ public class GuiCreateDimension extends GuiScreen
 		{
 			this.btnStructures.displayString = this.btnStructures.displayString + I18n.format("options.off", new Object[0]);
 		}
+		
 		this.btnDimensionType.displayString = I18n.format("selectWorld.mapType", new Object[0]) + " " + I18n.format(WorldType.WORLD_TYPES[this.selectedIndex].getTranslationKey(), new Object[0]);
+		this.btnEnvironmentType.displayString = I18n.format("simpleDimensions.environmentType", new Object[0]) + " " + I18n.format(getDisplayableName(DimensionType.values()[this.selectedEnvironmentIndex].getName()), new Object[0]);
 	}
 
-	public static String func_146317_a(ISaveFormat p_146317_0_, String p_146317_1_)
+	public static String getUncollidingSaveDirName(ISaveFormat saveLoader, String name)
 	{
-		p_146317_1_ = p_146317_1_.replaceAll("[\\./\"]", "_");
+		name = name.replaceAll("[\\./\"]", "_");
 		String[] astring = disallowedFilenames;
 		int i = astring.length;
 
@@ -146,18 +166,18 @@ public class GuiCreateDimension extends GuiScreen
 		{
 			String s1 = astring[j];
 
-			if (p_146317_1_.equalsIgnoreCase(s1))
+			if (name.equalsIgnoreCase(s1))
 			{
-				p_146317_1_ = "_" + p_146317_1_ + "_";
+				name = "_" + name + "_";
 			}
 		}
 
-		while (p_146317_0_.getWorldInfo(p_146317_1_) != null)
+		while (saveLoader.getWorldInfo(name) != null)
 		{
-			p_146317_1_ = p_146317_1_ + "-";
+			name = name + "-";
 		}
 
-		return p_146317_1_;
+		return name;
 	}
 
 	/**
@@ -225,14 +245,14 @@ public class GuiCreateDimension extends GuiScreen
 					worldsettings.enableCommands();
 				}
 
-				WorldInfo worldInfo = new WorldInfoSimple(worldsettings, this.dimensionNameTextField.getText().trim());
+				WorldInfoSimple worldInfo = new WorldInfoSimple(worldsettings, this.dimensionNameTextField.getText().trim(), DimensionType.values()[this.selectedEnvironmentIndex]);
 				MessageCreateDimension createMessage = new MessageCreateDimension(worldInfo);
 
 				PacketHandler.INSTANCE.sendToServer(createMessage);
 			}
 			else if (button.id == 3)
 			{
-				this.func_146315_i();
+				this.toggleMoreWorldOptions();
 			}
 			else if (button.id == 4)
 			{
@@ -248,7 +268,7 @@ public class GuiCreateDimension extends GuiScreen
 					this.selectedIndex = 0;
 				}
 
-				while (!this.func_175299_g())
+				while (!this.canSelectCurWorldType())
 				{
 					++this.selectedIndex;
 
@@ -259,6 +279,28 @@ public class GuiCreateDimension extends GuiScreen
 				}
 
 				this.chunkProviderSettingsJson = "";
+				this.updateDisplayState();
+				this.showMoreWorldOptions(this.userInMoreOptions);
+			}
+			else if (button.id == 11)
+			{
+				++this.selectedEnvironmentIndex;
+
+				if (this.selectedEnvironmentIndex >= DimensionType.values().length)
+				{
+					this.selectedEnvironmentIndex = 0;
+				}
+
+				while (!this.canSelectCurEnvironmentType())
+				{
+					++this.selectedEnvironmentIndex;
+
+					if (this.selectedEnvironmentIndex >= DimensionType.values().length)
+					{
+						this.selectedEnvironmentIndex = 0;
+					}
+				}
+
 				this.updateDisplayState();
 				this.showMoreWorldOptions(this.userInMoreOptions);
 			}
@@ -276,13 +318,20 @@ public class GuiCreateDimension extends GuiScreen
 		}
 	}
 
-	private boolean func_175299_g()
+	private boolean canSelectCurWorldType()
 	{
 		WorldType worldtype = WorldType.WORLD_TYPES[this.selectedIndex];
 		return worldtype != null && worldtype.canBeCreated() ? (worldtype == WorldType.DEBUG_ALL_BLOCK_STATES ? isShiftKeyDown() : true) : false;
 	}
+	
+	private boolean canSelectCurEnvironmentType()
+	{
+		DimensionType environmenttype = DimensionType.values()[this.selectedEnvironmentIndex];
+		
+		return true;
+	}
 
-	private void func_146315_i()
+	private void toggleMoreWorldOptions()
 	{
 		this.showMoreWorldOptions(!this.userInMoreOptions);
 	}
@@ -293,27 +342,29 @@ public class GuiCreateDimension extends GuiScreen
 
 		if (WorldType.WORLD_TYPES[this.selectedIndex] == WorldType.DEBUG_ALL_BLOCK_STATES)
 		{
-			if (this.field_175300_s == null)
+			if (this.savedGameMode == null)
 			{
-				this.field_175300_s = this.gameType;
+				this.savedGameMode = this.gameType;
 			}
 
 			this.gameType = "spectator";
 			this.btnStructures.visible = false;
 			this.btnDimensionType.visible = this.userInMoreOptions;
 			this.btnCustomizeType.visible = false;
+			this.btnEnvironmentType.visible = false;
 		}
 		else
 		{
-			if (this.field_175300_s != null)
+			if (this.savedGameMode != null)
 			{
-				this.gameType = this.field_175300_s;
-				this.field_175300_s = null;
+				this.gameType = this.savedGameMode;
+				this.savedGameMode = null;
 			}
 
 			this.btnStructures.visible = this.userInMoreOptions && WorldType.WORLD_TYPES[this.selectedIndex] != WorldType.CUSTOMIZED;
 			this.btnDimensionType.visible = this.userInMoreOptions;
 			this.btnCustomizeType.visible = this.userInMoreOptions && WorldType.WORLD_TYPES[this.selectedIndex].isCustomizable();
+			this.btnEnvironmentType.visible = this.userInMoreOptions;
 		}
 
 		this.updateDisplayState();
@@ -340,12 +391,12 @@ public class GuiCreateDimension extends GuiScreen
 		if (this.dimensionNameTextField.isFocused() && !this.userInMoreOptions)
 		{
 			this.dimensionNameTextField.textboxKeyTyped(typedChar, keyCode);
-			this.field_146330_J = this.dimensionNameTextField.getText();
+			this.worldName = this.dimensionNameTextField.getText();
 		}
 		else if (this.seedTextField.isFocused() && this.userInMoreOptions)
 		{
 			this.seedTextField.textboxKeyTyped(typedChar, keyCode);
-			this.field_146329_I = this.seedTextField.getText();
+			this.worldSeed = this.seedTextField.getText();
 		}
 
 		if (keyCode == 28 || keyCode == 156)
@@ -354,7 +405,7 @@ public class GuiCreateDimension extends GuiScreen
 		}
 
 		((GuiButton) this.buttonList.get(0)).enabled = this.dimensionNameTextField.getText().length() > 0;
-		this.func_146314_g();
+		this.calcSaveDirName();
 	}
 
 	/**
@@ -394,6 +445,11 @@ public class GuiCreateDimension extends GuiScreen
 			{
 				this.drawString(this.fontRenderer, I18n.format("selectWorld.mapFeatures.info", new Object[0]), this.width / 2 - 150, 122, -6250336);
 			}
+			
+			if (this.btnEnvironmentType.visible)
+			{
+				this.drawString(this.fontRenderer, I18n.format("simpleDimensions.environmentType.info", new Object[0]), this.width / 2 - 150, 172, -6250336);
+			}
 
 			this.seedTextField.drawTextBox();
 
@@ -405,31 +461,31 @@ public class GuiCreateDimension extends GuiScreen
 		else
 		{
 			this.drawString(this.fontRenderer, I18n.format("simpleDimensions.enterName", new Object[0]), this.width / 2 - 100, 47, -6250336);
-			this.drawString(this.fontRenderer, I18n.format("selectWorld.resultFolder", new Object[0]) + " " + this.field_146336_i, this.width / 2 - 100, 85, -6250336);
+			this.drawString(this.fontRenderer, I18n.format("selectWorld.resultFolder", new Object[0]) + " " + this.saveDirName, this.width / 2 - 100, 85, -6250336);
 			this.dimensionNameTextField.drawTextBox();
 		}
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
 	}
 
-	public void func_146318_a(WorldInfo p_146318_1_)
+	public void recreateFromExistingWorld(WorldInfo original)
 	{
-		this.field_146330_J = I18n.format("selectWorld.newWorld.copyOf", new Object[] { p_146318_1_.getWorldName() });
-		this.field_146329_I = p_146318_1_.getSeed() + "";
-		this.selectedIndex = p_146318_1_.getTerrainType().getId();
-		this.chunkProviderSettingsJson = p_146318_1_.getGeneratorOptions();
-		this.generateStructures = p_146318_1_.isMapFeaturesEnabled();
-		this.allowCheats = p_146318_1_.areCommandsAllowed();
+		this.worldName = I18n.format("selectWorld.newWorld.copyOf", new Object[] { original.getWorldName() });
+		this.worldSeed = original.getSeed() + "";
+		this.selectedIndex = original.getTerrainType().getId();
+		this.chunkProviderSettingsJson = original.getGeneratorOptions();
+		this.generateStructures = original.isMapFeaturesEnabled();
+		this.allowCheats = original.areCommandsAllowed();
 
-		if (p_146318_1_.isHardcoreModeEnabled())
+		if (original.isHardcoreModeEnabled())
 		{
 			this.gameType = "hardcore";
 		}
-		else if (p_146318_1_.getGameType().isSurvivalOrAdventure())
+		else if (original.getGameType().isSurvivalOrAdventure())
 		{
 			this.gameType = "survival";
 		}
-		else if (p_146318_1_.getGameType().isCreative())
+		else if (original.getGameType().isCreative())
 		{
 			this.gameType = "creative";
 		}

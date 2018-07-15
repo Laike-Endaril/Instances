@@ -1,47 +1,70 @@
 package lumien.simpledimensions.network.messages;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
+import net.minecraft.world.DimensionType;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class MessageDimensionSync implements IMessage
 {
-	ArrayList<Integer> simpleDimensions;
+	HashMap<Integer, DimensionType> simpleDimensions;
 
 	public MessageDimensionSync()
 	{
-		simpleDimensions = new ArrayList<Integer>();
+		simpleDimensions = new HashMap<Integer, DimensionType>();
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		int size = buf.readInt();
-
-		for (int i = 0; i < size; i++)
-		{
-			simpleDimensions.add(buf.readInt());
+		NBTTagCompound tag = ByteBufUtils.readTag(buf);
+		for (String key : tag.getKeySet()) {
+			int dimID;
+			DimensionType dimType = DimensionType.OVERWORLD;
+			try {
+				dimID = Integer.parseInt(key);
+			}
+			catch (NumberFormatException e) {
+				continue;
+			}
+			
+			String dimTypeS = tag.getString(key);
+			if (dimTypeS != null) {
+				try {
+					dimType = DimensionType.byName(dimTypeS);
+				}
+				catch (IllegalArgumentException e) {}
+			}
+			
+			simpleDimensions.put(dimID, dimType);
 		}
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		buf.writeInt(simpleDimensions.size());
-
-		for (Integer i : simpleDimensions)
-		{
-			buf.writeInt(i);
+		NBTTagCompound tag = new NBTTagCompound();
+		for (Map.Entry<Integer, DimensionType> entry : simpleDimensions.entrySet()) {
+			tag.setString(Integer.toString(entry.getKey()), entry.getValue().getName());
 		}
+		ByteBufUtils.writeTag(buf, tag);
 	}
 
-	public void addDimension(int id)
+	public void addDimension(int id, DimensionType type)
 	{
-		simpleDimensions.add(id);
+		if (type == null) {
+			type = DimensionType.OVERWORLD;
+		}
+		simpleDimensions.put(id, type);
 	}
 
-	public ArrayList<Integer> getDimensions()
+	public HashMap<Integer, DimensionType> getDimensions()
 	{
 		return simpleDimensions;
 	}
