@@ -5,7 +5,6 @@ import lumien.simpledimensions.config.SimpleDimensionsConfig;
 import lumien.simpledimensions.dimensions.DimensionHandler;
 import lumien.simpledimensions.lib.Reference;
 import lumien.simpledimensions.network.PacketHandler;
-import lumien.simpledimensions.server.WorldProviderSimpleDimension;
 import lumien.simpledimensions.server.commands.CommandSimpleDimensions;
 import lumien.simpledimensions.server.commands.CommandTeleportD;
 import lumien.simpledimensions.server.commands.CommandTimeD;
@@ -47,7 +46,7 @@ public class SimpleDimensions
 
 		config.preInit(event);
 
-		simpleDimensionType = DimensionType.register("SimpleDimensions", "Simple", "SimpleDimensions".hashCode(), WorldProviderSimpleDimension.class, false);
+//		simpleDimensionType = DimensionType.register("SimpleDimensions", "Simple", "SimpleDimensions".hashCode(), WorldProviderSimpleDimension.class, false);
 	}
 
 	@EventHandler

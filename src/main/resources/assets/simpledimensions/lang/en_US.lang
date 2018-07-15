@@ -4,6 +4,8 @@ simpleDimensions.moreDimensionOptions=More Dimension Options...
 simpleDimensions.enterName=Dimension Name
 simpleDimensions.nodimensions=There currently are no Simple Dimensions
 simpleDimensions.customizeTitle=Customize Dimension Settings
+simpleDimensions.environmentType=Dimension Type:
+simpleDimensions.environmentType.info=
 
 simpleDimensions.create.keepLoaded=Keep Loaded:
 

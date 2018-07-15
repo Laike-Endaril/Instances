@@ -9,14 +9,14 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class MessageCreateDimension implements IMessage
 {
-	WorldInfo worldInfo;
+	WorldInfoSimple worldInfo;
 	
 	public MessageCreateDimension()
 	{
 		
 	}
 	
-	public MessageCreateDimension(WorldInfo worldInfo)
+	public MessageCreateDimension(WorldInfoSimple worldInfo)
 	{
 		this.worldInfo = worldInfo;
 	}
@@ -35,7 +35,7 @@ public class MessageCreateDimension implements IMessage
 	
 	public WorldInfoSimple getWorldInfo()
 	{
-		return (WorldInfoSimple) worldInfo;
+		return worldInfo;
 	}
 
 }

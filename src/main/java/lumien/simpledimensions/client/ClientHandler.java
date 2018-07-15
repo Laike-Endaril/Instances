@@ -1,9 +1,12 @@
 package lumien.simpledimensions.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import lumien.simpledimensions.SimpleDimensions;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.DimensionManager;
 
 public class ClientHandler
@@ -38,18 +41,18 @@ public class ClientHandler
 		return INSTANCE;
 	}
 
-	public void sync(ArrayList<Integer> dimensions)
+	public void sync(HashMap<Integer, DimensionType> dimensions)
 	{
 		this.cleanUp();
 
 		this.simpleDimensions = new HashSet<Integer>();
-		this.simpleDimensions.addAll(dimensions);
+		this.simpleDimensions.addAll(dimensions.keySet());
 
-		for (Integer i : simpleDimensions)
+		for (Map.Entry<Integer, DimensionType> entry : dimensions.entrySet())
 		{
-			if (!DimensionManager.isDimensionRegistered(i))
+			if (!DimensionManager.isDimensionRegistered(entry.getKey()))
 			{
-				DimensionManager.registerDimension(i, SimpleDimensions.INSTANCE.simpleDimensionType);
+				DimensionManager.registerDimension(entry.getKey(), entry.getValue());
 			}
 		}
 	}
