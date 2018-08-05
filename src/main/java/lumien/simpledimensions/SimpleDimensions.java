@@ -35,8 +35,6 @@ public class SimpleDimensions
 
 	public SimpleDimensionsConfig config;
 
-	public DimensionType simpleDimensionType;
-
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
@@ -45,8 +43,6 @@ public class SimpleDimensions
 		config = new SimpleDimensionsConfig();
 
 		config.preInit(event);
-
-//		simpleDimensionType = DimensionType.register("SimpleDimensions", "Simple", "SimpleDimensions".hashCode(), WorldProviderSimpleDimension.class, false);
 	}
 
 	@EventHandler
