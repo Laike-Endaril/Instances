@@ -4,7 +4,6 @@ import lumien.simpledimensions.dimensions.DimensionHandler;
 import lumien.simpledimensions.network.PacketHandler;
 import lumien.simpledimensions.network.messages.MessageOpenGui;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -37,7 +36,7 @@ public class CommandSimpleDimensions extends CommandBase
     }
 
     @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args)
     {
         if (args.length == 0)
         {
@@ -45,35 +44,34 @@ public class CommandSimpleDimensions extends CommandBase
             return;
         }
 
-        if (args[0].equals("create"))
+        switch (args[0])
         {
-            if (sender instanceof EntityPlayerMP && !(sender instanceof FakePlayer))
-            {
-                EntityPlayerMP player = (EntityPlayerMP) sender;
+            case "create":
+                if (sender instanceof EntityPlayerMP && !(sender instanceof FakePlayer))
+                {
+                    EntityPlayerMP player = (EntityPlayerMP) sender;
 
-                PacketHandler.INSTANCE.sendTo(new MessageOpenGui().setGuiID(0), player);
-            }
-        }
-        else if (args[0].equals("delete"))
-        {
-            if (args.length == 1)
-            {
-                sender.sendMessage(new TextComponentString("Usage: /simpledimensions delete <id>"));
-            }
-            if (args.length == 2)
-            {
-                int dimensionID = Integer.parseInt(args[1]);
+                    PacketHandler.INSTANCE.sendTo(new MessageOpenGui(), player);
+                }
+                break;
+            case "delete":
+                if (args.length == 1)
+                {
+                    sender.sendMessage(new TextComponentString("Usage: /simpledimensions delete <id>"));
+                }
+                if (args.length == 2)
+                {
+                    int dimensionID = Integer.parseInt(args[1]);
 
-                DimensionHandler.getInstance().deleteDimension(sender, dimensionID);
-            }
-        }
-        else if (args[0].equals("list"))
-        {
-            sender.sendMessage(DimensionHandler.getInstance().generateList());
-        }
-        else
-        {
-            sender.sendMessage(new TextComponentString(getUsage(sender)));
+                    DimensionHandler.getInstance().deleteDimension(sender, dimensionID);
+                }
+                break;
+            case "list":
+                sender.sendMessage(DimensionHandler.getInstance().generateList());
+                break;
+            default:
+                sender.sendMessage(new TextComponentString(getUsage(sender)));
+                break;
         }
     }
 
@@ -86,7 +84,7 @@ public class CommandSimpleDimensions extends CommandBase
         }
         else
         {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
     }
 }

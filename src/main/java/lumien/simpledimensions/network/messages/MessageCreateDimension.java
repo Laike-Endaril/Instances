@@ -11,7 +11,7 @@ public class MessageCreateDimension implements IMessage
 
     public MessageCreateDimension()
     {
-
+        //Required IIRC (Laike_Endaril)
     }
 
     public MessageCreateDimension(WorldInfoSimple worldInfo)

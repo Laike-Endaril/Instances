@@ -9,26 +9,14 @@ import java.util.Map;
 
 public class ClientHandler
 {
-    static ClientHandler INSTANCE;
-
-    HashSet<Integer> simpleDimensions;
+    private static HashSet<Integer> simpleDimensions;
 
     public ClientHandler()
     {
-        simpleDimensions = new HashSet<Integer>();
+        simpleDimensions = new HashSet<>();
     }
 
-    public static ClientHandler getInstance()
-    {
-        if (INSTANCE == null)
-        {
-            INSTANCE = new ClientHandler();
-        }
-
-        return INSTANCE;
-    }
-
-    public void cleanUp()
+    public static void cleanUp()
     {
         for (Integer i : simpleDimensions)
         {
@@ -39,12 +27,12 @@ public class ClientHandler
         }
     }
 
-    public void sync(HashMap<Integer, DimensionType> dimensions)
+    public static void sync(HashMap<Integer, DimensionType> dimensions)
     {
-        this.cleanUp();
+        cleanUp();
 
-        this.simpleDimensions = new HashSet<Integer>();
-        this.simpleDimensions.addAll(dimensions.keySet());
+        simpleDimensions = new HashSet<>();
+        simpleDimensions.addAll(dimensions.keySet());
 
         for (Map.Entry<Integer, DimensionType> entry : dimensions.entrySet())
         {

@@ -11,11 +11,11 @@ import java.util.Map;
 
 public class MessageDimensionSync implements IMessage
 {
-    HashMap<Integer, DimensionType> simpleDimensions;
+    private HashMap<Integer, DimensionType> simpleDimensions;
 
     public MessageDimensionSync()
     {
-        simpleDimensions = new HashMap<Integer, DimensionType>();
+        simpleDimensions = new HashMap<>();
     }
 
     @Override

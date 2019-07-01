@@ -11,7 +11,6 @@ import lumien.simpledimensions.server.commands.CommandWeatherD;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -25,9 +24,6 @@ public class SimpleDimensions
     public static final String MODID = "simpledimensions";
     public static final String NAME = "Simple Dimensions";
     public static final String VERSION = "1.12.2.000";
-
-    @SidedProxy(clientSide = "lumien.simpledimensions.client.ClientProxy", serverSide = "lumien.simpledimensions.CommonProxy")
-    public static CommonProxy proxy;
 
     public static SimpleDimensionsConfig config;
 
@@ -69,7 +65,7 @@ public class SimpleDimensions
     {
         if (!event.getManager().isLocalChannel())
         {
-            ClientHandler.getInstance().cleanUp();
+            ClientHandler.cleanUp();
         }
     }
 }

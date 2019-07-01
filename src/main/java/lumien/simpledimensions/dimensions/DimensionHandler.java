@@ -37,22 +37,22 @@ import java.util.Map.Entry;
 
 public class DimensionHandler extends WorldSavedData
 {
-    static String NAME = "SimpleDimensionsHandler";
+    private static String NAME = "SimpleDimensionsHandler";
 
-    HashMap<Integer, WorldInfoSimple> dimensionInfo;
+    private HashMap<Integer, WorldInfoSimple> dimensionInfo;
 
     public DimensionHandler(String name)
     {
         super(name);
 
-        dimensionInfo = new HashMap<Integer, WorldInfoSimple>();
+        dimensionInfo = new HashMap<>();
     }
 
     public DimensionHandler()
     {
         super(NAME);
 
-        dimensionInfo = new HashMap<Integer, WorldInfoSimple>();
+        dimensionInfo = new HashMap<>();
     }
 
     private static String getDisplayableName(String input)
@@ -117,8 +117,7 @@ public class DimensionHandler extends WorldSavedData
 
     private int findFreeDimensionID()
     {
-        HashSet<Integer> ids = new HashSet<Integer>();
-        ids.addAll(Arrays.asList(DimensionManager.getIDs()));
+        HashSet<Integer> ids = new HashSet<>(Arrays.asList(DimensionManager.getIDs()));
 
         int currentID = SimpleDimensions.config.startDimensionID();
         while (true)
@@ -289,8 +288,7 @@ public class DimensionHandler extends WorldSavedData
             MinecraftServer mcserver = overworld.getMinecraftServer();
             PlayerList plist = mcserver.getPlayerList();
             BlockPos defaultspawnpoint = overworld.getSpawnPoint();
-            ArrayList<EntityPlayer> currentPlayers = new ArrayList<EntityPlayer>();
-            currentPlayers.addAll(w.playerEntities);
+            ArrayList<EntityPlayer> currentPlayers = new ArrayList<>(w.playerEntities);
             for (EntityPlayer player : currentPlayers)
             {
                 BlockPos spawnpoint = new BlockPos(defaultspawnpoint.getX(), overworld.getHeight(defaultspawnpoint.getX(), defaultspawnpoint.getZ()), defaultspawnpoint.getZ());

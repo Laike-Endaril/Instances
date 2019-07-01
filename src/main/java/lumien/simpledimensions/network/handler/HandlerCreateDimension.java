@@ -10,25 +10,19 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class HandlerCreateDimension implements IMessageHandler<MessageCreateDimension, IMessage>
 {
-
     @Override
     public IMessage onMessage(final MessageCreateDimension message, final MessageContext ctx)
     {
-        FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(new Runnable()
+        FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() ->
         {
-            @Override
-            public void run()
-            {
-                NetHandlerPlayServer netHandler = (NetHandlerPlayServer) ctx.netHandler;
+            NetHandlerPlayServer netHandler = (NetHandlerPlayServer) ctx.netHandler;
 
-                if (netHandler.player.canUseCommand(3, "simpledimensions"))
-                {
-                    DimensionHandler.getInstance().createDimension(((NetHandlerPlayServer) ctx.netHandler).player, message.getWorldInfo());
-                }
+            if (netHandler.player.canUseCommand(3, "simpledimensions"))
+            {
+                DimensionHandler.getInstance().createDimension(((NetHandlerPlayServer) ctx.netHandler).player, message.getWorldInfo());
             }
         });
 
         return null;
     }
-
 }

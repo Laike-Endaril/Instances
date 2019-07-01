@@ -11,14 +11,14 @@ import javax.annotation.Nullable;
 
 public class WorldInfoSimple extends WorldInfo
 {
-    WorldInfo superInfo;
-    DimensionType dimensionType;
+    private WorldInfo superInfo;
+    private DimensionType dimensionType;
 
     public WorldInfoSimple(NBTTagCompound nbt)
     {
         super(nbt);
 
-        this.dimensionType = DimensionType.OVERWORLD;
+        dimensionType = DimensionType.OVERWORLD;
 
         if (nbt.hasKey("dimType"))
         {
@@ -28,7 +28,7 @@ public class WorldInfoSimple extends WorldInfo
                 try
                 {
                     DimensionType dimType = DimensionType.byName(dimTypeS);
-                    this.dimensionType = dimType;
+                    dimensionType = dimType;
                 }
                 catch (IllegalArgumentException e)
                 {
@@ -45,11 +45,11 @@ public class WorldInfoSimple extends WorldInfo
 
         if (dimType == null)
         {
-            this.dimensionType = DimensionType.OVERWORLD;
+            dimensionType = DimensionType.OVERWORLD;
         }
         else
         {
-            this.dimensionType = dimType;
+            dimensionType = dimType;
         }
     }
 
@@ -57,7 +57,7 @@ public class WorldInfoSimple extends WorldInfo
     public NBTTagCompound cloneNBTCompound(@Nullable NBTTagCompound nbt)
     {
         NBTTagCompound superNbt = super.cloneNBTCompound(nbt);
-        superNbt.setString("dimType", this.dimensionType.getName());
+        superNbt.setString("dimType", dimensionType.getName());
         return superNbt;
     }
 

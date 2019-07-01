@@ -22,7 +22,7 @@ import java.util.List;
 
 public class CommandTeleportD extends CommandBase
 {
-    static Method copyDataFromOld;
+    private static Method copyDataFromOld;
 
     static
     {
@@ -56,7 +56,7 @@ public class CommandTeleportD extends CommandBase
     {
         if (args.length < 1)
         {
-            throw new WrongUsageException("simpleDimensions.commands.tpd.usage", new Object[0]);
+            throw new WrongUsageException("simpleDimensions.commands.tpd.usage");
         }
         else
         {
@@ -65,17 +65,13 @@ public class CommandTeleportD extends CommandBase
 
             boolean dimensionThere = false;
             int dimensionID = 0;
-            if (args.length > 0)
+            try
             {
-                try
-                {
-                    dimensionID = Integer.parseInt(args[0]);
-                    dimensionThere = true;
-                }
-                catch (NumberFormatException exception)
-                {
-
-                }
+                dimensionID = Integer.parseInt(args[0]);
+                dimensionThere = true;
+            }
+            catch (NumberFormatException exception)
+            {
             }
 
             if (dimensionThere)
@@ -123,7 +119,7 @@ public class CommandTeleportD extends CommandBase
             {
                 if (args.length < b0 + 3 || !dimensionThere)
                 {
-                    throw new WrongUsageException("simpleDimensions.commands.tpd.usage", new Object[0]);
+                    throw new WrongUsageException("simpleDimensions.commands.tpd.usage");
                 }
                 else if (((Entity) object).world != null)
                 {
@@ -210,7 +206,7 @@ public class CommandTeleportD extends CommandBase
                         ((Entity) object).world.updateEntityWithOptionalForce((Entity) object, false);
                     }
 
-                    notifyCommandListener(sender, this, "commands.tp.success.coordinates", new Object[]{((Entity) object).getName(), Double.valueOf(coordinatearg.getResult()), Double.valueOf(coordinatearg1.getResult()), Double.valueOf(coordinatearg2.getResult())});
+                    notifyCommandListener(sender, this, "commands.tp.success.coordinates", ((Entity) object).getName(), coordinatearg.getResult(), coordinatearg1.getResult(), coordinatearg2.getResult());
                 }
             }
             else
@@ -238,7 +234,7 @@ public class CommandTeleportD extends CommandBase
                     ((Entity) object).setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
                 }
 
-                notifyCommandListener(sender, this, "commands.tp.success", new Object[]{((Entity) object).getName(), entity.getName()});
+                notifyCommandListener(sender, this, "commands.tp.success", ((Entity) object).getName(), entity.getName());
             }
         }
     }

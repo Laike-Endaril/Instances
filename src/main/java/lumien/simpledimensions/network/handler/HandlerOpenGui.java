@@ -9,32 +9,13 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class HandlerOpenGui implements IMessageHandler<MessageOpenGui, IMessage>
 {
-
     @Override
-    @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageOpenGui message, MessageContext ctx)
     {
-        final int id = message.getGuiID();
-
-        Minecraft.getMinecraft().addScheduledTask(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                switch (id)
-                {
-                    case 0:
-                        Minecraft.getMinecraft().displayGuiScreen(new GuiCreateDimension(Minecraft.getMinecraft().ingameGUI));
-                        break;
-                }
-            }
-
-        });
-
-
+        Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().displayGuiScreen(new GuiCreateDimension()));
         return null;
     }
-
 }

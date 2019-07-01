@@ -15,7 +15,6 @@ public class TeleporterSimple extends Teleporter
     @Override
     public void placeInPortal(Entity entityIn, float rotationYaw)
     {
-
     }
 
     @Override
@@ -28,11 +27,5 @@ public class TeleporterSimple extends Teleporter
     public boolean makePortal(Entity p_85188_1_)
     {
         return true;
-    }
-
-    @Override
-    public void removeStalePortalLocations(long p_85189_1_)
-    {
-
     }
 }

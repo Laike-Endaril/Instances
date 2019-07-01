@@ -41,27 +41,29 @@ public class CommandTimeD extends CommandBase
 
             if (worldserver == null)
             {
-                notifyCommandListener(sender, this, "No dimension found with the id %s", new Object[]{Integer.valueOf(dimension)});
+                notifyCommandListener(sender, this, "No dimension found with the id %s", dimension);
                 return;
             }
 
             if (args[1].equals("set"))
             {
-                if (args[2].equals("day"))
+                switch (args[2])
                 {
-                    i = 1000;
-                }
-                else if (args[2].equals("night"))
-                {
-                    i = 13000;
-                }
-                else
-                {
-                    i = parseInt(args[2], 0);
+                    case "day":
+                        i = 1000;
+                        break;
+
+                    case "night":
+                        i = 13000;
+                        break;
+
+                    default:
+                        i = parseInt(args[2], 0);
+                        break;
                 }
 
                 worldserver.setWorldTime(i);
-                notifyCommandListener(sender, this, "commands.time.set", new Object[]{Integer.valueOf(i)});
+                notifyCommandListener(sender, this, "commands.time.set", i);
                 return;
             }
 
@@ -69,7 +71,7 @@ public class CommandTimeD extends CommandBase
             {
                 i = parseInt(args[2], 0);
                 worldserver.setWorldTime(worldserver.getWorldTime() + i);
-                notifyCommandListener(sender, this, "commands.time.added", new Object[]{Integer.valueOf(i)});
+                notifyCommandListener(sender, this, "commands.time.added", i);
                 return;
             }
 
@@ -79,7 +81,7 @@ public class CommandTimeD extends CommandBase
                 {
                     i = (int) (sender.getEntityWorld().getWorldTime() % 2147483647L);
                     sender.setCommandStat(CommandResultStats.Type.QUERY_RESULT, i);
-                    notifyCommandListener(sender, this, "commands.time.query", new Object[]{Integer.valueOf(i)});
+                    notifyCommandListener(sender, this, "commands.time.query", i);
                     return;
                 }
 
@@ -87,18 +89,18 @@ public class CommandTimeD extends CommandBase
                 {
                     i = (int) (sender.getEntityWorld().getTotalWorldTime() % 2147483647L);
                     sender.setCommandStat(CommandResultStats.Type.QUERY_RESULT, i);
-                    notifyCommandListener(sender, this, "commands.time.query", new Object[]{Integer.valueOf(i)});
+                    notifyCommandListener(sender, this, "commands.time.query", i);
                     return;
                 }
             }
         }
 
-        throw new WrongUsageException("simpleDimensions.commands.timed.usage", new Object[0]);
+        throw new WrongUsageException("simpleDimensions.commands.timed.usage");
     }
 
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 2 ? getListOfStringsMatchingLastWord(args, new String[]{"set", "add", "query"}) : (args.length == 3 && args[1].equals("set") ? getListOfStringsMatchingLastWord(args, new String[]{"day", "night"}) : (args.length == 3 && args[1].equals("query") ? getListOfStringsMatchingLastWord(args, new String[]{"daytime", "gametime"}) : null));
+        return args.length == 2 ? getListOfStringsMatchingLastWord(args, "set", "add", "query") : (args.length == 3 && args[1].equals("set") ? getListOfStringsMatchingLastWord(args, "day", "night") : (args.length == 3 && args[1].equals("query") ? getListOfStringsMatchingLastWord(args, "daytime", "gametime") : null));
     }
 }

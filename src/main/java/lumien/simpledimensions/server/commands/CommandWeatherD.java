@@ -49,7 +49,7 @@ public class CommandWeatherD extends CommandBase
         {
             int dimension = Integer.parseInt(args[0]);
 
-            int i = (300 + (new Random()).nextInt(600)) * 20;
+            int i = 6000 + new Random().nextInt(12000);
 
             if (args.length >= 3)
             {
@@ -69,7 +69,7 @@ public class CommandWeatherD extends CommandBase
                     worldinfo.setThunderTime(0);
                     worldinfo.setRaining(false);
                     worldinfo.setThundering(false);
-                    notifyCommandListener(sender, this, "commands.weather.clear", new Object[0]);
+                    notifyCommandListener(sender, this, "commands.weather.clear");
                 }
                 else if ("rain".equalsIgnoreCase(args[1]))
                 {
@@ -78,13 +78,13 @@ public class CommandWeatherD extends CommandBase
                     worldinfo.setThunderTime(i);
                     worldinfo.setRaining(true);
                     worldinfo.setThundering(false);
-                    notifyCommandListener(sender, this, "commands.weather.rain", new Object[0]);
+                    notifyCommandListener(sender, this, "commands.weather.rain");
                 }
                 else
                 {
                     if (!"thunder".equalsIgnoreCase(args[1]))
                     {
-                        throw new WrongUsageException("simpleDimensions.commands.weatherd.usage", new Object[0]);
+                        throw new WrongUsageException("simpleDimensions.commands.weatherd.usage");
                     }
 
                     worldinfo.setCleanWeatherTime(0);
@@ -92,23 +92,23 @@ public class CommandWeatherD extends CommandBase
                     worldinfo.setThunderTime(i);
                     worldinfo.setRaining(true);
                     worldinfo.setThundering(true);
-                    notifyCommandListener(sender, this, "commands.weather.thunder", new Object[0]);
+                    notifyCommandListener(sender, this, "commands.weather.thunder");
                 }
             }
             else
             {
-                notifyCommandListener(sender, this, "No dimension found with the id %s", new Object[]{Integer.valueOf(dimension)});
+                notifyCommandListener(sender, this, "No dimension found with the id %s", dimension);
             }
         }
         else
         {
-            throw new WrongUsageException("simpleDimensions.commands.weatherd.usage", new Object[0]);
+            throw new WrongUsageException("simpleDimensions.commands.weatherd.usage");
         }
     }
 
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 2 ? getListOfStringsMatchingLastWord(args, new String[]{"clear", "rain", "thunder"}) : null;
+        return args.length == 2 ? getListOfStringsMatchingLastWord(args, "clear", "rain", "thunder") : null;
     }
 }
