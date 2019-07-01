@@ -9,12 +9,7 @@ import java.util.Map;
 
 public class ClientHandler
 {
-    private static HashSet<Integer> simpleDimensions;
-
-    public ClientHandler()
-    {
-        simpleDimensions = new HashSet<>();
-    }
+    private static HashSet<Integer> simpleDimensions = new HashSet<>();
 
     public static void cleanUp()
     {
