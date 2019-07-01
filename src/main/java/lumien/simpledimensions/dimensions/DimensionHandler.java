@@ -1,28 +1,12 @@
 package lumien.simpledimensions.dimensions;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-
-import org.apache.commons.io.FileUtils;
-
 import lumien.simpledimensions.SimpleDimensions;
 import lumien.simpledimensions.network.PacketHandler;
 import lumien.simpledimensions.network.messages.MessageDimensionSync;
 import lumien.simpledimensions.server.WorldCustom;
 import lumien.simpledimensions.util.TeleporterSimple;
 import lumien.simpledimensions.util.WorldInfoSimple;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -31,18 +15,10 @@ import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.*;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.MinecraftException;
 import net.minecraft.world.ServerWorldEventHandler;
-import net.minecraft.world.Teleporter;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
@@ -52,325 +28,345 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class DimensionHandler extends WorldSavedData
 {
-	static String NAME = "SimpleDimensionsHandler";
+    static String NAME = "SimpleDimensionsHandler";
 
-	HashMap<Integer, WorldInfoSimple> dimensionInfo;
+    HashMap<Integer, WorldInfoSimple> dimensionInfo;
 
-	public DimensionHandler(String name)
-	{
-		super(name);
+    public DimensionHandler(String name)
+    {
+        super(name);
 
-		dimensionInfo = new HashMap<Integer, WorldInfoSimple>();
-	}
+        dimensionInfo = new HashMap<Integer, WorldInfoSimple>();
+    }
 
-	public DimensionHandler()
-	{
-		super(NAME);
+    public DimensionHandler()
+    {
+        super(NAME);
 
-		dimensionInfo = new HashMap<Integer, WorldInfoSimple>();
-	}
+        dimensionInfo = new HashMap<Integer, WorldInfoSimple>();
+    }
 
-	@Override
-	public boolean isDirty()
-	{
-		return true;
-	}
+    private static String getDisplayableName(String input)
+    {
+        StringBuilder titleCase = new StringBuilder();
+        boolean nextTitleCase = true;
 
-	public void createDimension(EntityPlayerMP playerEntity, WorldInfoSimple worldInfo)
-	{
-		int dimensionID = findFreeDimensionID();
+        for (char c : input.replace("_", " ").toCharArray())
+        {
+            if (Character.isSpaceChar(c))
+            {
+                nextTitleCase = true;
+            }
+            else if (nextTitleCase)
+            {
+                c = Character.toTitleCase(c);
+                nextTitleCase = false;
+            }
 
-		dimensionInfo.put(dimensionID, worldInfo);
-		
-		DimensionType dimensionType = worldInfo.getDimensionType();
-		
-		DimensionManager.registerDimension(dimensionID, dimensionType);
-		
-		loadDimension(dimensionID, worldInfo);
+            titleCase.append(c);
+        }
 
-		playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
+        return titleCase.toString();
+    }
 
-		syncWithClients();
-	}
+    public static DimensionHandler getInstance()
+    {
+        DimensionHandler INSTANCE;
+        INSTANCE = (DimensionHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(DimensionHandler.class, NAME);
 
-	private int findFreeDimensionID()
-	{
-		HashSet<Integer> ids = new HashSet<Integer>();
-		ids.addAll(Arrays.asList(DimensionManager.getIDs()));
+        if (INSTANCE == null)
+        {
+            INSTANCE = new DimensionHandler();
+            FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().setData(NAME, INSTANCE);
+        }
 
-		int currentID = SimpleDimensions.INSTANCE.config.startDimensionID();
-		while (true)
-		{
-			if (!ids.contains(currentID))
-			{
-				return currentID;
-			}
-			else
-			{
-				currentID++;
-			}
-		}
-	}
+        return INSTANCE;
+    }
 
-	private static String getDisplayableName(String input) {
-	    StringBuilder titleCase = new StringBuilder();
-	    boolean nextTitleCase = true;
+    @Override
+    public boolean isDirty()
+    {
+        return true;
+    }
 
-	    for (char c : input.replace("_", " ").toCharArray()) {
-	        if (Character.isSpaceChar(c)) {
-	            nextTitleCase = true;
-	        } else if (nextTitleCase) {
-	            c = Character.toTitleCase(c);
-	            nextTitleCase = false;
-	        }
+    public void createDimension(EntityPlayerMP playerEntity, WorldInfoSimple worldInfo)
+    {
+        int dimensionID = findFreeDimensionID();
 
-	        titleCase.append(c);
-	    }
+        dimensionInfo.put(dimensionID, worldInfo);
 
-	    return titleCase.toString();
-	}
-	
-	public ITextComponent generateList()
-	{
-		StringBuilder stringBuilder = new StringBuilder();
+        DimensionType dimensionType = worldInfo.getDimensionType();
 
-		if (dimensionInfo.isEmpty())
-		{
-			return new TextComponentTranslation("simpleDimensions.nodimensions");
-		}
-		else
-		{
-			int counter = 0;
-			for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-			{
-				DimensionType dimensionType = entry.getValue().getDimensionType();
-				
-				stringBuilder.append(String.format("%s %s", "DIM " + entry.getKey(), "(" + entry.getValue().getWorldName() + ") (" + getDisplayableName(dimensionType.getName()) + ")"));
-				counter++;
-				if (counter < dimensionInfo.size())
-				{
-					stringBuilder.append("\n");
-				}
-			}
+        DimensionManager.registerDimension(dimensionID, dimensionType);
 
-			return new TextComponentString(stringBuilder.toString());
-		}
-	}
+        loadDimension(dimensionID, worldInfo);
 
-	public static DimensionHandler getInstance()
-	{
-		DimensionHandler INSTANCE;
-		INSTANCE = (DimensionHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(DimensionHandler.class, NAME);
+        playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
 
-		if (INSTANCE == null)
-		{
-			INSTANCE = new DimensionHandler();
-			FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().setData(NAME, INSTANCE);
-		}
+        syncWithClients();
+    }
 
-		return INSTANCE;
-	}
+    private int findFreeDimensionID()
+    {
+        HashSet<Integer> ids = new HashSet<Integer>();
+        ids.addAll(Arrays.asList(DimensionManager.getIDs()));
 
-	public String getDimensionName(int dimensionId)
-	{
-		return dimensionInfo.get(dimensionId).getWorldName();
-	}
+        int currentID = SimpleDimensions.config.startDimensionID();
+        while (true)
+        {
+            if (!ids.contains(currentID))
+            {
+                return currentID;
+            }
+            else
+            {
+                currentID++;
+            }
+        }
+    }
 
-	public HashMap<Integer, WorldInfoSimple> getDimensionInfo()
-	{
-		return dimensionInfo;
-	}
+    public ITextComponent generateList()
+    {
+        StringBuilder stringBuilder = new StringBuilder();
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt)
-	{
-		NBTTagList nbtList = nbt.getTagList("dimensionInfo", 10);
+        if (dimensionInfo.isEmpty())
+        {
+            return new TextComponentTranslation("simpleDimensions.nodimensions");
+        }
+        else
+        {
+            int counter = 0;
+            for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+            {
+                DimensionType dimensionType = entry.getValue().getDimensionType();
 
-		for (int i = 0; i < nbtList.tagCount(); i++)
-		{
-			NBTTagCompound compound = nbtList.getCompoundTagAt(i);
+                stringBuilder.append(String.format("%s %s", "DIM " + entry.getKey(), "(" + entry.getValue().getWorldName() + ") (" + getDisplayableName(dimensionType.getName()) + ")"));
+                counter++;
+                if (counter < dimensionInfo.size())
+                {
+                    stringBuilder.append("\n");
+                }
+            }
 
-			dimensionInfo.put(compound.getInteger("dimensionID"), new WorldInfoSimple(compound.getCompoundTag("worldInfo")));
-		}
-	}
+            return new TextComponentString(stringBuilder.toString());
+        }
+    }
 
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-	{
-		NBTTagList nbtList = new NBTTagList();
+    public String getDimensionName(int dimensionId)
+    {
+        return dimensionInfo.get(dimensionId).getWorldName();
+    }
 
-		for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-		{
-			NBTTagCompound compound = new NBTTagCompound();
+    public HashMap<Integer, WorldInfoSimple> getDimensionInfo()
+    {
+        return dimensionInfo;
+    }
 
-			compound.setInteger("dimensionID", entry.getKey());
-			compound.setTag("worldInfo", entry.getValue().cloneNBTCompound(null));
+    @Override
+    public void readFromNBT(NBTTagCompound nbt)
+    {
+        NBTTagList nbtList = nbt.getTagList("dimensionInfo", 10);
 
-			nbtList.appendTag(compound);
-		}
+        for (int i = 0; i < nbtList.tagCount(); i++)
+        {
+            NBTTagCompound compound = nbtList.getCompoundTagAt(i);
 
-		nbt.setTag("dimensionInfo", nbtList);
+            dimensionInfo.put(compound.getInteger("dimensionID"), new WorldInfoSimple(compound.getCompoundTag("worldInfo")));
+        }
+    }
 
-		return nbt;
-	}
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+    {
+        NBTTagList nbtList = new NBTTagList();
 
-	public void loadDimensions()
-	{
-		for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-		{
-			int dimensionID = entry.getKey();
-			WorldInfoSimple worldInfo = entry.getValue();
+        for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            NBTTagCompound compound = new NBTTagCompound();
 
-			DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
-			
-			System.out.println(worldInfo.getDimensionType());
+            compound.setInteger("dimensionID", entry.getKey());
+            compound.setTag("worldInfo", entry.getValue().cloneNBTCompound(null));
 
-			loadDimension(dimensionID, worldInfo);
-		}
-	}
+            nbtList.appendTag(compound);
+        }
 
-	private void loadDimension(int dimensionID, WorldInfo worldInfo)
-	{
-		WorldServer overworld = (WorldServer) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld();
-		if (overworld == null)
-		{
-			throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
-		}
-		try
-		{
-			DimensionManager.getProviderType(dimensionID);
-		}
-		catch (Exception e)
-		{
-			System.err.println("Cannot Hotload Dim: " + e.getMessage());
-			return;
-		}
+        nbt.setTag("dimensionInfo", nbtList);
 
-		MinecraftServer mcServer = overworld.getMinecraftServer();
-		ISaveHandler savehandler = overworld.getSaveHandler();
-		EnumDifficulty difficulty = mcServer.getEntityWorld().getDifficulty();
+        return nbt;
+    }
 
-		WorldServer world = (WorldServer) (new WorldCustom(worldInfo, mcServer, savehandler, dimensionID, overworld, mcServer.profiler).init());
-		world.addEventListener(new ServerWorldEventHandler(mcServer, world));
-		MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
+    public void loadDimensions()
+    {
+        for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            int dimensionID = entry.getKey();
+            WorldInfoSimple worldInfo = entry.getValue();
 
-		if (!mcServer.isSinglePlayer())
-		{
-			world.getWorldInfo().setGameType(mcServer.getGameType());
-		}
+            DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
 
-		mcServer.setDifficultyForAllWorlds(difficulty);
-	}
+            System.out.println(worldInfo.getDimensionType());
 
-	public void deleteDimension(ICommandSender sender, int dimensionID)
-	{
-		WorldServer w = DimensionManager.getWorld(dimensionID);
+            loadDimension(dimensionID, worldInfo);
+        }
+    }
 
-		if (!dimensionInfo.containsKey(dimensionID))
-		{
-			if (w == null) {
-				sender.sendMessage(new TextComponentString("No dimension with that id exists").setStyle(new Style().setColor(TextFormatting.RED)));
-			}
-			else {
-				sender.sendMessage(new TextComponentString("The dimension associated with that id is not from the SimpleDimensions mod").setStyle(new Style().setColor(TextFormatting.RED)));
-			}
-			return;
-		}
-		
-		if (w == null) {
-			if (DimensionManager.isDimensionRegistered(dimensionID)) {
-				loadDimension(dimensionID, dimensionInfo.get(dimensionID));
-				w = DimensionManager.getWorld(dimensionID);
-				if (w == null) {
-					sender.sendMessage(new TextComponentString("Failed to load dimension").setStyle(new Style().setColor(TextFormatting.RED)));
-					return;
-				}
-			}
-		}
+    private void loadDimension(int dimensionID, WorldInfo worldInfo)
+    {
+        WorldServer overworld = (WorldServer) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld();
+        if (overworld == null)
+        {
+            throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
+        }
+        try
+        {
+            DimensionManager.getProviderType(dimensionID);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Cannot Hotload Dim: " + e.getMessage());
+            return;
+        }
 
-		if (!w.playerEntities.isEmpty())
-		{
-			WorldServer overworld = DimensionManager.getWorld(0);
-			MinecraftServer mcserver = overworld.getMinecraftServer();
-			PlayerList plist = mcserver.getPlayerList();
-			BlockPos defaultspawnpoint = overworld.getSpawnPoint();
-			ArrayList<EntityPlayer> currentPlayers = new ArrayList<EntityPlayer>();
-			currentPlayers.addAll(w.playerEntities);
-			for (EntityPlayer player : currentPlayers) {
-				BlockPos spawnpoint = new BlockPos(defaultspawnpoint.getX(), overworld.getHeight(defaultspawnpoint.getX(), defaultspawnpoint.getZ()), defaultspawnpoint.getZ()); 
-				BlockPos bedlocation = player.getBedLocation();
-				
-				if (bedlocation != null) {
-					BlockPos bedspawnlocation = EntityPlayer.getBedSpawnLocation(overworld, bedlocation, false);
-					if (bedspawnlocation != null) {
-						spawnpoint = bedspawnlocation;
-					}
-				}
-				
-				EnumSet enumset = EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class);
-				
-				player.dismountRidingEntity();
-				((EntityPlayerMP) player).connection.setPlayerLocation(spawnpoint.getX(), spawnpoint.getY(), spawnpoint.getZ(), 0, 0, enumset);
-				
-				plist.transferPlayerToDimension((EntityPlayerMP) player, 0, new TeleporterSimple(overworld));
-				
-				if (sender != player) {
-					player.sendMessage(new TextComponentString("The dimension you were in was deleted").setStyle(new Style().setColor(TextFormatting.RED)));
-				}
-			}
-		}
+        MinecraftServer mcServer = overworld.getMinecraftServer();
+        ISaveHandler savehandler = overworld.getSaveHandler();
+        EnumDifficulty difficulty = mcServer.getEntityWorld().getDifficulty();
 
-		MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(w));
-		w.flush();
-		DimensionManager.setWorld(dimensionID, null, w.getMinecraftServer());
-		DimensionManager.unregisterDimension(dimensionID);
+        WorldServer world = (WorldServer) (new WorldCustom(worldInfo, mcServer, savehandler, dimensionID, overworld, mcServer.profiler).init());
+        world.addEventListener(new ServerWorldEventHandler(mcServer, world));
+        MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
 
-		dimensionInfo.remove(dimensionID);
-		w.flush();
+        if (!mcServer.isSinglePlayer())
+        {
+            world.getWorldInfo().setGameType(mcServer.getGameType());
+        }
 
-		File dimensionFolder = new File(DimensionManager.getCurrentSaveRootDirectory(), "DIM" + dimensionID);
+        mcServer.setDifficultyForAllWorlds(difficulty);
+    }
 
-		try
-		{
-			FileUtils.deleteDirectory(dimensionFolder);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-			sender.sendMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
-		}
-		finally
-		{
-			sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
-		}
+    public void deleteDimension(ICommandSender sender, int dimensionID)
+    {
+        WorldServer w = DimensionManager.getWorld(dimensionID);
 
-		syncWithClients();
-	}
+        if (!dimensionInfo.containsKey(dimensionID))
+        {
+            if (w == null)
+            {
+                sender.sendMessage(new TextComponentString("No dimension with that id exists").setStyle(new Style().setColor(TextFormatting.RED)));
+            }
+            else
+            {
+                sender.sendMessage(new TextComponentString("The dimension associated with that id is not from the SimpleDimensions mod").setStyle(new Style().setColor(TextFormatting.RED)));
+            }
+            return;
+        }
 
-	private void syncWithClients()
-	{
-		MessageDimensionSync message = new MessageDimensionSync();
+        if (w == null)
+        {
+            if (DimensionManager.isDimensionRegistered(dimensionID))
+            {
+                loadDimension(dimensionID, dimensionInfo.get(dimensionID));
+                w = DimensionManager.getWorld(dimensionID);
+                if (w == null)
+                {
+                    sender.sendMessage(new TextComponentString("Failed to load dimension").setStyle(new Style().setColor(TextFormatting.RED)));
+                    return;
+                }
+            }
+        }
 
-		for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-		{
-			message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
-		}
+        if (!w.playerEntities.isEmpty())
+        {
+            WorldServer overworld = DimensionManager.getWorld(0);
+            MinecraftServer mcserver = overworld.getMinecraftServer();
+            PlayerList plist = mcserver.getPlayerList();
+            BlockPos defaultspawnpoint = overworld.getSpawnPoint();
+            ArrayList<EntityPlayer> currentPlayers = new ArrayList<EntityPlayer>();
+            currentPlayers.addAll(w.playerEntities);
+            for (EntityPlayer player : currentPlayers)
+            {
+                BlockPos spawnpoint = new BlockPos(defaultspawnpoint.getX(), overworld.getHeight(defaultspawnpoint.getX(), defaultspawnpoint.getZ()), defaultspawnpoint.getZ());
+                BlockPos bedlocation = player.getBedLocation();
 
-		PacketHandler.INSTANCE.sendToAll(message);
-	}
+                if (bedlocation != null)
+                {
+                    BlockPos bedspawnlocation = EntityPlayer.getBedSpawnLocation(overworld, bedlocation, false);
+                    if (bedspawnlocation != null)
+                    {
+                        spawnpoint = bedspawnlocation;
+                    }
+                }
 
-	public IMessage constructSyncMessage()
-	{
-		MessageDimensionSync message = new MessageDimensionSync();
+                EnumSet enumset = EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class);
 
-		for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-		{
-			message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
-		}
+                player.dismountRidingEntity();
+                ((EntityPlayerMP) player).connection.setPlayerLocation(spawnpoint.getX(), spawnpoint.getY(), spawnpoint.getZ(), 0, 0, enumset);
 
-		return message;
-	}
+                plist.transferPlayerToDimension((EntityPlayerMP) player, 0, new TeleporterSimple(overworld));
+
+                if (sender != player)
+                {
+                    player.sendMessage(new TextComponentString("The dimension you were in was deleted").setStyle(new Style().setColor(TextFormatting.RED)));
+                }
+            }
+        }
+
+        MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(w));
+        w.flush();
+        DimensionManager.setWorld(dimensionID, null, w.getMinecraftServer());
+        DimensionManager.unregisterDimension(dimensionID);
+
+        dimensionInfo.remove(dimensionID);
+        w.flush();
+
+        File dimensionFolder = new File(DimensionManager.getCurrentSaveRootDirectory(), "DIM" + dimensionID);
+
+        try
+        {
+            FileUtils.deleteDirectory(dimensionFolder);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            sender.sendMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
+        }
+        finally
+        {
+            sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
+        }
+
+        syncWithClients();
+    }
+
+    private void syncWithClients()
+    {
+        MessageDimensionSync message = new MessageDimensionSync();
+
+        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
+        }
+
+        PacketHandler.INSTANCE.sendToAll(message);
+    }
+
+    public IMessage constructSyncMessage()
+    {
+        MessageDimensionSync message = new MessageDimensionSync();
+
+        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
+        }
+
+        return message;
+    }
 }

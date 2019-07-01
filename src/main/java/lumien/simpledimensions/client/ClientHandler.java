@@ -1,59 +1,57 @@
 package lumien.simpledimensions.client;
 
-import java.util.ArrayList;
+import net.minecraft.world.DimensionType;
+import net.minecraftforge.common.DimensionManager;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import lumien.simpledimensions.SimpleDimensions;
-import net.minecraft.world.DimensionType;
-import net.minecraftforge.common.DimensionManager;
-
 public class ClientHandler
 {
-	static ClientHandler INSTANCE;
+    static ClientHandler INSTANCE;
 
-	HashSet<Integer> simpleDimensions;
+    HashSet<Integer> simpleDimensions;
 
-	public ClientHandler()
-	{
-		simpleDimensions = new HashSet<Integer>();
-	}
+    public ClientHandler()
+    {
+        simpleDimensions = new HashSet<Integer>();
+    }
 
-	public void cleanUp()
-	{
-		for (Integer i : simpleDimensions)
-		{
-			if (DimensionManager.isDimensionRegistered(i))
-			{
-				DimensionManager.unregisterDimension(i);
-			}
-		}
-	}
+    public static ClientHandler getInstance()
+    {
+        if (INSTANCE == null)
+        {
+            INSTANCE = new ClientHandler();
+        }
 
-	public static ClientHandler getInstance()
-	{
-		if (INSTANCE == null)
-		{
-			INSTANCE = new ClientHandler();
-		}
+        return INSTANCE;
+    }
 
-		return INSTANCE;
-	}
+    public void cleanUp()
+    {
+        for (Integer i : simpleDimensions)
+        {
+            if (DimensionManager.isDimensionRegistered(i))
+            {
+                DimensionManager.unregisterDimension(i);
+            }
+        }
+    }
 
-	public void sync(HashMap<Integer, DimensionType> dimensions)
-	{
-		this.cleanUp();
+    public void sync(HashMap<Integer, DimensionType> dimensions)
+    {
+        this.cleanUp();
 
-		this.simpleDimensions = new HashSet<Integer>();
-		this.simpleDimensions.addAll(dimensions.keySet());
+        this.simpleDimensions = new HashSet<Integer>();
+        this.simpleDimensions.addAll(dimensions.keySet());
 
-		for (Map.Entry<Integer, DimensionType> entry : dimensions.entrySet())
-		{
-			if (!DimensionManager.isDimensionRegistered(entry.getKey()))
-			{
-				DimensionManager.registerDimension(entry.getKey(), entry.getValue());
-			}
-		}
-	}
+        for (Map.Entry<Integer, DimensionType> entry : dimensions.entrySet())
+        {
+            if (!DimensionManager.isDimensionRegistered(entry.getKey()))
+            {
+                DimensionManager.registerDimension(entry.getKey(), entry.getValue());
+            }
+        }
+    }
 }

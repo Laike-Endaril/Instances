@@ -1,7 +1,5 @@
 package lumien.simpledimensions.client.gui;
 
-import java.io.IOException;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.Gui;
@@ -23,23 +21,37 @@ import net.minecraft.world.gen.FlatLayerInfo;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.io.IOException;
+
 @SideOnly(Side.CLIENT)
 public class GuiCreateFlatDimension extends GuiScreen
 {
     private final GuiCreateDimension createDimensionGui;
     private FlatGeneratorInfo theFlatGeneratorInfo = FlatGeneratorInfo.getDefaultFlatGenerator();
-    /** The title given to the flat world currently in creation */
+    /**
+     * The title given to the flat world currently in creation
+     */
     private String flatWorldTitle;
-    /** The text used to identify the material for a layer */
+    /**
+     * The text used to identify the material for a layer
+     */
     private String materialText;
-    /** The text used to identify the height of a layer */
+    /**
+     * The text used to identify the height of a layer
+     */
     private String heightText;
     private GuiCreateFlatDimension.Details createFlatWorldListSlotGui;
-    /** The (unused and permenantly hidden) add layer button */
+    /**
+     * The (unused and permenantly hidden) add layer button
+     */
     private GuiButton addLayerButton;
-    /** The (unused and permenantly hidden) edit layer button */
+    /**
+     * The (unused and permenantly hidden) edit layer button
+     */
     private GuiButton editLayerButton;
-    /** The remove layer button */
+    /**
+     * The remove layer button
+     */
     private GuiButton removeLayerButton;
 
     public GuiCreateFlatDimension(GuiCreateDimension createWorldGuiIn, String preset)
@@ -58,7 +70,7 @@ public class GuiCreateFlatDimension extends GuiScreen
 
     /**
      * Sets the superflat preset. Invalid or null values will result in the default superflat preset being used.
-     *  
+     *
      * @param preset The new preset to use in the format described on the Superflat article on the Minecraft Wiki
      */
     public void setPreset(String preset)
@@ -150,9 +162,9 @@ public class GuiCreateFlatDimension extends GuiScreen
 
     /**
      * Draws the screen and all the components in it.
-     *  
-     * @param mouseX Mouse x coordinate
-     * @param mouseY Mouse y coordinate
+     *
+     * @param mouseX       Mouse x coordinate
+     * @param mouseY       Mouse y coordinate
      * @param partialTicks How far into the current tick (1/20th of a second) the game is
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
@@ -183,11 +195,11 @@ public class GuiCreateFlatDimension extends GuiScreen
         /**
          * Draws an item with a background at the given coordinates. The item and its background are 20 pixels tall/wide
          * (though only the inner 18x18 is actually drawn on)
-         *  
-         * @param x Display x coordinate; the background is drawn 1 pixel further than this and the itemstack is drawn 2
-         * pixels further
-         * @param z Display z coordinate; the background is drawn 1 pixel further than this and the itemstack is drawn 2
-         * pixels further
+         *
+         * @param x          Display x coordinate; the background is drawn 1 pixel further than this and the itemstack is drawn 2
+         *                   pixels further
+         * @param z          Display z coordinate; the background is drawn 1 pixel further than this and the itemstack is drawn 2
+         *                   pixels further
          * @param itemToDraw The item to draw
          */
         private void drawItem(int x, int z, ItemStack itemToDraw)
@@ -207,7 +219,7 @@ public class GuiCreateFlatDimension extends GuiScreen
 
         /**
          * Draws the background icon for an item, with the indented texture from stats.png
-         *  
+         *
          * @param x Display x coordinate
          * @param y Display y coordinate
          */
@@ -218,9 +230,9 @@ public class GuiCreateFlatDimension extends GuiScreen
 
         /**
          * Draws the background icon for an item, using a texture from stats.png with the given coords
-         *  
-         * @param x Display x coordinate
-         * @param z Display z coordinate
+         *
+         * @param x        Display x coordinate
+         * @param z        Display z coordinate
          * @param textureX Leftmost coordinate of the icon in stats.png to use; only ever set to 0
          * @param textureY Topmost coordinate of the icon in stats.png to use; only ever set to 0
          */
@@ -235,10 +247,10 @@ public class GuiCreateFlatDimension extends GuiScreen
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder vertexbuffer = tessellator.getBuffer();
             vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-            vertexbuffer.pos((double)(x + 0), (double)(z + 18), (double)GuiCreateFlatDimension.this.zLevel).tex((double)((float)(textureX + 0) * 0.0078125F), (double)((float)(textureY + 18) * 0.0078125F)).endVertex();
-            vertexbuffer.pos((double)(x + 18), (double)(z + 18), (double)GuiCreateFlatDimension.this.zLevel).tex((double)((float)(textureX + 18) * 0.0078125F), (double)((float)(textureY + 18) * 0.0078125F)).endVertex();
-            vertexbuffer.pos((double)(x + 18), (double)(z + 0), (double)GuiCreateFlatDimension.this.zLevel).tex((double)((float)(textureX + 18) * 0.0078125F), (double)((float)(textureY + 0) * 0.0078125F)).endVertex();
-            vertexbuffer.pos((double)(x + 0), (double)(z + 0), (double)GuiCreateFlatDimension.this.zLevel).tex((double)((float)(textureX + 0) * 0.0078125F), (double)((float)(textureY + 0) * 0.0078125F)).endVertex();
+            vertexbuffer.pos((double) (x + 0), (double) (z + 18), (double) GuiCreateFlatDimension.this.zLevel).tex((double) ((float) (textureX + 0) * 0.0078125F), (double) ((float) (textureY + 18) * 0.0078125F)).endVertex();
+            vertexbuffer.pos((double) (x + 18), (double) (z + 18), (double) GuiCreateFlatDimension.this.zLevel).tex((double) ((float) (textureX + 18) * 0.0078125F), (double) ((float) (textureY + 18) * 0.0078125F)).endVertex();
+            vertexbuffer.pos((double) (x + 18), (double) (z + 0), (double) GuiCreateFlatDimension.this.zLevel).tex((double) ((float) (textureX + 18) * 0.0078125F), (double) ((float) (textureY + 0) * 0.0078125F)).endVertex();
+            vertexbuffer.pos((double) (x + 0), (double) (z + 0), (double) GuiCreateFlatDimension.this.zLevel).tex((double) ((float) (textureX + 0) * 0.0078125F), (double) ((float) (textureY + 0) * 0.0078125F)).endVertex();
             tessellator.draw();
         }
 
@@ -270,7 +282,7 @@ public class GuiCreateFlatDimension extends GuiScreen
 
         protected void drawSlot(int entryID, int insideLeft, int yPos, int insideSlotHeight, int mouseXIn, int mouseYIn, float partialTicks)
         {
-            FlatLayerInfo flatlayerinfo = (FlatLayerInfo)GuiCreateFlatDimension.this.theFlatGeneratorInfo.getFlatLayers().get(GuiCreateFlatDimension.this.theFlatGeneratorInfo.getFlatLayers().size() - entryID - 1);
+            FlatLayerInfo flatlayerinfo = (FlatLayerInfo) GuiCreateFlatDimension.this.theFlatGeneratorInfo.getFlatLayers().get(GuiCreateFlatDimension.this.theFlatGeneratorInfo.getFlatLayers().size() - entryID - 1);
             IBlockState iblockstate = flatlayerinfo.getLayerMaterial();
             Block block = iblockstate.getBlock();
             Item item = Item.getItemFromBlock(block);
@@ -304,15 +316,15 @@ public class GuiCreateFlatDimension extends GuiScreen
 
             if (entryID == 0)
             {
-                s1 = I18n.format("createWorld.customize.flat.layer.top", new Object[] {Integer.valueOf(flatlayerinfo.getLayerCount())});
+                s1 = I18n.format("createWorld.customize.flat.layer.top", new Object[]{Integer.valueOf(flatlayerinfo.getLayerCount())});
             }
             else if (entryID == GuiCreateFlatDimension.this.theFlatGeneratorInfo.getFlatLayers().size() - 1)
             {
-                s1 = I18n.format("createWorld.customize.flat.layer.bottom", new Object[] {Integer.valueOf(flatlayerinfo.getLayerCount())});
+                s1 = I18n.format("createWorld.customize.flat.layer.bottom", new Object[]{Integer.valueOf(flatlayerinfo.getLayerCount())});
             }
             else
             {
-                s1 = I18n.format("createWorld.customize.flat.layer", new Object[] {Integer.valueOf(flatlayerinfo.getLayerCount())});
+                s1 = I18n.format("createWorld.customize.flat.layer", new Object[]{Integer.valueOf(flatlayerinfo.getLayerCount())});
             }
 
             GuiCreateFlatDimension.this.fontRenderer.drawString(s1, insideLeft + 2 + 213 - GuiCreateFlatDimension.this.fontRenderer.getStringWidth(s1), yPos + 3, 16777215);
