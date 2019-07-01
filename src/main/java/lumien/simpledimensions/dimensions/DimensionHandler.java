@@ -80,16 +80,16 @@ public class DimensionHandler extends WorldSavedData
 
     public static DimensionHandler getInstance()
     {
-        DimensionHandler INSTANCE;
-        INSTANCE = (DimensionHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(DimensionHandler.class, NAME);
+        DimensionHandler dimensionHandler;
+        dimensionHandler = (DimensionHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(DimensionHandler.class, NAME);
 
-        if (INSTANCE == null)
+        if (dimensionHandler == null)
         {
-            INSTANCE = new DimensionHandler();
-            FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().setData(NAME, INSTANCE);
+            dimensionHandler = new DimensionHandler();
+            FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().setData(NAME, dimensionHandler);
         }
 
-        return INSTANCE;
+        return dimensionHandler;
     }
 
     @Override
