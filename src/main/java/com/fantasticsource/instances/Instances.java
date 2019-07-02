@@ -66,9 +66,6 @@ public class Instances
     @SubscribeEvent
     public void clientDisconnect(ClientDisconnectionFromServerEvent event)
     {
-        if (!event.getManager().isLocalChannel())
-        {
-            ClientHandler.cleanUp();
-        }
+        if (!event.getManager().isLocalChannel()) ClientHandler.cleanUp();
     }
 }
