@@ -1,0 +1,7 @@
+
+
+
+
+Non-Faerun
+
+Make sure player spawns at 0, 0, 0 in void and skyroom world types

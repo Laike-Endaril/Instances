@@ -30,24 +30,71 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
     {
         Chunk chunk = new Chunk(world, chunkPrimer, chunkX, chunkZ);
 
-        byte[] bytes = chunk.getBiomeArray();
 
+        byte[] bytes = chunk.getBiomeArray();
         for (int i = 0; i < bytes.length; ++i)
         {
             bytes[i] = (byte) Biome.getIdForBiome(BiomeVoid.voidBiome);
         }
 
-        int h = world.getHeight();
-        for (int x = 0; x < 16; x++)
+
+        if (chunkX >= -1 && chunkX <= 0 && chunkZ >= -1 && chunkZ <= 0)
         {
-            for (int z = 0; z < 16; z++)
+            //Floor and ceiling
+            for (int x = 0; x < 16; x++)
             {
-                for (int y = 0; y < h - 2; y++)
+                for (int z = 0; z < 16; z++)
                 {
-                    chunk.setBlockState(new BlockPos(x, y, z), Blocks.DIRT.getDefaultState());
+                    chunk.setBlockState(new BlockPos(x, 75, z), Blocks.BEDROCK.getDefaultState());
+                    chunk.setBlockState(new BlockPos(x, 108, z), Blocks.BARRIER.getDefaultState());
+                }
+            }
+
+            //Walls
+            if (chunkX == -1)
+            {
+                for (int y = 76; y < 108; y++)
+                {
+                    for (int z = 0; z < 16; z++)
+                    {
+                        chunk.setBlockState(new BlockPos(0, y, z), Blocks.BARRIER.getDefaultState());
+                    }
+                }
+            }
+            else
+            {
+                for (int y = 76; y < 108; y++)
+                {
+                    for (int z = 0; z < 16; z++)
+                    {
+                        chunk.setBlockState(new BlockPos(15, y, z), Blocks.BARRIER.getDefaultState());
+                    }
+                }
+            }
+
+            //Walls
+            if (chunkZ == -1)
+            {
+                for (int y = 76; y < 108; y++)
+                {
+                    for (int x = 0; x < 16; x++)
+                    {
+                        chunk.setBlockState(new BlockPos(x, y, 0), Blocks.BARRIER.getDefaultState());
+                    }
+                }
+            }
+            else
+            {
+                for (int y = 76; y < 108; y++)
+                {
+                    for (int x = 0; x < 16; x++)
+                    {
+                        chunk.setBlockState(new BlockPos(x, y, 15), Blocks.BARRIER.getDefaultState());
+                    }
                 }
             }
         }
+
 
         chunk.generateSkylightMap();
         return chunk;

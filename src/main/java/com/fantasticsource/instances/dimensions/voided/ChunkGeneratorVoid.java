@@ -28,12 +28,13 @@ public class ChunkGeneratorVoid implements IChunkGenerator
     {
         Chunk chunk = new Chunk(world, chunkPrimer, chunkX, chunkZ);
 
-        byte[] bytes = chunk.getBiomeArray();
 
+        byte[] bytes = chunk.getBiomeArray();
         for (int i = 0; i < bytes.length; ++i)
         {
             bytes[i] = (byte) Biome.getIdForBiome(BiomeVoid.voidBiome);
         }
+
 
         chunk.generateSkylightMap();
         return chunk;
