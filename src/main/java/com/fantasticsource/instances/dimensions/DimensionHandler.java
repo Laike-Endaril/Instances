@@ -135,7 +135,7 @@ public class DimensionHandler extends WorldSavedData
 
         if (dimensionInfo.isEmpty())
         {
-            return new TextComponentTranslation("instances.noInstances");
+            return new TextComponentTranslation(Instances.MODID + ".noInstances");
         }
         else
         {

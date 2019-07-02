@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.server.commands;
 
+import com.fantasticsource.instances.Instances;
 import net.minecraft.command.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -26,7 +27,7 @@ public class CommandTimeD extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "instances.commands.timed.usage";
+        return Instances.MODID + ".commands.timed.usage";
     }
 
     @Override
@@ -95,7 +96,7 @@ public class CommandTimeD extends CommandBase
             }
         }
 
-        throw new WrongUsageException("instances.commands.timed.usage");
+        throw new WrongUsageException(Instances.MODID + ".commands.timed.usage");
     }
 
     @Override

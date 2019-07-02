@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.server.commands;
 
+import com.fantasticsource.instances.Instances;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -36,7 +37,7 @@ public class CommandWeatherD extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "instances.commands.weatherd.usage";
+        return Instances.MODID + ".commands.weatherd.usage";
     }
 
     /**
@@ -84,7 +85,7 @@ public class CommandWeatherD extends CommandBase
                 {
                     if (!"thunder".equalsIgnoreCase(args[1]))
                     {
-                        throw new WrongUsageException("instances.commands.weatherd.usage");
+                        throw new WrongUsageException(Instances.MODID + ".commands.weatherd.usage");
                     }
 
                     worldinfo.setCleanWeatherTime(0);
@@ -102,7 +103,7 @@ public class CommandWeatherD extends CommandBase
         }
         else
         {
-            throw new WrongUsageException("instances.commands.weatherd.usage");
+            throw new WrongUsageException(Instances.MODID + ".commands.weatherd.usage");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.server.commands;
 
+import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.util.TeleporterSimple;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -49,14 +50,14 @@ public class CommandTeleportD extends CommandBase
 
     public String getUsage(ICommandSender sender)
     {
-        return "instances.commands.tpd.usage";
+        return Instances.MODID + ".commands.tpd.usage";
     }
 
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 1)
         {
-            throw new WrongUsageException("instances.commands.tpd.usage");
+            throw new WrongUsageException(Instances.MODID + ".commands.tpd.usage");
         }
         else
         {
@@ -119,7 +120,7 @@ public class CommandTeleportD extends CommandBase
             {
                 if (args.length < b0 + 3 || !dimensionThere)
                 {
-                    throw new WrongUsageException("instances.commands.tpd.usage");
+                    throw new WrongUsageException(Instances.MODID + ".commands.tpd.usage");
                 }
                 else if (((Entity) object).world != null)
                 {

@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.client.gui;
 
+import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageCreateDimension;
 import com.fantasticsource.instances.util.WorldInfoSimple;
@@ -52,7 +53,7 @@ public class GuiCreateDimension extends GuiScreen
     public GuiCreateDimension()
     {
         worldSeed = "";
-        worldName = I18n.format("instances.newInstance");
+        worldName = I18n.format(Instances.MODID + ".newInstance");
     }
 
     private static String getDisplayableName(String input)
@@ -119,16 +120,16 @@ public class GuiCreateDimension extends GuiScreen
         Keyboard.enableRepeatEvents(true);
         buttonList.clear();
         int halfWidth = width >> 1;
-        buttonList.add(new GuiButton(0, halfWidth - 155, height - 28, 150, 20, I18n.format("instances.create")));
+        buttonList.add(new GuiButton(0, halfWidth - 155, height - 28, 150, 20, I18n.format(Instances.MODID + ".create")));
         buttonList.add(new GuiButton(1, halfWidth + 5, height - 28, 150, 20, I18n.format("gui.cancel")));
-        buttonList.add(btnMoreOptions = new GuiButton(3, halfWidth - 75, 187, 150, 20, I18n.format("instances.moreInstanceOptions")));
+        buttonList.add(btnMoreOptions = new GuiButton(3, halfWidth - 75, 187, 150, 20, I18n.format(Instances.MODID + ".moreInstanceOptions")));
         buttonList.add(btnStructures = new GuiButton(4, halfWidth - 155, 100, 150, 20, I18n.format("selectWorld.mapFeatures")));
         btnStructures.visible = false;
         buttonList.add(btnDimensionType = new GuiButton(5, halfWidth + 5, 100, 150, 20, I18n.format("selectWorld.mapType")));
         btnDimensionType.visible = false;
         buttonList.add(btnCustomizeType = new GuiButton(8, halfWidth + 5, 120, 150, 20, I18n.format("selectWorld.customizeType")));
         btnCustomizeType.visible = false;
-        buttonList.add(instanceType = new GuiButton(11, halfWidth - 155, 151, 150, 20, I18n.format("instances.instanceType")));
+        buttonList.add(instanceType = new GuiButton(11, halfWidth - 155, 151, 150, 20, I18n.format(Instances.MODID + ".instanceType")));
         instanceType.visible = false;
         dimensionNameTextField = new GuiTextField(9, fontRenderer, halfWidth - 100, 60, 200, 20);
         dimensionNameTextField.setFocused(true);
@@ -174,7 +175,7 @@ public class GuiCreateDimension extends GuiScreen
         }
 
         btnDimensionType.displayString = I18n.format("selectWorld.mapType") + " " + I18n.format(WorldType.WORLD_TYPES[selectedIndex].getTranslationKey());
-        instanceType.displayString = I18n.format("instances.instanceType") + " " + I18n.format(getDisplayableName(DimensionType.values()[selectedInstanceTypeIndex].getName()));
+        instanceType.displayString = I18n.format(Instances.MODID + ".instanceType") + " " + I18n.format(getDisplayableName(DimensionType.values()[selectedInstanceTypeIndex].getName()));
     }
 
     /**
@@ -347,7 +348,7 @@ public class GuiCreateDimension extends GuiScreen
         }
         else
         {
-            btnMoreOptions.displayString = I18n.format("instances.moreInstanceOptions");
+            btnMoreOptions.displayString = I18n.format(Instances.MODID + ".moreInstanceOptions");
         }
     }
 
@@ -407,7 +408,7 @@ public class GuiCreateDimension extends GuiScreen
     {
         drawDefaultBackground();
         int halfWidth = width >> 1;
-        drawCenteredString(fontRenderer, I18n.format("instances.create"), halfWidth, 20, -1);
+        drawCenteredString(fontRenderer, I18n.format(Instances.MODID + ".create"), halfWidth, 20, -1);
 
         if (userInMoreOptions)
         {
@@ -421,7 +422,7 @@ public class GuiCreateDimension extends GuiScreen
 
             if (instanceType.visible)
             {
-                drawString(fontRenderer, I18n.format("instances.instanceType.info"), halfWidth - 150, 172, -6250336);
+                drawString(fontRenderer, I18n.format(Instances.MODID + ".instanceType.info"), halfWidth - 150, 172, -6250336);
             }
 
             seedTextField.drawTextBox();
@@ -433,7 +434,7 @@ public class GuiCreateDimension extends GuiScreen
         }
         else
         {
-            drawString(fontRenderer, I18n.format("instances.enterName"), halfWidth - 100, 47, -6250336);
+            drawString(fontRenderer, I18n.format(Instances.MODID + ".enterName"), halfWidth - 100, 47, -6250336);
             drawString(fontRenderer, I18n.format("selectWorld.resultFolder") + " " + saveDirName, halfWidth - 100, 85, -6250336);
             dimensionNameTextField.drawTextBox();
         }

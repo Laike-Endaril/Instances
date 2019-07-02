@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.client.gui;
 
+import com.fantasticsource.instances.Instances;
 import com.google.common.base.Predicate;
 import com.google.common.primitives.Floats;
 import net.minecraft.client.gui.*;
@@ -66,7 +67,7 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
     @Override
     public void initGui()
     {
-        field_175341_a = I18n.format("instances.customizeTitle");
+        field_175341_a = I18n.format(Instances.MODID + ".customizeTitle");
         buttonList.clear();
         buttonList.add(guiButton3 = new GuiButton(302, 20, 5, 80, 20, I18n.format("createWorld.customize.custom.prev")));
         buttonList.add(guiButton4 = new GuiButton(303, width - 100, 5, 80, 20, I18n.format("createWorld.customize.custom.next")));

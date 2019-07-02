@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.dimensions.voided;
 
+import com.fantasticsource.instances.Instances;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -9,6 +10,8 @@ import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.biome.BiomeProviderSingle;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Random;
 
@@ -16,12 +19,18 @@ public class WorldTypeVoid extends WorldType
 {
     public static int voidDimID;
     public static DimensionType voidDimType;
-    public static String voidDimName = "Laike's Void";
+    public static String voidDimName = "Void Instance";
     public static Biome voidBiome;
 
     private WorldTypeVoid()
     {
         super(voidDimName);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public String getTranslationKey()
+    {
+        return Instances.MODID + ".worldType.void";
     }
 
     public static void init()
