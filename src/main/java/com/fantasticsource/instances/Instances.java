@@ -3,6 +3,7 @@ package com.fantasticsource.instances;
 import com.fantasticsource.instances.client.ClientHandler;
 import com.fantasticsource.instances.config.InstancesConfig;
 import com.fantasticsource.instances.dimensions.DimensionHandler;
+import com.fantasticsource.instances.dimensions.voided.BiomeVoid;
 import com.fantasticsource.instances.dimensions.voided.WorldTypeVoid;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.server.commands.CommandTeleportD;
@@ -37,6 +38,10 @@ public class Instances
 
         config.preInit(event);
 
+        //Biomes
+        BiomeVoid.init();
+
+        //World/Instance Types
         WorldTypeVoid.init();
     }
 

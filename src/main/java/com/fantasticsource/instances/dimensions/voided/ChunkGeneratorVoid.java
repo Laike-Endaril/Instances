@@ -31,7 +31,7 @@ public class ChunkGeneratorVoid implements IChunkGenerator
 
         for (int i = 0; i < bytes.length; ++i)
         {
-            bytes[i] = (byte) Biome.getIdForBiome(WorldTypeVoid.voidBiome);
+            bytes[i] = (byte) Biome.getIdForBiome(BiomeVoid.voidBiome);
         }
 
         //TODO create area here?
