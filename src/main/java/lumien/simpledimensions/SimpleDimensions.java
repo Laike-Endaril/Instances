@@ -3,6 +3,7 @@ package lumien.simpledimensions;
 import lumien.simpledimensions.client.ClientHandler;
 import lumien.simpledimensions.config.SimpleDimensionsConfig;
 import lumien.simpledimensions.dimensions.DimensionHandler;
+import lumien.simpledimensions.dimensions.voided.WorldTypeVoid;
 import lumien.simpledimensions.network.PacketHandler;
 import lumien.simpledimensions.server.commands.CommandSimpleDimensions;
 import lumien.simpledimensions.server.commands.CommandTeleportD;
@@ -35,6 +36,8 @@ public class SimpleDimensions
         config = new SimpleDimensionsConfig();
 
         config.preInit(event);
+
+        WorldTypeVoid.init();
     }
 
     @EventHandler

@@ -179,10 +179,10 @@ public class CommandTeleportD extends CommandBase
                             f1 = MathHelper.wrapDegrees(f1);
                         }
 
-                        if (f1 > 90.0F || f1 < -90.0F)
+                        if (f1 > 90 || f1 < -90)
                         {
-                            f1 = MathHelper.wrapDegrees(180.0F - f1);
-                            f = MathHelper.wrapDegrees(f + 180.0F);
+                            f1 = MathHelper.wrapDegrees(180 - f1);
+                            f = MathHelper.wrapDegrees(f + 180);
                         }
 
                         ((Entity) object).dismountRidingEntity();
@@ -194,10 +194,10 @@ public class CommandTeleportD extends CommandBase
                         float f2 = (float) MathHelper.wrapDegrees(coordinatearg3.getResult());
                         f = (float) MathHelper.wrapDegrees(coordinatearg4.getResult());
 
-                        if (f > 90.0F || f < -90.0F)
+                        if (f > 90 || f < -90)
                         {
-                            f = MathHelper.wrapDegrees(180.0F - f);
-                            f2 = MathHelper.wrapDegrees(f2 + 180.0F);
+                            f = MathHelper.wrapDegrees(180 - f);
+                            f2 = MathHelper.wrapDegrees(f2 + 180);
                         }
 
                         ((Entity) object).setLocationAndAngles(coordinatearg.getResult(), coordinatearg1.getResult(), coordinatearg2.getResult(), f2, f);

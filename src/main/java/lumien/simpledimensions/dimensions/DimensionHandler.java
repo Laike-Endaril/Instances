@@ -101,13 +101,9 @@ public class DimensionHandler extends WorldSavedData
     public void createDimension(EntityPlayerMP playerEntity, WorldInfoSimple worldInfo)
     {
         int dimensionID = findFreeDimensionID();
-
         dimensionInfo.put(dimensionID, worldInfo);
 
-        DimensionType dimensionType = worldInfo.getDimensionType();
-
-        DimensionManager.registerDimension(dimensionID, dimensionType);
-
+        DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
         loadDimension(dimensionID, worldInfo);
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
@@ -221,10 +217,8 @@ public class DimensionHandler extends WorldSavedData
     private void loadDimension(int dimensionID, WorldInfo worldInfo)
     {
         WorldServer overworld = (WorldServer) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld();
-        if (overworld == null)
-        {
-            throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
-        }
+        if (overworld == null) throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
+
         try
         {
             DimensionManager.getProviderType(dimensionID);
