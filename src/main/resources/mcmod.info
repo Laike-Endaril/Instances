@@ -1,14 +1,14 @@
 [
 {
-  "modid": "simpledimensions",
-  "name": "Simple Dimensions",
-  "description": "A simple mod that allows you to create additional dimensions.",
+  "modid": "instances",
+  "name": "Instances",
+  "description": "Allows the creation and handling of area instances.  Originally based on/forked from lumien's Simple Dimensions mod",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["lumien", "MelonLord145", Laike_Endaril],
-  "credits": "",
+  "authorList": [Laike_Endaril],
+  "credits": "\nlumien (For the original Simple Dimensions mod)\nMelonLord145 (for the fork of Simple Dimensions that I forked from (and then massively edited)",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

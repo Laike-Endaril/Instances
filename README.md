@@ -1,5 +1,5 @@
-# Simple-Dimensions
-Minecraft mod that allows you to easily create new dimensions
+# Instances
+Allows the creation and handling of area instances.  Originally based on/forked from lumien's Simple Dimensions mod
 
 ## Changes from original:
 + Added support for any dimension type from any mod (Ex: The Nether, The End, Twilight Forest)

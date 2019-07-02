@@ -1,0 +1,18 @@
+instances.newDimension=New Dimension
+instances.create=Create New Dimension
+instances.moreDimensionOptions=More Dimension Options...
+instances.enterName=Dimension Name
+instances.noInstances=There currently are no Instances
+instances.customizeTitle=Customize Dimension Settings
+instances.environmentType=Dimension Type:
+instances.environmentType.info=
+
+instances.create.keepLoaded=Keep Loaded:
+
+instances.commands.weatherd.usage=/weatherd <dimension> <clear|rain|thunder> [duration in seconds]
+instances.commands.timed.usage=/timed <dimension> <set|add|query> <value>
+instances.commands.tpd.usage=/tpd [target player] <destination player> OR /tpd [dimensionID] [target player] <x> <y> <z> [<y-rot> <x-rot>]
+
+item.instances.card.name=Instances Card
+
+itemGroup.instances=Instances
