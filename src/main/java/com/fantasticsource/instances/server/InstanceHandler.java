@@ -34,20 +34,20 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class DimensionHandler extends WorldSavedData
+public class InstanceHandler extends WorldSavedData
 {
-    private static String NAME = "InstancesHandler";
+    private static String NAME = "InstanceHandler";
 
     private HashMap<Integer, WorldInfoSimple> dimensionInfo;
 
-    public DimensionHandler(String name)
+    public InstanceHandler(String name)
     {
         super(name);
 
         dimensionInfo = new HashMap<>();
     }
 
-    public DimensionHandler()
+    public InstanceHandler()
     {
         super(NAME);
 
@@ -77,18 +77,18 @@ public class DimensionHandler extends WorldSavedData
         return titleCase.toString();
     }
 
-    public static DimensionHandler getInstance()
+    public static InstanceHandler getInstance()
     {
-        DimensionHandler dimensionHandler;
-        dimensionHandler = (DimensionHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(DimensionHandler.class, NAME);
+        InstanceHandler instanceHandler;
+        instanceHandler = (InstanceHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(InstanceHandler.class, NAME);
 
-        if (dimensionHandler == null)
+        if (instanceHandler == null)
         {
-            dimensionHandler = new DimensionHandler();
-            FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().setData(NAME, dimensionHandler);
+            instanceHandler = new InstanceHandler();
+            FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().setData(NAME, instanceHandler);
         }
 
-        return dimensionHandler;
+        return instanceHandler;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.fantasticsource.instances.network.handler;
 
 import com.fantasticsource.instances.network.messages.MessageCreateDimension;
-import com.fantasticsource.instances.server.DimensionHandler;
+import com.fantasticsource.instances.server.InstanceHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -19,7 +19,7 @@ public class HandlerCreateDimension implements IMessageHandler<MessageCreateDime
 
             if (netHandler.player.canUseCommand(3, "instances"))
             {
-                DimensionHandler.getInstance().createDimension(((NetHandlerPlayServer) ctx.netHandler).player, message.getWorldInfo());
+                InstanceHandler.getInstance().createDimension(((NetHandlerPlayServer) ctx.netHandler).player, message.getWorldInfo());
             }
         });
 

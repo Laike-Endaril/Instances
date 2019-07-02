@@ -6,7 +6,7 @@ import com.fantasticsource.instances.instancetypes.skyroom.WorldTypeSkyroom;
 import com.fantasticsource.instances.instancetypes.voided.BiomeVoid;
 import com.fantasticsource.instances.instancetypes.voided.WorldTypeVoid;
 import com.fantasticsource.instances.network.PacketHandler;
-import com.fantasticsource.instances.server.DimensionHandler;
+import com.fantasticsource.instances.server.InstanceHandler;
 import com.fantasticsource.instances.server.commands.CommandTeleportD;
 import com.fantasticsource.instances.server.commands.CommandTimeD;
 import com.fantasticsource.instances.server.commands.CommandWeatherD;
@@ -61,13 +61,13 @@ public class Instances
         event.registerServerCommand(new CommandTimeD());
         event.registerServerCommand(new CommandTeleportD());
 
-        DimensionHandler.getInstance().loadDimensions();
+        InstanceHandler.getInstance().loadDimensions();
     }
 
     @SubscribeEvent
     public void clientConnect(ServerConnectionFromClientEvent event)
     {
-        event.getManager().sendPacket(PacketHandler.INSTANCE.getPacketFrom(DimensionHandler.getInstance().constructSyncMessage()));
+        event.getManager().sendPacket(PacketHandler.INSTANCE.getPacketFrom(InstanceHandler.getInstance().constructSyncMessage()));
     }
 
     @SubscribeEvent

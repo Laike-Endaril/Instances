@@ -2,7 +2,7 @@ package com.fantasticsource.instances.server.commands;
 
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageOpenGui;
-import com.fantasticsource.instances.server.DimensionHandler;
+import com.fantasticsource.instances.server.InstanceHandler;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -63,11 +63,11 @@ public class Commands extends CommandBase
                 {
                     int dimensionID = Integer.parseInt(args[1]);
 
-                    DimensionHandler.getInstance().deleteDimension(sender, dimensionID);
+                    InstanceHandler.getInstance().deleteDimension(sender, dimensionID);
                 }
                 break;
             case "list":
-                sender.sendMessage(DimensionHandler.getInstance().generateList());
+                sender.sendMessage(InstanceHandler.getInstance().generateList());
                 break;
             default:
                 sender.sendMessage(new TextComponentString(getUsage(sender)));
