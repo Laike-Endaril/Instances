@@ -1,6 +1,8 @@
-package com.fantasticsource.instances.dimensions.voided;
+package com.fantasticsource.instances.dimensions.skyroom;
 
+import com.fantasticsource.instances.dimensions.voided.BiomeVoid;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -12,12 +14,12 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChunkGeneratorVoid implements IChunkGenerator
+public class ChunkGeneratorSkyroom implements IChunkGenerator
 {
     protected World world;
     private ChunkPrimer chunkPrimer = new ChunkPrimer();
 
-    public ChunkGeneratorVoid(World worldIn)
+    public ChunkGeneratorSkyroom(World worldIn)
     {
         world = worldIn;
         world.setSeaLevel(63);
@@ -33,6 +35,18 @@ public class ChunkGeneratorVoid implements IChunkGenerator
         for (int i = 0; i < bytes.length; ++i)
         {
             bytes[i] = (byte) Biome.getIdForBiome(BiomeVoid.voidBiome);
+        }
+
+        int h = world.getHeight();
+        for (int x = 0; x < 16; x++)
+        {
+            for (int z = 0; z < 16; z++)
+            {
+                for (int y = 0; y < h - 2; y++)
+                {
+                    chunk.setBlockState(new BlockPos(x, y, z), Blocks.DIRT.getDefaultState());
+                }
+            }
         }
 
         chunk.generateSkylightMap();

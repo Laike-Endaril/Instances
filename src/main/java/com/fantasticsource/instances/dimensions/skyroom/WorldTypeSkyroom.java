@@ -1,6 +1,7 @@
-package com.fantasticsource.instances.dimensions.voided;
+package com.fantasticsource.instances.dimensions.skyroom;
 
 import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.dimensions.voided.BiomeVoid;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -14,21 +15,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Random;
 
-public class WorldTypeVoid extends WorldType
+public class WorldTypeSkyroom extends WorldType
 {
-    public static int voidDimID;
-    public static DimensionType voidDimType;
-    public static String voidDimName = "Void Instance";
+    public static int skyroomDimID;
+    public static DimensionType skyroomDimType;
+    public static String skyroomDimName = "Skyroom Instance";
 
-    private WorldTypeVoid()
+    private WorldTypeSkyroom()
     {
-        super(voidDimName);
+        super(skyroomDimName);
     }
 
     public static void init()
     {
         //Indirectly initializes via super constructor
-        new WorldTypeVoid();
+        new WorldTypeSkyroom();
 
         int i;
         for (i = Integer.MIN_VALUE; i < Integer.MAX_VALUE; i++)
@@ -40,16 +41,16 @@ public class WorldTypeVoid extends WorldType
         }
 
         if (i == Integer.MAX_VALUE) throw new IllegalStateException("All dimensions used; this should absolutely never happen");
-        voidDimID = i;
+        skyroomDimID = i;
 
-        voidDimType = DimensionType.register(voidDimName, "_" + voidDimName, voidDimID, WorldProviderVoid.class, false);
-        DimensionManager.registerDimension(i, voidDimType);
+        skyroomDimType = DimensionType.register(skyroomDimName, "_" + skyroomDimName, skyroomDimID, WorldProviderSkyroom.class, false);
+        DimensionManager.registerDimension(i, skyroomDimType);
     }
 
     @SideOnly(Side.CLIENT)
     public String getTranslationKey()
     {
-        return Instances.MODID + ".worldType.void";
+        return Instances.MODID + ".worldType.skyroom";
     }
 
     @Override
@@ -67,7 +68,7 @@ public class WorldTypeVoid extends WorldType
     @Override
     public IChunkGenerator getChunkGenerator(World world, String generatorOptions)
     {
-        return new ChunkGeneratorVoid(world);
+        return new ChunkGeneratorSkyroom(world);
     }
 
     @Override
