@@ -43,16 +43,16 @@ public class GuiCreateDimension extends GuiScreen
     private GuiButton btnStructures;
     private GuiButton btnDimensionType;
     private GuiButton btnCustomizeType;
-    private GuiButton btnEnvironmentType;
+    private GuiButton instanceType;
     private String worldSeed;
     private String worldName;
     private int selectedIndex;
-    private int selectedEnvironmentIndex;
+    private int selectedInstanceTypeIndex;
 
     public GuiCreateDimension()
     {
         worldSeed = "";
-        worldName = I18n.format("instances.newDimension");
+        worldName = I18n.format("instances.newInstance");
     }
 
     private static String getDisplayableName(String input)
@@ -121,15 +121,15 @@ public class GuiCreateDimension extends GuiScreen
         int halfWidth = width >> 1;
         buttonList.add(new GuiButton(0, halfWidth - 155, height - 28, 150, 20, I18n.format("instances.create")));
         buttonList.add(new GuiButton(1, halfWidth + 5, height - 28, 150, 20, I18n.format("gui.cancel")));
-        buttonList.add(btnMoreOptions = new GuiButton(3, halfWidth - 75, 187, 150, 20, I18n.format("instances.moreDimensionOptions")));
+        buttonList.add(btnMoreOptions = new GuiButton(3, halfWidth - 75, 187, 150, 20, I18n.format("instances.moreInstanceOptions")));
         buttonList.add(btnStructures = new GuiButton(4, halfWidth - 155, 100, 150, 20, I18n.format("selectWorld.mapFeatures")));
         btnStructures.visible = false;
         buttonList.add(btnDimensionType = new GuiButton(5, halfWidth + 5, 100, 150, 20, I18n.format("selectWorld.mapType")));
         btnDimensionType.visible = false;
         buttonList.add(btnCustomizeType = new GuiButton(8, halfWidth + 5, 120, 150, 20, I18n.format("selectWorld.customizeType")));
         btnCustomizeType.visible = false;
-        buttonList.add(btnEnvironmentType = new GuiButton(11, halfWidth - 155, 151, 150, 20, I18n.format("instances.environmentType")));
-        btnEnvironmentType.visible = false;
+        buttonList.add(instanceType = new GuiButton(11, halfWidth - 155, 151, 150, 20, I18n.format("instances.instanceType")));
+        instanceType.visible = false;
         dimensionNameTextField = new GuiTextField(9, fontRenderer, halfWidth - 100, 60, 200, 20);
         dimensionNameTextField.setFocused(true);
         dimensionNameTextField.setText(worldName);
@@ -174,7 +174,7 @@ public class GuiCreateDimension extends GuiScreen
         }
 
         btnDimensionType.displayString = I18n.format("selectWorld.mapType") + " " + I18n.format(WorldType.WORLD_TYPES[selectedIndex].getTranslationKey());
-        btnEnvironmentType.displayString = I18n.format("instances.environmentType") + " " + I18n.format(getDisplayableName(DimensionType.values()[selectedEnvironmentIndex].getName()));
+        instanceType.displayString = I18n.format("instances.instanceType") + " " + I18n.format(getDisplayableName(DimensionType.values()[selectedInstanceTypeIndex].getName()));
     }
 
     /**
@@ -234,7 +234,7 @@ public class GuiCreateDimension extends GuiScreen
 
                 if (allowCheats) worldsettings.enableCommands();
 
-                WorldInfoSimple worldInfo = new WorldInfoSimple(worldsettings, dimensionNameTextField.getText().trim(), DimensionType.values()[selectedEnvironmentIndex]);
+                WorldInfoSimple worldInfo = new WorldInfoSimple(worldsettings, dimensionNameTextField.getText().trim(), DimensionType.values()[selectedInstanceTypeIndex]);
                 MessageCreateDimension createMessage = new MessageCreateDimension(worldInfo);
 
                 PacketHandler.INSTANCE.sendToServer(createMessage);
@@ -273,11 +273,11 @@ public class GuiCreateDimension extends GuiScreen
             }
             else if (button.id == 11)
             {
-                ++selectedEnvironmentIndex;
+                ++selectedInstanceTypeIndex;
 
-                if (selectedEnvironmentIndex >= DimensionType.values().length)
+                if (selectedInstanceTypeIndex >= DimensionType.values().length)
                 {
-                    selectedEnvironmentIndex = 0;
+                    selectedInstanceTypeIndex = 0;
                 }
 
                 updateDisplayState();
@@ -323,7 +323,7 @@ public class GuiCreateDimension extends GuiScreen
             btnStructures.visible = false;
             btnDimensionType.visible = userInMoreOptions;
             btnCustomizeType.visible = false;
-            btnEnvironmentType.visible = false;
+            instanceType.visible = false;
         }
         else
         {
@@ -336,7 +336,7 @@ public class GuiCreateDimension extends GuiScreen
             btnStructures.visible = userInMoreOptions && WorldType.WORLD_TYPES[selectedIndex] != WorldType.CUSTOMIZED;
             btnDimensionType.visible = userInMoreOptions;
             btnCustomizeType.visible = userInMoreOptions && WorldType.WORLD_TYPES[selectedIndex].isCustomizable();
-            btnEnvironmentType.visible = userInMoreOptions;
+            instanceType.visible = userInMoreOptions;
         }
 
         updateDisplayState();
@@ -347,7 +347,7 @@ public class GuiCreateDimension extends GuiScreen
         }
         else
         {
-            btnMoreOptions.displayString = I18n.format("instances.moreDimensionOptions");
+            btnMoreOptions.displayString = I18n.format("instances.moreInstanceOptions");
         }
     }
 
@@ -419,9 +419,9 @@ public class GuiCreateDimension extends GuiScreen
                 drawString(fontRenderer, I18n.format("selectWorld.mapFeatures.info"), halfWidth - 150, 122, -6250336);
             }
 
-            if (btnEnvironmentType.visible)
+            if (instanceType.visible)
             {
-                drawString(fontRenderer, I18n.format("instances.environmentType.info"), halfWidth - 150, 172, -6250336);
+                drawString(fontRenderer, I18n.format("instances.instanceType.info"), halfWidth - 150, 172, -6250336);
             }
 
             seedTextField.drawTextBox();

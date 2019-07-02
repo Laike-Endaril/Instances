@@ -23,15 +23,15 @@ public class WorldInfoSimple extends WorldInfo
         if (nbt.hasKey("dimType"))
         {
             String dimTypeS = nbt.getString("dimType");
-            if (dimTypeS != null)
+            if (!dimTypeS.equals(""))
             {
                 try
                 {
-                    DimensionType dimType = DimensionType.byName(dimTypeS);
-                    dimensionType = dimType;
+                    dimensionType = DimensionType.byName(dimTypeS);
                 }
                 catch (IllegalArgumentException e)
                 {
+                    //Just keep default value from above
                 }
             }
         }
@@ -42,15 +42,7 @@ public class WorldInfoSimple extends WorldInfo
     public WorldInfoSimple(WorldSettings settings, String name, DimensionType dimType)
     {
         super(settings, name);
-
-        if (dimType == null)
-        {
-            dimensionType = DimensionType.OVERWORLD;
-        }
-        else
-        {
-            dimensionType = dimType;
-        }
+        dimensionType = dimType != null ? dimType : DimensionType.OVERWORLD;
     }
 
     @Override
