@@ -1,8 +1,8 @@
 package com.fantasticsource.instances.server.commands;
 
-import com.fantasticsource.instances.dimensions.DimensionHandler;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageOpenGui;
+import com.fantasticsource.instances.server.DimensionHandler;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;

@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.dimensions.skyroom;
+package com.fantasticsource.instances.instancetypes.skyroom;
 
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;

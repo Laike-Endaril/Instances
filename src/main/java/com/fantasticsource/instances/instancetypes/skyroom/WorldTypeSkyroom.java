@@ -1,7 +1,7 @@
-package com.fantasticsource.instances.dimensions.skyroom;
+package com.fantasticsource.instances.instancetypes.skyroom;
 
 import com.fantasticsource.instances.Instances;
-import com.fantasticsource.instances.dimensions.voided.BiomeVoid;
+import com.fantasticsource.instances.instancetypes.voided.BiomeVoid;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;

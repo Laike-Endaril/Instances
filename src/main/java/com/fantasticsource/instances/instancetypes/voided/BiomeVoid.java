@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.dimensions.voided;
+package com.fantasticsource.instances.instancetypes.voided;
 
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.world.biome.Biome;

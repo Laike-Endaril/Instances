@@ -2,11 +2,11 @@ package com.fantasticsource.instances;
 
 import com.fantasticsource.instances.client.ClientHandler;
 import com.fantasticsource.instances.config.InstancesConfig;
-import com.fantasticsource.instances.dimensions.DimensionHandler;
-import com.fantasticsource.instances.dimensions.skyroom.WorldTypeSkyroom;
-import com.fantasticsource.instances.dimensions.voided.BiomeVoid;
-import com.fantasticsource.instances.dimensions.voided.WorldTypeVoid;
+import com.fantasticsource.instances.instancetypes.skyroom.WorldTypeSkyroom;
+import com.fantasticsource.instances.instancetypes.voided.BiomeVoid;
+import com.fantasticsource.instances.instancetypes.voided.WorldTypeVoid;
 import com.fantasticsource.instances.network.PacketHandler;
+import com.fantasticsource.instances.server.DimensionHandler;
 import com.fantasticsource.instances.server.commands.CommandTeleportD;
 import com.fantasticsource.instances.server.commands.CommandTimeD;
 import com.fantasticsource.instances.server.commands.CommandWeatherD;
