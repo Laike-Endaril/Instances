@@ -12,7 +12,7 @@ public class InstancesConfig
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
 
-        startDimensionID = config.get("Settings", "StartDimensionID", -7777776, "Where should Instances start to search for free Dimension IDs?").getInt();
+        startDimensionID = config.get("Settings", "StartDimensionID", Integer.MIN_VALUE, "Where should Instances start to search for free Dimension IDs?").getInt();
 
         if (config.hasChanged()) config.save();
     }
