@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.util;
 
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.*;
 import net.minecraft.world.storage.WorldInfo;
@@ -8,20 +9,30 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class WorldInfoSimple extends WorldInfo
 {
     private WorldInfo superInfo;
-    private DimensionType dimensionType;
+    private DimensionType dimensionType = DimensionType.OVERWORLD;
+    private UUID owner = null;
 
     public WorldInfoSimple(NBTTagCompound nbt)
     {
         super(nbt);
 
-        dimensionType = DimensionType.OVERWORLD;
         try
         {
             dimensionType = DimensionType.byName(nbt.getString("dimType"));
+        }
+        catch (IllegalArgumentException e)
+        {
+            //Just keep default value from above
+        }
+
+        try
+        {
+            owner = UUID.fromString(nbt.getString("owner"));
         }
         catch (IllegalArgumentException e)
         {
@@ -42,6 +53,7 @@ public class WorldInfoSimple extends WorldInfo
     {
         NBTTagCompound superNbt = super.cloneNBTCompound(nbt);
         superNbt.setString("dimType", dimensionType.getName());
+        superNbt.setString("owner", owner == null ? "null" : owner.toString());
         return superNbt;
     }
 
@@ -97,5 +109,20 @@ public class WorldInfoSimple extends WorldInfo
     public DimensionType getDimensionType()
     {
         return dimensionType;
+    }
+
+    public void setOwner(UUID id)
+    {
+        owner = id;
+    }
+
+    public void setOwner(EntityPlayerMP player)
+    {
+        setOwner(player.getPersistentID());
+    }
+
+    public UUID getOwner()
+    {
+        return owner;
     }
 }
