@@ -57,7 +57,7 @@ public class InstanceHandler extends WorldSavedData
         dimensionInfo = new HashMap<>();
     }
 
-    public static void load()
+    public static void registerInstances()
     {
         if (instanceHandler != null) return;
 
@@ -76,12 +76,10 @@ public class InstanceHandler extends WorldSavedData
 
             DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
             DimensionManager.keepDimensionLoaded(dimensionID, false);
-
-            loadDimension(dimensionID, worldInfo);
         }
     }
 
-    public static void unload()
+    public static void unloadHandler()
     {
         instanceHandler = null;
 
@@ -100,7 +98,6 @@ public class InstanceHandler extends WorldSavedData
         dimensionInfo.put(dimensionID, worldInfo);
 
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
-        loadDimension(dimensionID, worldInfo);
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
     }

@@ -68,13 +68,13 @@ public class Instances
         event.registerServerCommand(new CommandTimeD());
         event.registerServerCommand(new CommandTeleportD());
 
-        InstanceHandler.load();
+        InstanceHandler.registerInstances();
     }
 
     @EventHandler
     public void serverStop(FMLServerStoppedEvent event)
     {
-        InstanceHandler.unload();
+        InstanceHandler.unloadHandler();
     }
 
     @SubscribeEvent
