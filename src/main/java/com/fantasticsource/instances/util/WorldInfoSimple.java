@@ -8,13 +8,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
-import java.util.UUID;
 
 public class WorldInfoSimple extends WorldInfo
 {
     private WorldInfo superInfo;
     private DimensionType dimensionType;
-    private UUID owner;
 
     public WorldInfoSimple(NBTTagCompound nbt)
     {
@@ -24,16 +22,6 @@ public class WorldInfoSimple extends WorldInfo
         try
         {
             dimensionType = DimensionType.byName(nbt.getString("dimType"));
-        }
-        catch (IllegalArgumentException e)
-        {
-            //Just keep default value from above
-        }
-
-        owner = null;
-        try
-        {
-            owner = UUID.fromString(nbt.getString("owner")); //TODO
         }
         catch (IllegalArgumentException e)
         {

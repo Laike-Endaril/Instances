@@ -1,6 +1,5 @@
 package com.fantasticsource.instances.server;
 
-import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.util.TeleporterSimple;
 import com.fantasticsource.instances.util.WorldInfoSimple;
 import net.minecraft.command.ICommandSender;
@@ -12,8 +11,9 @@ import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.*;
-import net.minecraft.world.DimensionType;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.ServerWorldEventHandler;
 import net.minecraft.world.WorldServer;
@@ -31,13 +31,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class InstanceHandler extends WorldSavedData
 {
     private static String NAME = "InstanceHandler";
-
-    private HashMap<Integer, WorldInfoSimple> dimensionInfo;
+    private static HashMap<Integer, WorldInfoSimple> dimensionInfo;
+    private static InstanceHandler instanceHandler = null;
 
     public InstanceHandler(String name)
     {
@@ -78,7 +79,13 @@ public class InstanceHandler extends WorldSavedData
 
     public static InstanceHandler getInstanceHandler()
     {
-        InstanceHandler instanceHandler;
+        return instanceHandler;
+    }
+
+    public static void load()
+    {
+        if (instanceHandler != null) return;
+
         instanceHandler = (InstanceHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(InstanceHandler.class, NAME);
 
         if (instanceHandler == null)
@@ -87,7 +94,30 @@ public class InstanceHandler extends WorldSavedData
             FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().setData(NAME, instanceHandler);
         }
 
-        return instanceHandler;
+        for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            int dimensionID = entry.getKey();
+            WorldInfoSimple worldInfo = entry.getValue();
+
+            DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
+
+            System.out.println(worldInfo.getDimensionType());
+
+            loadDimension(dimensionID, worldInfo);
+        }
+    }
+
+    public static void unload()
+    {
+        instanceHandler = null;
+
+        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            int id = entry.getKey();
+            System.out.println("Unregistering instance " + id + " (" + entry.getValue().getWorldName() + ")");
+            DimensionManager.unregisterDimension(id);
+        }
+        dimensionInfo.clear();
     }
 
     @Override
@@ -105,43 +135,6 @@ public class InstanceHandler extends WorldSavedData
         loadDimension(dimensionID, worldInfo);
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
-    }
-
-    public ITextComponent generateList()
-    {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        if (dimensionInfo.isEmpty())
-        {
-            return new TextComponentTranslation(Instances.MODID + ".noInstances");
-        }
-        else
-        {
-            int counter = 0;
-            for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-            {
-                DimensionType dimensionType = entry.getValue().getDimensionType();
-
-                stringBuilder.append(String.format("%s %s", "DIM " + entry.getKey(), "(" + entry.getValue().getWorldName() + ") (" + getDisplayableName(dimensionType.getName()) + ")"));
-                counter++;
-                if (counter < dimensionInfo.size())
-                {
-                    stringBuilder.append("\n");
-                }
-            }
-
-            return new TextComponentString(stringBuilder.toString());
-        }
-    }
-
-    public String getDimensionName(int dimensionId)
-    {
-        return dimensionInfo.get(dimensionId).getWorldName();
-    }
-
-    public HashMap<Integer, WorldInfoSimple> getDimensionInfo()
-    {
-        return dimensionInfo;
     }
 
     @Override
@@ -177,22 +170,7 @@ public class InstanceHandler extends WorldSavedData
         return nbt;
     }
 
-    public void loadDimensions()
-    {
-        for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-        {
-            int dimensionID = entry.getKey();
-            WorldInfoSimple worldInfo = entry.getValue();
-
-            DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
-
-            System.out.println(worldInfo.getDimensionType());
-
-            loadDimension(dimensionID, worldInfo);
-        }
-    }
-
-    private void loadDimension(int dimensionID, WorldInfo worldInfo)
+    private static void loadDimension(int dimensionID, WorldInfo worldInfo)
     {
         WorldServer overworld = (WorldServer) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld();
         if (overworld == null) throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
@@ -223,7 +201,7 @@ public class InstanceHandler extends WorldSavedData
         mcServer.setDifficultyForAllWorlds(difficulty);
     }
 
-    public void deleteDimension(ICommandSender sender, int dimensionID)
+    public static void deleteDimension(ICommandSender sender, int dimensionID)
     {
         WorldServer w = DimensionManager.getWorld(dimensionID);
 

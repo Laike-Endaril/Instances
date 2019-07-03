@@ -63,11 +63,10 @@ public class Commands extends CommandBase
                 {
                     int dimensionID = Integer.parseInt(args[1]);
 
-                    InstanceHandler.getInstanceHandler().deleteDimension(sender, dimensionID);
+                    InstanceHandler.deleteDimension(sender, dimensionID);
                 }
                 break;
             case "list":
-                sender.sendMessage(InstanceHandler.getInstanceHandler().generateList());
                 break;
             default:
                 sender.sendMessage(new TextComponentString(getUsage(sender)));

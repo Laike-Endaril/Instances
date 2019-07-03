@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 
 @Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION)
 public class Instances
@@ -50,6 +51,12 @@ public class Instances
         event.registerServerCommand(new CommandTimeD());
         event.registerServerCommand(new CommandTeleportD());
 
-        InstanceHandler.getInstanceHandler().loadDimensions();
+        InstanceHandler.load();
+    }
+
+    @EventHandler
+    public void serverStop(FMLServerStoppedEvent event)
+    {
+        InstanceHandler.unload();
     }
 }
