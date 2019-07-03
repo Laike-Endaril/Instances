@@ -54,34 +54,6 @@ public class InstanceHandler extends WorldSavedData
         dimensionInfo = new HashMap<>();
     }
 
-    private static String getDisplayableName(String input)
-    {
-        StringBuilder titleCase = new StringBuilder();
-        boolean nextTitleCase = true;
-
-        for (char c : input.replace("_", " ").toCharArray())
-        {
-            if (Character.isSpaceChar(c))
-            {
-                nextTitleCase = true;
-            }
-            else if (nextTitleCase)
-            {
-                c = Character.toTitleCase(c);
-                nextTitleCase = false;
-            }
-
-            titleCase.append(c);
-        }
-
-        return titleCase.toString();
-    }
-
-    public static InstanceHandler getInstanceHandler()
-    {
-        return instanceHandler;
-    }
-
     public static void load()
     {
         if (instanceHandler != null) return;
@@ -120,13 +92,7 @@ public class InstanceHandler extends WorldSavedData
         dimensionInfo.clear();
     }
 
-    @Override
-    public boolean isDirty()
-    {
-        return true;
-    }
-
-    public void createDimension(EntityPlayerMP playerEntity, WorldInfoSimple worldInfo)
+    public static void createDimension(EntityPlayerMP playerEntity, WorldInfoSimple worldInfo)
     {
         int dimensionID = DimensionManager.getNextFreeDimId();
         dimensionInfo.put(dimensionID, worldInfo);
@@ -135,39 +101,6 @@ public class InstanceHandler extends WorldSavedData
         loadDimension(dimensionID, worldInfo);
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
-        NBTTagList nbtList = nbt.getTagList("dimensionInfo", 10);
-
-        for (int i = 0; i < nbtList.tagCount(); i++)
-        {
-            NBTTagCompound compound = nbtList.getCompoundTagAt(i);
-
-            dimensionInfo.put(compound.getInteger("dimensionID"), new WorldInfoSimple(compound.getCompoundTag("worldInfo")));
-        }
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
-        NBTTagList nbtList = new NBTTagList();
-
-        for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-        {
-            NBTTagCompound compound = new NBTTagCompound();
-
-            compound.setInteger("dimensionID", entry.getKey());
-            compound.setTag("worldInfo", entry.getValue().cloneNBTCompound(null));
-
-            nbtList.appendTag(compound);
-        }
-
-        nbt.setTag("dimensionInfo", nbtList);
-
-        return nbt;
     }
 
     private static void loadDimension(int dimensionID, WorldInfo worldInfo)
@@ -290,5 +223,44 @@ public class InstanceHandler extends WorldSavedData
         {
             sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
         }
+    }
+
+    @Override
+    public boolean isDirty()
+    {
+        return true;
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbt)
+    {
+        NBTTagList nbtList = nbt.getTagList("dimensionInfo", 10);
+
+        for (int i = 0; i < nbtList.tagCount(); i++)
+        {
+            NBTTagCompound compound = nbtList.getCompoundTagAt(i);
+
+            dimensionInfo.put(compound.getInteger("dimensionID"), new WorldInfoSimple(compound.getCompoundTag("worldInfo")));
+        }
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+    {
+        NBTTagList nbtList = new NBTTagList();
+
+        for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            NBTTagCompound compound = new NBTTagCompound();
+
+            compound.setInteger("dimensionID", entry.getKey());
+            compound.setTag("worldInfo", entry.getValue().cloneNBTCompound(null));
+
+            nbtList.appendTag(compound);
+        }
+
+        nbt.setTag("dimensionInfo", nbtList);
+
+        return nbt;
     }
 }
