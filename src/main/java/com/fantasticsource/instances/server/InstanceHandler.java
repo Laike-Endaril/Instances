@@ -33,28 +33,24 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 public class InstanceHandler extends WorldSavedData
 {
     private static String NAME = "InstanceHandler";
-    private static HashMap<Integer, WorldInfoSimple> dimensionInfo;
+    private static LinkedHashMap<Integer, WorldInfoSimple> dimensionInfo = new LinkedHashMap<>();
     private static InstanceHandler instanceHandler = null;
 
     public InstanceHandler(String name)
     {
         super(name);
-
-        dimensionInfo = new HashMap<>();
     }
 
     public InstanceHandler()
     {
-        super(NAME);
-
-        dimensionInfo = new HashMap<>();
+        this(NAME);
     }
 
     public static void registerInstances()
@@ -288,5 +284,16 @@ public class InstanceHandler extends WorldSavedData
         nbt.setTag("dimensionInfo", nbtList);
 
         return nbt;
+    }
+
+    public static ArrayList<String> list()
+    {
+        ArrayList<String> result = new ArrayList<>();
+        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            WorldInfoSimple info = entry.getValue();
+            result.add(entry.getKey() + " (" + info.getWorldName() + ") Type = " + info.getDimensionType());
+        }
+        return result;
     }
 }

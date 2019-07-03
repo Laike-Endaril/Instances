@@ -54,6 +54,7 @@ public class Commands extends CommandBase
                     PacketHandler.INSTANCE.sendTo(new MessageOpenGui(), player);
                 }
                 break;
+
             case "delete":
                 if (args.length == 1)
                 {
@@ -66,8 +67,14 @@ public class Commands extends CommandBase
                     InstanceHandler.deleteDimension(sender, dimensionID);
                 }
                 break;
+
             case "list":
+                for (String s : InstanceHandler.list())
+                {
+                    sender.sendMessage(new TextComponentString(s));
+                }
                 break;
+
             default:
                 sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
