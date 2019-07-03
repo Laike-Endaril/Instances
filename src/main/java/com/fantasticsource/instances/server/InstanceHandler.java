@@ -31,7 +31,10 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class InstanceHandler extends WorldSavedData
@@ -99,7 +102,7 @@ public class InstanceHandler extends WorldSavedData
 
     public void createDimension(EntityPlayerMP playerEntity, WorldInfoSimple worldInfo)
     {
-        int dimensionID = findFreeDimensionID();
+        int dimensionID = DimensionManager.getNextFreeDimId();
         dimensionInfo.put(dimensionID, worldInfo);
 
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
@@ -108,24 +111,6 @@ public class InstanceHandler extends WorldSavedData
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
 
         syncWithClients();
-    }
-
-    private int findFreeDimensionID()
-    {
-        HashSet<Integer> ids = new HashSet<>(Arrays.asList(DimensionManager.getIDs()));
-
-        int currentID = Instances.config.startDimensionID();
-        while (true)
-        {
-            if (!ids.contains(currentID))
-            {
-                return currentID;
-            }
-            else
-            {
-                currentID++;
-            }
-        }
     }
 
     public ITextComponent generateList()

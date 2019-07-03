@@ -292,8 +292,6 @@ public class CommandTeleportD extends CommandBase
 
             worldserver1.updateEntityWithOptionalForce(newEntity, true);
 
-            entity.isDead = true;
-            entity.world.profiler.endSection();
             worldserver.resetUpdateEntityTick();
             worldserver1.resetUpdateEntityTick();
             entity.world.profiler.endSection();

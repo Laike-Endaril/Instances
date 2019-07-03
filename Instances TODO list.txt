@@ -5,6 +5,7 @@ Interact permissions for owner and nobody else
 Command-based whitelist per owned instance for who is allowed to visit
 Command to go to an instance of a specified owner (can probably just use existing /tpd with specially named instances using player UUIDs)
 
+Does it have faulty profiling code?
 
 
 Non-Faerun

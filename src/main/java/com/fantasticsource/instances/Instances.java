@@ -1,7 +1,6 @@
 package com.fantasticsource.instances;
 
 import com.fantasticsource.instances.client.ClientHandler;
-import com.fantasticsource.instances.config.InstancesConfig;
 import com.fantasticsource.instances.instancetypes.skyroom.WorldTypeSkyroom;
 import com.fantasticsource.instances.instancetypes.voided.BiomeVoid;
 import com.fantasticsource.instances.instancetypes.voided.WorldTypeVoid;
@@ -28,16 +27,10 @@ public class Instances
     public static final String NAME = "Instances";
     public static final String VERSION = "1.12.2.000";
 
-    public static InstancesConfig config;
-
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(this);
-
-        config = new InstancesConfig();
-
-        config.preInit(event);
 
         //Biomes
         BiomeVoid.init();
