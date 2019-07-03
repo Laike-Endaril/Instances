@@ -1,6 +1,8 @@
 package com.fantasticsource.instances.server;
 
 import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.network.PacketHandler;
+import com.fantasticsource.instances.network.messages.MessageDimensionSync;
 import com.fantasticsource.instances.util.TeleporterSimple;
 import com.fantasticsource.instances.util.WorldInfoSimple;
 import net.minecraft.command.ICommandSender;
@@ -25,6 +27,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -224,6 +227,30 @@ public class InstanceHandler extends WorldSavedData
         {
             sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
         }
+    }
+
+    private static void syncWithClients()
+    {
+        MessageDimensionSync message = new MessageDimensionSync();
+
+        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
+        }
+
+        PacketHandler.INSTANCE.sendToAll(message);
+    }
+
+    public static IMessage constructSyncMessage()
+    {
+        MessageDimensionSync message = new MessageDimensionSync();
+
+        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
+        }
+
+        return message;
     }
 
     @Override

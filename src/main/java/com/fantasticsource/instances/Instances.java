@@ -1,5 +1,6 @@
 package com.fantasticsource.instances;
 
+import com.fantasticsource.instances.client.ClientHandler;
 import com.fantasticsource.instances.instancetypes.skyroom.WorldTypeSkyroom;
 import com.fantasticsource.instances.instancetypes.voided.BiomeVoid;
 import com.fantasticsource.instances.instancetypes.voided.WorldTypeVoid;
@@ -17,6 +18,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 @Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION)
 public class Instances
@@ -24,6 +27,18 @@ public class Instances
     public static final String MODID = "instances";
     public static final String NAME = "Instances";
     public static final String VERSION = "1.12.2.000";
+
+    public static Integer nextFreeDimID()
+    {
+        for (int i = Integer.MIN_VALUE; i < Integer.MAX_VALUE; i++)
+        {
+            if (!DimensionManager.isDimensionRegistered(i))
+            {
+                return i;
+            }
+        }
+        return null;
+    }
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -61,15 +76,18 @@ public class Instances
         InstanceHandler.unload();
     }
 
-    public static Integer nextFreeDimID()
+    @SubscribeEvent
+    public void clientConnect(FMLNetworkEvent.ServerConnectionFromClientEvent event)
     {
-        for (int i = Integer.MIN_VALUE; i < Integer.MAX_VALUE; i++)
+        event.getManager().sendPacket(PacketHandler.INSTANCE.getPacketFrom(InstanceHandler.constructSyncMessage()));
+    }
+
+    @SubscribeEvent
+    public void clientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
+    {
+        if (!event.getManager().isLocalChannel())
         {
-            if (!DimensionManager.isDimensionRegistered(i))
-            {
-                return i;
-            }
+            ClientHandler.getInstance().cleanUp();
         }
-        return null;
     }
 }
