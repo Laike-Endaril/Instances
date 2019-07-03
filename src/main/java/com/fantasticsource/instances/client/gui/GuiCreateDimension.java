@@ -415,16 +415,6 @@ public class GuiCreateDimension extends GuiScreen
             drawString(fontRenderer, I18n.format("selectWorld.enterSeed"), halfWidth - 100, 47, -6250336);
             drawString(fontRenderer, I18n.format("selectWorld.seedInfo"), halfWidth - 100, 85, -6250336);
 
-            if (btnStructures.visible)
-            {
-                drawString(fontRenderer, I18n.format("selectWorld.mapFeatures.info"), halfWidth - 150, 122, -6250336);
-            }
-
-            if (instanceType.visible)
-            {
-                drawString(fontRenderer, I18n.format(Instances.MODID + ".instanceType.info"), halfWidth - 150, 172, -6250336);
-            }
-
             seedTextField.drawTextBox();
 
             if (WorldType.WORLD_TYPES[selectedIndex].hasInfoNotice())

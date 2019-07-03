@@ -5,7 +5,6 @@ instances.enterName=Instance Name
 instances.noInstances=There currently are no Instances
 instances.customizeTitle=Customize Instance Settings
 instances.instanceType=Dimension Type:
-instances.instanceType.info=Where does this text appear?
 
 instances.commands.weatherd.usage=/weatherd <dimension> <clear|rain|thunder> [duration in seconds]
 instances.commands.timed.usage=/timed <dimension> <set|add|query> <value>
