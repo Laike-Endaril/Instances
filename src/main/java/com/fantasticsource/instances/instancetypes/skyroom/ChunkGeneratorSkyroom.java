@@ -53,7 +53,7 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
             //Walls
             if (chunkX == -1)
             {
-                for (int y = 76; y < 108; y++)
+                for (int y = 76; y < 106; y++)
                 {
                     for (int z = 0; z < 16; z++)
                     {
