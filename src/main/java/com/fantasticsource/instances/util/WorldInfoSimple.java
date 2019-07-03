@@ -116,13 +116,13 @@ public class WorldInfoSimple extends WorldInfo
         owner = id;
     }
 
-    public void setOwner(EntityPlayerMP player)
-    {
-        setOwner(player.getPersistentID());
-    }
-
     public UUID getOwner()
     {
         return owner;
+    }
+
+    public void setOwner(EntityPlayerMP player)
+    {
+        setOwner(player.getPersistentID());
     }
 }

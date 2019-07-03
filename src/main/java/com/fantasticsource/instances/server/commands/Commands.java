@@ -3,6 +3,8 @@ package com.fantasticsource.instances.server.commands;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageOpenGui;
 import com.fantasticsource.instances.server.InstanceHandler;
+import com.fantasticsource.instances.util.WorldInfoSimple;
+import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -13,6 +15,7 @@ import net.minecraftforge.common.util.FakePlayer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Commands extends CommandBase
 {
@@ -26,7 +29,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <create:delete:list>";
+        return "Usage: /instances <create:delete:list:setowner>";
     }
 
     @Override
@@ -46,6 +49,13 @@ public class Commands extends CommandBase
 
         switch (args[0])
         {
+            case "list":
+                for (String s : InstanceHandler.list())
+                {
+                    sender.sendMessage(new TextComponentString(s));
+                }
+                break;
+
             case "create":
                 if (sender instanceof EntityPlayerMP && !(sender instanceof FakePlayer))
                 {
@@ -56,28 +66,51 @@ public class Commands extends CommandBase
                 break;
 
             case "delete":
-                if (args.length == 1)
-                {
-                    sender.sendMessage(new TextComponentString("Usage: /instances delete <id>"));
-                }
                 if (args.length == 2)
                 {
                     int dimensionID = Integer.parseInt(args[1]);
 
                     InstanceHandler.deleteDimension(sender, dimensionID);
                 }
+                else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
 
-            case "list":
-                for (String s : InstanceHandler.list())
+            case "setowner":
+                if (args.length == 3)
                 {
-                    sender.sendMessage(new TextComponentString(s));
+                    int dimID;
+                    try
+                    {
+                        dimID = Integer.parseInt(args[1]);
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        sender.sendMessage(new TextComponentString(args[1] + " is not a (instance ID) number"));
+                        return;
+                    }
+
+                    WorldInfoSimple info = InstanceHandler.get(dimID);
+                    if (info == null)
+                    {
+                        sender.sendMessage(new TextComponentString("Instance ID (" + args[1] + ") not found"));
+                        return;
+                    }
+
+                    UUID id = PlayerData.getID(args[2]);
+                    if (id == null)
+                    {
+                        sender.sendMessage(new TextComponentString("Player (" + args[2] + ") not found"));
+                        return;
+                    }
+
+                    info.setOwner(id);
+                    sender.sendMessage(new TextComponentString("Set owner of " + info.getWorldName() + " to " + PlayerData.getName(id) + " (ID = " + args[1] + ", type = " + info.getDimensionType().name() + ")"));
                 }
+                else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
 
             default:
                 sender.sendMessage(new TextComponentString(getUsage(sender)));
-                break;
         }
     }
 
@@ -86,7 +119,34 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "create", "delete", "list");
+            return getListOfStringsMatchingLastWord(args, "create", "delete", "list", "setowner");
+        }
+        else if (args.length == 2)
+        {
+            if (args[0].equals("delete") || args[0].equals("setowner"))
+            {
+                ArrayList<String> strings = new ArrayList<>();
+
+                for (int i : InstanceHandler.instanceInfo.keySet()) strings.add("" + i);
+
+                return getListOfStringsMatchingLastWord(args, strings);
+            }
+            else return new ArrayList<>();
+        }
+        else if (args.length == 3)
+        {
+            if (args[0].equals("setowner"))
+            {
+                ArrayList<String> strings = new ArrayList<>();
+
+                for (PlayerData data : PlayerData.playerData.values())
+                {
+                    strings.add(data.name);
+                }
+
+                return getListOfStringsMatchingLastWord(args, strings);
+            }
+            else return new ArrayList<>();
         }
         else
         {

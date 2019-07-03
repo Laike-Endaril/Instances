@@ -39,8 +39,8 @@ import java.util.Map.Entry;
 
 public class InstanceHandler extends WorldSavedData
 {
+    public static LinkedHashMap<Integer, WorldInfoSimple> instanceInfo = new LinkedHashMap<>();
     private static String NAME = "InstanceHandler";
-    private static LinkedHashMap<Integer, WorldInfoSimple> dimensionInfo = new LinkedHashMap<>();
     private static InstanceHandler instanceHandler = null;
 
     public InstanceHandler(String name)
@@ -65,7 +65,7 @@ public class InstanceHandler extends WorldSavedData
             FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().setData(NAME, instanceHandler);
         }
 
-        for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        for (Entry<Integer, WorldInfoSimple> entry : instanceInfo.entrySet())
         {
             int dimensionID = entry.getKey();
             WorldInfoSimple worldInfo = entry.getValue();
@@ -79,18 +79,18 @@ public class InstanceHandler extends WorldSavedData
     {
         instanceHandler = null;
 
-        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        for (Map.Entry<Integer, WorldInfoSimple> entry : instanceInfo.entrySet())
         {
             int id = entry.getKey();
             DimensionManager.unregisterDimension(id);
         }
-        dimensionInfo.clear();
+        instanceInfo.clear();
     }
 
     public static void createDimension(EntityPlayerMP playerEntity, WorldInfoSimple worldInfo)
     {
         int dimensionID = Instances.nextFreeDimID();
-        dimensionInfo.put(dimensionID, worldInfo);
+        instanceInfo.put(dimensionID, worldInfo);
 
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
 
@@ -128,29 +128,22 @@ public class InstanceHandler extends WorldSavedData
         mcServer.setDifficultyForAllWorlds(difficulty);
     }
 
-    public static void unloadDimension(ICommandSender sender, int dimensionID)
+    public static void unloadDimension(ICommandSender sender, int instanceID)
     {
-        WorldServer w = DimensionManager.getWorld(dimensionID);
-
-        if (!dimensionInfo.containsKey(dimensionID))
+        if (!instanceInfo.containsKey(instanceID))
         {
-            if (w == null)
-            {
-                if (sender != null) sender.sendMessage(new TextComponentString("No dimension with that id exists").setStyle(new Style().setColor(TextFormatting.RED)));
-            }
-            else
-            {
-                if (sender != null) sender.sendMessage(new TextComponentString("The dimension associated with that id is not from the Instances mod").setStyle(new Style().setColor(TextFormatting.RED)));
-            }
+            if (sender != null) sender.sendMessage(new TextComponentString("Instance ID (" + instanceID + ") not found"));
             return;
         }
 
+        WorldServer w = DimensionManager.getWorld(instanceID);
+
         if (w == null)
         {
-            if (DimensionManager.isDimensionRegistered(dimensionID))
+            if (DimensionManager.isDimensionRegistered(instanceID))
             {
-                loadDimension(dimensionID, dimensionInfo.get(dimensionID));
-                w = DimensionManager.getWorld(dimensionID);
+                loadDimension(instanceID, instanceInfo.get(instanceID));
+                w = DimensionManager.getWorld(instanceID);
                 if (w == null)
                 {
                     if (sender != null) sender.sendMessage(new TextComponentString("Failed to load dimension").setStyle(new Style().setColor(TextFormatting.RED)));
@@ -196,7 +189,7 @@ public class InstanceHandler extends WorldSavedData
 
         MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(w));
         w.flush();
-        DimensionManager.setWorld(dimensionID, null, w.getMinecraftServer());
+        DimensionManager.setWorld(instanceID, null, w.getMinecraftServer());
         w.flush();
     }
 
@@ -206,7 +199,7 @@ public class InstanceHandler extends WorldSavedData
 
 
         DimensionManager.unregisterDimension(dimensionID);
-        dimensionInfo.remove(dimensionID);
+        instanceInfo.remove(dimensionID);
 
 
         File dimensionFolder = new File(DimensionManager.getCurrentSaveRootDirectory(), "DIM" + dimensionID);
@@ -230,7 +223,7 @@ public class InstanceHandler extends WorldSavedData
     {
         MessageDimensionSync message = new MessageDimensionSync();
 
-        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        for (Map.Entry<Integer, WorldInfoSimple> entry : instanceInfo.entrySet())
         {
             message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
         }
@@ -241,12 +234,17 @@ public class InstanceHandler extends WorldSavedData
     public static ArrayList<String> list()
     {
         ArrayList<String> result = new ArrayList<>();
-        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        for (Map.Entry<Integer, WorldInfoSimple> entry : instanceInfo.entrySet())
         {
             WorldInfoSimple info = entry.getValue();
             result.add(entry.getKey() + " (" + info.getWorldName() + ") Type = " + info.getDimensionType());
         }
         return result;
+    }
+
+    public static WorldInfoSimple get(int id)
+    {
+        return instanceInfo.get(id);
     }
 
     @Override
@@ -258,13 +256,13 @@ public class InstanceHandler extends WorldSavedData
     @Override
     public void readFromNBT(NBTTagCompound nbt)
     {
-        NBTTagList nbtList = nbt.getTagList("dimensionInfo", 10);
+        NBTTagList nbtList = nbt.getTagList("instanceInfo", 10);
 
         for (int i = 0; i < nbtList.tagCount(); i++)
         {
             NBTTagCompound compound = nbtList.getCompoundTagAt(i);
 
-            dimensionInfo.put(compound.getInteger("dimensionID"), new WorldInfoSimple(compound.getCompoundTag("worldInfo")));
+            instanceInfo.put(compound.getInteger("dimensionID"), new WorldInfoSimple(compound.getCompoundTag("worldInfo")));
         }
     }
 
@@ -273,7 +271,7 @@ public class InstanceHandler extends WorldSavedData
     {
         NBTTagList nbtList = new NBTTagList();
 
-        for (Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        for (Entry<Integer, WorldInfoSimple> entry : instanceInfo.entrySet())
         {
             NBTTagCompound compound = new NBTTagCompound();
 
@@ -283,7 +281,7 @@ public class InstanceHandler extends WorldSavedData
             nbtList.appendTag(compound);
         }
 
-        nbt.setTag("dimensionInfo", nbtList);
+        nbt.setTag("instanceInfo", nbtList);
 
         return nbt;
     }

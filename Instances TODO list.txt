@@ -1,4 +1,4 @@
-Ownership command
+Full creation + ownership command (no gui)
 
 Build permissions for owner and nobody else
 
