@@ -1,8 +1,8 @@
 package com.fantasticsource.instances;
 
 import com.fantasticsource.instances.client.ClientHandler;
-import com.fantasticsource.instances.instancetypes.InstanceTypes;
-import com.fantasticsource.instances.instancetypes.voided.BiomeVoid;
+import com.fantasticsource.instances.dimension.InstanceTypes;
+import com.fantasticsource.instances.boime.BiomeVoid;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.server.InstanceHandler;
 import com.fantasticsource.instances.server.commands.CommandTeleportD;

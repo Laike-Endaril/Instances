@@ -1,6 +1,6 @@
-package com.fantasticsource.instances.instancetypes.skyroom;
+package com.fantasticsource.instances.dimension.skyroom;
 
-import com.fantasticsource.instances.instancetypes.InstanceTypes;
+import com.fantasticsource.instances.dimension.InstanceTypes;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.gen.IChunkGenerator;

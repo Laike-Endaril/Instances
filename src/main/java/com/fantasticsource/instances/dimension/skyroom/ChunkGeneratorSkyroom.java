@@ -1,6 +1,6 @@
-package com.fantasticsource.instances.instancetypes.skyroom;
+package com.fantasticsource.instances.dimension.skyroom;
 
-import com.fantasticsource.instances.instancetypes.voided.BiomeVoid;
+import com.fantasticsource.instances.boime.BiomeVoid;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;

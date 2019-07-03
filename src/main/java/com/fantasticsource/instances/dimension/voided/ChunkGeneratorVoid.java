@@ -1,5 +1,6 @@
-package com.fantasticsource.instances.instancetypes.voided;
+package com.fantasticsource.instances.dimension.voided;
 
+import com.fantasticsource.instances.boime.BiomeVoid;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
