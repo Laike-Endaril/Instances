@@ -238,15 +238,6 @@ public class InstanceHandler extends WorldSavedData
         return message;
     }
 
-    public static void checkUnloadWorlds()
-    {
-        for (int i : dimensionInfo.keySet())
-        {
-            WorldServer world = DimensionManager.getWorld(i);
-            if (world != null && world.playerEntities.isEmpty()) unloadDimension(null, i);
-        }
-    }
-
     public static ArrayList<String> list()
     {
         ArrayList<String> result = new ArrayList<>();
