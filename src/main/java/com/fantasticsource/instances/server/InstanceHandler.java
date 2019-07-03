@@ -247,6 +247,17 @@ public class InstanceHandler extends WorldSavedData
         }
     }
 
+    public static ArrayList<String> list()
+    {
+        ArrayList<String> result = new ArrayList<>();
+        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
+        {
+            WorldInfoSimple info = entry.getValue();
+            result.add(entry.getKey() + " (" + info.getWorldName() + ") Type = " + info.getDimensionType());
+        }
+        return result;
+    }
+
     @Override
     public boolean isDirty()
     {
@@ -284,16 +295,5 @@ public class InstanceHandler extends WorldSavedData
         nbt.setTag("dimensionInfo", nbtList);
 
         return nbt;
-    }
-
-    public static ArrayList<String> list()
-    {
-        ArrayList<String> result = new ArrayList<>();
-        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-        {
-            WorldInfoSimple info = entry.getValue();
-            result.add(entry.getKey() + " (" + info.getWorldName() + ") Type = " + info.getDimensionType());
-        }
-        return result;
     }
 }

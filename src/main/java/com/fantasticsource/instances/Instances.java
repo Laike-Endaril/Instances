@@ -1,15 +1,15 @@
 package com.fantasticsource.instances;
 
 import com.fantasticsource.instances.client.ClientHandler;
-import com.fantasticsource.instances.instancetypes.skyroom.WorldTypeSkyroom;
+import com.fantasticsource.instances.instancetypes.InstanceTypes;
 import com.fantasticsource.instances.instancetypes.voided.BiomeVoid;
-import com.fantasticsource.instances.instancetypes.voided.WorldTypeVoid;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.server.InstanceHandler;
 import com.fantasticsource.instances.server.commands.CommandTeleportD;
 import com.fantasticsource.instances.server.commands.CommandTimeD;
 import com.fantasticsource.instances.server.commands.CommandWeatherD;
 import com.fantasticsource.instances.server.commands.Commands;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -41,6 +41,32 @@ public class Instances
         return null;
     }
 
+    public static Integer nextFreeDimTypeID()
+    {
+        DimensionType[] dimensionTypes = DimensionType.values();
+        int count = dimensionTypes.length;
+
+        int[] ints = new int[count];
+        for (int i = 0; i < count; i++)
+        {
+            ints[i] = dimensionTypes[i].getId();
+        }
+
+        for (int i = Integer.MIN_VALUE; i < Integer.MAX_VALUE; i++)
+        {
+            boolean found = false;
+            for (int i2 : ints)
+                if (i2 == i)
+                {
+                    found = true;
+                    break;
+                }
+            if (!found) return i;
+        }
+
+        return null;
+    }
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
@@ -49,9 +75,8 @@ public class Instances
         //Biomes
         BiomeVoid.init();
 
-        //World/Instance Types
-        WorldTypeVoid.init();
-        WorldTypeSkyroom.init();
+        //Instance Types
+        InstanceTypes.init();
     }
 
     @EventHandler
