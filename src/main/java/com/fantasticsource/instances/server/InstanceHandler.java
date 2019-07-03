@@ -80,7 +80,7 @@ public class InstanceHandler extends WorldSavedData
         return titleCase.toString();
     }
 
-    public static InstanceHandler getInstance()
+    public static InstanceHandler getInstanceHandler()
     {
         InstanceHandler instanceHandler;
         instanceHandler = (InstanceHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(InstanceHandler.class, NAME);

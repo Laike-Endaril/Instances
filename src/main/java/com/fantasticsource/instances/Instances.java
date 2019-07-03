@@ -54,13 +54,13 @@ public class Instances
         event.registerServerCommand(new CommandTimeD());
         event.registerServerCommand(new CommandTeleportD());
 
-        InstanceHandler.getInstance().loadDimensions();
+        InstanceHandler.getInstanceHandler().loadDimensions();
     }
 
     @SubscribeEvent
     public void clientConnect(ServerConnectionFromClientEvent event)
     {
-        event.getManager().sendPacket(PacketHandler.INSTANCE.getPacketFrom(InstanceHandler.getInstance().constructSyncMessage()));
+        event.getManager().sendPacket(PacketHandler.INSTANCE.getPacketFrom(InstanceHandler.getInstanceHandler().constructSyncMessage()));
     }
 
     @SubscribeEvent
