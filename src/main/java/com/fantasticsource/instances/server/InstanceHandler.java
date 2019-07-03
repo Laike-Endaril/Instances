@@ -86,7 +86,6 @@ public class InstanceHandler extends WorldSavedData
         for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
         {
             int id = entry.getKey();
-            System.out.println("Unregistering instance " + id + " (" + entry.getValue().getWorldName() + ")");
             DimensionManager.unregisterDimension(id);
         }
         dimensionInfo.clear();
