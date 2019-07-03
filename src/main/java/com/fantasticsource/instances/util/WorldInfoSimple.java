@@ -8,32 +8,36 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class WorldInfoSimple extends WorldInfo
 {
     private WorldInfo superInfo;
     private DimensionType dimensionType;
+    private UUID owner;
 
     public WorldInfoSimple(NBTTagCompound nbt)
     {
         super(nbt);
 
         dimensionType = DimensionType.OVERWORLD;
-
-        if (nbt.hasKey("dimType"))
+        try
         {
-            String dimTypeS = nbt.getString("dimType");
-            if (!dimTypeS.equals(""))
-            {
-                try
-                {
-                    dimensionType = DimensionType.byName(dimTypeS);
-                }
-                catch (IllegalArgumentException e)
-                {
-                    //Just keep default value from above
-                }
-            }
+            dimensionType = DimensionType.byName(nbt.getString("dimType"));
+        }
+        catch (IllegalArgumentException e)
+        {
+            //Just keep default value from above
+        }
+
+        owner = null;
+        try
+        {
+            owner = UUID.fromString(nbt.getString("owner")); //TODO
+        }
+        catch (IllegalArgumentException e)
+        {
+            //Just keep default value from above
         }
 
         superInfo = FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getWorldInfo();
