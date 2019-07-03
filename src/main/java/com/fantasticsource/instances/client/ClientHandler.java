@@ -15,10 +15,7 @@ public class ClientHandler
     {
         for (Integer i : simpleDimensions)
         {
-            if (DimensionManager.isDimensionRegistered(i))
-            {
-                DimensionManager.unregisterDimension(i);
-            }
+            if (DimensionManager.isDimensionRegistered(i)) DimensionManager.unregisterDimension(i);
         }
     }
 

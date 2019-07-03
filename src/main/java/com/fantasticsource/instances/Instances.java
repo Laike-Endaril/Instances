@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 @Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION)
@@ -86,5 +87,14 @@ public class Instances
     public void clientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
     {
         if (!event.getManager().isLocalChannel()) ClientHandler.cleanUp();
+    }
+
+    @SubscribeEvent
+    public void serverTick(TickEvent.ServerTickEvent event)
+    {
+        if (event.phase == TickEvent.Phase.END)
+        {
+            InstanceHandler.checkUnloadWorlds();
+        }
     }
 }

@@ -75,8 +75,7 @@ public class InstanceHandler extends WorldSavedData
             WorldInfoSimple worldInfo = entry.getValue();
 
             DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
-
-            System.out.println(worldInfo.getDimensionType());
+            DimensionManager.keepDimensionLoaded(dimensionID, false);
 
             loadDimension(dimensionID, worldInfo);
         }
@@ -137,7 +136,7 @@ public class InstanceHandler extends WorldSavedData
         mcServer.setDifficultyForAllWorlds(difficulty);
     }
 
-    public static void deleteDimension(ICommandSender sender, int dimensionID)
+    public static void unloadDimension(ICommandSender sender, int dimensionID)
     {
         WorldServer w = DimensionManager.getWorld(dimensionID);
 
@@ -145,11 +144,11 @@ public class InstanceHandler extends WorldSavedData
         {
             if (w == null)
             {
-                sender.sendMessage(new TextComponentString("No dimension with that id exists").setStyle(new Style().setColor(TextFormatting.RED)));
+                if (sender != null) sender.sendMessage(new TextComponentString("No dimension with that id exists").setStyle(new Style().setColor(TextFormatting.RED)));
             }
             else
             {
-                sender.sendMessage(new TextComponentString("The dimension associated with that id is not from the Instances mod").setStyle(new Style().setColor(TextFormatting.RED)));
+                if (sender != null) sender.sendMessage(new TextComponentString("The dimension associated with that id is not from the Instances mod").setStyle(new Style().setColor(TextFormatting.RED)));
             }
             return;
         }
@@ -162,7 +161,7 @@ public class InstanceHandler extends WorldSavedData
                 w = DimensionManager.getWorld(dimensionID);
                 if (w == null)
                 {
-                    sender.sendMessage(new TextComponentString("Failed to load dimension").setStyle(new Style().setColor(TextFormatting.RED)));
+                    if (sender != null) sender.sendMessage(new TextComponentString("Failed to load dimension").setStyle(new Style().setColor(TextFormatting.RED)));
                     return;
                 }
             }
@@ -198,7 +197,7 @@ public class InstanceHandler extends WorldSavedData
 
                 if (sender != player)
                 {
-                    player.sendMessage(new TextComponentString("The dimension you were in was deleted").setStyle(new Style().setColor(TextFormatting.RED)));
+                    player.sendMessage(new TextComponentString("The dimension you were in was unloaded").setStyle(new Style().setColor(TextFormatting.RED)));
                 }
             }
         }
@@ -206,10 +205,17 @@ public class InstanceHandler extends WorldSavedData
         MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(w));
         w.flush();
         DimensionManager.setWorld(dimensionID, null, w.getMinecraftServer());
-        DimensionManager.unregisterDimension(dimensionID);
-
-        dimensionInfo.remove(dimensionID);
         w.flush();
+    }
+
+    public static void deleteDimension(ICommandSender sender, int dimensionID)
+    {
+        unloadDimension(sender, dimensionID);
+
+
+        DimensionManager.unregisterDimension(dimensionID);
+        dimensionInfo.remove(dimensionID);
+
 
         File dimensionFolder = new File(DimensionManager.getCurrentSaveRootDirectory(), "DIM" + dimensionID);
 
@@ -220,11 +226,11 @@ public class InstanceHandler extends WorldSavedData
         catch (IOException e)
         {
             e.printStackTrace();
-            sender.sendMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
+            if (sender != null) sender.sendMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
         }
         finally
         {
-            sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
+            if (sender != null) sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
         }
     }
 
@@ -238,6 +244,15 @@ public class InstanceHandler extends WorldSavedData
         }
 
         return message;
+    }
+
+    public static void checkUnloadWorlds()
+    {
+        for (int i : dimensionInfo.keySet())
+        {
+            WorldServer world = DimensionManager.getWorld(i);
+            if (world != null && world.playerEntities.isEmpty()) unloadDimension(null, i);
+        }
     }
 
     @Override
