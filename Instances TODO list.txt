@@ -1,3 +1,5 @@
+Somewhere along the line I broke instance creation; it's always creating an overworld instance instead of the selected type
+
 Player-owned instances
 Build permissions for owner and nobody else
 
