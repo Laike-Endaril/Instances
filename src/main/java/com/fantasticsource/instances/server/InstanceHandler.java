@@ -1,8 +1,6 @@
 package com.fantasticsource.instances.server;
 
 import com.fantasticsource.instances.Instances;
-import com.fantasticsource.instances.network.PacketHandler;
-import com.fantasticsource.instances.network.messages.MessageDimensionSync;
 import com.fantasticsource.instances.util.TeleporterSimple;
 import com.fantasticsource.instances.util.WorldInfoSimple;
 import net.minecraft.command.ICommandSender;
@@ -26,7 +24,6 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -34,7 +31,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 public class InstanceHandler extends WorldSavedData
@@ -109,8 +105,6 @@ public class InstanceHandler extends WorldSavedData
         loadDimension(dimensionID, worldInfo);
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
-
-        syncWithClients();
     }
 
     public ITextComponent generateList()
@@ -318,31 +312,5 @@ public class InstanceHandler extends WorldSavedData
         {
             sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
         }
-
-        syncWithClients();
-    }
-
-    private void syncWithClients()
-    {
-        MessageDimensionSync message = new MessageDimensionSync();
-
-        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-        {
-            message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
-        }
-
-        PacketHandler.INSTANCE.sendToAll(message);
-    }
-
-    public IMessage constructSyncMessage()
-    {
-        MessageDimensionSync message = new MessageDimensionSync();
-
-        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-        {
-            message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
-        }
-
-        return message;
     }
 }
