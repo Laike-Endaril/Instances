@@ -1,7 +1,6 @@
 package com.fantasticsource.instances.server;
 
 import com.fantasticsource.instances.Instances;
-import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageDimensionSync;
 import com.fantasticsource.instances.util.TeleporterSimple;
 import com.fantasticsource.instances.util.WorldInfoSimple;
@@ -105,8 +104,6 @@ public class InstanceHandler extends WorldSavedData
         loadDimension(dimensionID, worldInfo);
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
-
-//        syncWithClients();
     }
 
     private static void loadDimension(int dimensionID, WorldInfo worldInfo)
@@ -229,20 +226,6 @@ public class InstanceHandler extends WorldSavedData
         {
             sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
         }
-
-//        syncWithClients();
-    }
-
-    private static void syncWithClients()
-    {
-        MessageDimensionSync message = new MessageDimensionSync();
-
-        for (Map.Entry<Integer, WorldInfoSimple> entry : dimensionInfo.entrySet())
-        {
-            message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
-        }
-
-        PacketHandler.INSTANCE.sendToAll(message);
     }
 
     public static IMessage constructSyncMessage()
