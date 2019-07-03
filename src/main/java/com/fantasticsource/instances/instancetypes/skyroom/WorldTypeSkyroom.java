@@ -31,20 +31,10 @@ public class WorldTypeSkyroom extends WorldType
         //Indirectly initializes via super constructor
         new WorldTypeSkyroom();
 
-        int i;
-        for (i = Integer.MIN_VALUE; i < Integer.MAX_VALUE; i++)
-        {
-            if (!DimensionManager.isDimensionRegistered(i))
-            {
-                break;
-            }
-        }
-
-        if (i == Integer.MAX_VALUE) throw new IllegalStateException("All dimensions used; this should absolutely never happen");
-        skyroomDimID = i;
+        skyroomDimID = Instances.nextFreeDimID();
 
         skyroomDimType = DimensionType.register(skyroomDimName, "_" + skyroomDimName, skyroomDimID, WorldProviderSkyroom.class, false);
-        DimensionManager.registerDimension(i, skyroomDimType);
+        DimensionManager.registerDimension(skyroomDimID, skyroomDimType);
     }
 
     @SideOnly(Side.CLIENT)

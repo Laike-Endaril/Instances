@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.server;
 
+import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.util.TeleporterSimple;
 import com.fantasticsource.instances.util.WorldInfoSimple;
 import net.minecraft.command.ICommandSender;
@@ -94,7 +95,7 @@ public class InstanceHandler extends WorldSavedData
 
     public static void createDimension(EntityPlayerMP playerEntity, WorldInfoSimple worldInfo)
     {
-        int dimensionID = DimensionManager.getNextFreeDimId();
+        int dimensionID = Instances.nextFreeDimID();
         dimensionInfo.put(dimensionID, worldInfo);
 
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());

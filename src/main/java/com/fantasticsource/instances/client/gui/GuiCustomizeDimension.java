@@ -33,8 +33,8 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
     private GuiButton guiButton2;
     private GuiButton guiButton3;
     private GuiButton guiButton4;
-    private GuiButton guiButton5;
-    private GuiButton guiButton6;
+    private GuiButton guiButtonYes;
+    private GuiButton guiButtonNo;
     private GuiButton guiButton7;
     private boolean field_175338_A = false;
     private int field_175339_B = 0;
@@ -75,12 +75,12 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
         buttonList.add(guiButton1 = new GuiButton(301, width / 2 - 92, height - 27, 90, 20, I18n.format("createWorld.customize.custom.randomize")));
         buttonList.add(guiButton7 = new GuiButton(305, width / 2 + 3, height - 27, 90, 20, I18n.format("createWorld.customize.custom.presets")));
         buttonList.add(guiButton = new GuiButton(300, width / 2 + 98, height - 27, 90, 20, I18n.format("gui.done")));
-        guiButton5 = new GuiButton(306, width / 2 - 55, 160, 50, 20, I18n.format("gui.yes"));
-        guiButton5.visible = false;
-        buttonList.add(guiButton5);
-        guiButton6 = new GuiButton(307, width / 2 + 5, 160, 50, 20, I18n.format("gui.no"));
-        guiButton6.visible = false;
-        buttonList.add(guiButton6);
+        guiButtonYes = new GuiButton(306, width / 2 - 55, 160, 50, 20, I18n.format("gui.yes"));
+        guiButtonYes.visible = false;
+        buttonList.add(guiButtonYes);
+        guiButtonNo = new GuiButton(307, width / 2 + 5, 160, 50, 20, I18n.format("gui.no"));
+        guiButtonNo.visible = false;
+        buttonList.add(guiButtonNo);
         func_175325_f();
     }
 
@@ -725,8 +725,8 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
 
     private void func_175329_a(boolean p_175329_1_)
     {
-        guiButton5.visible = p_175329_1_;
-        guiButton6.visible = p_175329_1_;
+        guiButtonYes.visible = p_175329_1_;
+        guiButtonNo.visible = p_175329_1_;
         guiButton1.enabled = !p_175329_1_;
         guiButton.enabled = !p_175329_1_;
         guiButton3.enabled = !p_175329_1_;
@@ -860,12 +860,15 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
         if (field_175339_B != 0)
         {
             drawRect(0, 0, width, height, Integer.MIN_VALUE);
+
             drawHorizontalLine(halfWidth - 91, halfWidth + 90, 99, -2039584);
             drawHorizontalLine(halfWidth - 91, halfWidth + 90, 185, -6250336);
             drawVerticalLine(halfWidth - 91, 99, 185, -2039584);
             drawVerticalLine(halfWidth + 90, 99, 185, -6250336);
+
             GlStateManager.disableLighting();
             GlStateManager.disableFog();
+
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder vertexBuffer = tessellator.getBuffer();
             mc.getTextureManager().bindTexture(OPTIONS_BACKGROUND);
@@ -876,11 +879,13 @@ public class GuiCustomizeDimension extends GuiScreen implements GuiSlider.Format
             vertexBuffer.pos(halfWidth + 90, 100, 0).tex(5.625, 0).color(64, 64, 64, 64).endVertex();
             vertexBuffer.pos(halfWidth - 90, 100, 0).tex(0, 0).color(64, 64, 64, 64).endVertex();
             tessellator.draw();
+
             drawCenteredString(fontRenderer, I18n.format("createWorld.customize.custom.confirmTitle"), halfWidth, 105, 16777215);
             drawCenteredString(fontRenderer, I18n.format("createWorld.customize.custom.confirm1"), halfWidth, 125, 16777215);
             drawCenteredString(fontRenderer, I18n.format("createWorld.customize.custom.confirm2"), halfWidth, 135, 16777215);
-            guiButton5.drawButton(mc, mouseX, mouseY, partialTicks);
-            guiButton6.drawButton(mc, mouseX, mouseY, partialTicks);
+
+            guiButtonYes.drawButton(mc, mouseX, mouseY, partialTicks);
+            guiButtonNo.drawButton(mc, mouseX, mouseY, partialTicks);
         }
     }
 }

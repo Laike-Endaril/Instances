@@ -9,6 +9,7 @@ import com.fantasticsource.instances.server.commands.CommandTeleportD;
 import com.fantasticsource.instances.server.commands.CommandTimeD;
 import com.fantasticsource.instances.server.commands.CommandWeatherD;
 import com.fantasticsource.instances.server.commands.Commands;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -58,5 +59,17 @@ public class Instances
     public void serverStop(FMLServerStoppedEvent event)
     {
         InstanceHandler.unload();
+    }
+
+    public static Integer nextFreeDimID()
+    {
+        for (int i = Integer.MIN_VALUE; i < Integer.MAX_VALUE; i++)
+        {
+            if (!DimensionManager.isDimensionRegistered(i))
+            {
+                return i;
+            }
+        }
+        return null;
     }
 }

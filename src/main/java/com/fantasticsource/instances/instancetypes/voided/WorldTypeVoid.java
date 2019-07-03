@@ -30,20 +30,10 @@ public class WorldTypeVoid extends WorldType
         //Indirectly initializes via super constructor
         new WorldTypeVoid();
 
-        int i;
-        for (i = Integer.MIN_VALUE; i < Integer.MAX_VALUE; i++)
-        {
-            if (!DimensionManager.isDimensionRegistered(i))
-            {
-                break;
-            }
-        }
-
-        if (i == Integer.MAX_VALUE) throw new IllegalStateException("All dimensions used; this should absolutely never happen");
-        voidDimID = i;
+        voidDimID = Instances.nextFreeDimID();
 
         voidDimType = DimensionType.register(voidDimName, "_" + voidDimName, voidDimID, WorldProviderVoid.class, false);
-        DimensionManager.registerDimension(i, voidDimType);
+        DimensionManager.registerDimension(voidDimID, voidDimType);
     }
 
     @SideOnly(Side.CLIENT)
