@@ -85,9 +85,6 @@ public class Instances
     @SubscribeEvent
     public void clientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
     {
-        if (!event.getManager().isLocalChannel())
-        {
-            ClientHandler.getInstance().cleanUp();
-        }
+        if (!event.getManager().isLocalChannel()) ClientHandler.cleanUp();
     }
 }

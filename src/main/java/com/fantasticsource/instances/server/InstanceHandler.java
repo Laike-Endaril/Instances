@@ -105,6 +105,8 @@ public class InstanceHandler extends WorldSavedData
         loadDimension(dimensionID, worldInfo);
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
+
+//        syncWithClients();
     }
 
     private static void loadDimension(int dimensionID, WorldInfo worldInfo)
@@ -227,6 +229,8 @@ public class InstanceHandler extends WorldSavedData
         {
             sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
         }
+
+//        syncWithClients();
     }
 
     private static void syncWithClients()
