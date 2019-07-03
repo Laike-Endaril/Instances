@@ -1,4 +1,5 @@
-Somewhere along the line I broke instance creation; it's always creating an overworld instance instead of the selected type
+Somewhere along the line I broke instance creation; it's always creating an overworld instance instead of the selected type...
+...something in "instances finally unload themselves automatically" caused the issue
 
 Player-owned instances
 Build permissions for owner and nobody else
