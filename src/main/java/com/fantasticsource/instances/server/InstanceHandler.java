@@ -97,7 +97,7 @@ public class InstanceHandler extends WorldSavedData
         int dimensionID = Instances.nextFreeDimID();
 
         WorldInfo tempInfo = DimensionManager.getWorld(0).getWorldInfo();
-        WorldInfoSimple worldInfo = new WorldInfoSimple(new WorldSettings(new Random().nextLong(), tempInfo.getGameType(), true, false, tempInfo.getTerrainType()), name, type);
+        WorldInfoSimple worldInfo = new WorldInfoSimple(new WorldSettings(new Random().nextLong(), GameType.SURVIVAL, true, false, tempInfo.getTerrainType()), name, type);
 
         instanceInfo.put(dimensionID, worldInfo);
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
