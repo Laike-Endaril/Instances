@@ -1,5 +1,3 @@
-Fix issue where teleporting to instance in Faerun doesn't load terrain client-side
-
 Fix exp desync when teleporting back to overworld
 Try possible inventory desync fix using a packet to force an inventory update
 
@@ -27,3 +25,5 @@ Rename or remove all commands, so we don't get any conflicts with Simple Dimensi
 Low priority
 
 Fix spinny camera bug when changing yaw/pitch during a teleport (currently avoiding by not changing yaw/pitch)
+
+Fix client not loading chunks when teleporting to an instance with use-native-transport=true in server config
