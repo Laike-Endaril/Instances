@@ -6,7 +6,6 @@ import com.fantasticsource.instances.network.messages.MessageOpenGui;
 import com.fantasticsource.instances.server.InstanceHandler;
 import com.fantasticsource.instances.util.WorldInfoSimple;
 import com.fantasticsource.mctools.PlayerData;
-import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -73,11 +72,17 @@ public class Commands extends CommandBase
                 {
                     if (args.length == 1)
                     {
-                        joinPossiblyCreating((EntityPlayerMP) sender, server);
+                        if (!joinPossiblyCreating((EntityPlayerMP) sender, server))
+                        {
+                            sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
+                        }
                     }
                     else if (args.length == 2)
                     {
-                        joinPossiblyCreating((EntityPlayerMP) sender, args[1], server);
+                        if (!joinPossiblyCreating((EntityPlayerMP) sender, args[1], server))
+                        {
+                            sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
+                        }
                     }
                     else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 }
@@ -207,19 +212,15 @@ public class Commands extends CommandBase
         }
     }
 
-    public static void joinPossiblyCreating(EntityPlayerMP owner, MinecraftServer server)
+    public static boolean joinPossiblyCreating(EntityPlayerMP owner, MinecraftServer server)
     {
-        joinPossiblyCreating(owner, owner.getName(), server);
+        return joinPossiblyCreating(owner, owner.getName(), server);
     }
 
-    public static void joinPossiblyCreating(Entity entity, String ownername, MinecraftServer server)
+    public static boolean joinPossiblyCreating(Entity entity, String ownername, MinecraftServer server)
     {
         UUID id = PlayerData.getID(ownername);
-        if (id == null)
-        {
-            Tools.printStackTrace();
-            return;
-        }
+        if (id == null) return false;
 
         //Try finding any instance owned by the player
         for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
@@ -229,12 +230,12 @@ public class Commands extends CommandBase
                 try
                 {
                     CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + entry.getKey()});
+                    return true;
                 }
                 catch (CommandException e)
                 {
-                    e.printStackTrace();
+                    return false;
                 }
-                return;
             }
         }
 
@@ -243,11 +244,11 @@ public class Commands extends CommandBase
         try
         {
             CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + pair.getKey()});
+            return true;
         }
         catch (CommandException e)
         {
-            e.printStackTrace();
+            return false;
         }
-        return;
     }
 }
