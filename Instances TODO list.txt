@@ -7,8 +7,6 @@ Whitelist per owned instance for who is allowed to visit
 
 Add command to escape a personal instance
 
-Add portal(s) to personal instance gen
-
 Add "Hub" dim type
 Hub has portals to...
 ...where you came from (very important)

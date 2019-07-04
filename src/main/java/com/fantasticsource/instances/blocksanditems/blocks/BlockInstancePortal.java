@@ -59,7 +59,7 @@ public class BlockInstancePortal extends Block
                 }
                 else
                 {
-                    System.out.println("Behavior for more than one destination is not yet implemented");
+                    System.out.println("Behavior for more than one destination is not yet implemented (" + pos + ")");
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.world.dimensions.skyroom;
 
+import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
@@ -48,6 +49,10 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
                     chunk.setBlockState(new BlockPos(x, 75, z), Blocks.BEDROCK.getDefaultState());
                     chunk.setBlockState(new BlockPos(x, 108, z), Blocks.BARRIER.getDefaultState());
                 }
+            }
+            if (chunkX == -1 && chunkZ == -1)
+            {
+                chunk.setBlockState(new BlockPos(1, 75, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
             }
 
             //Walls
