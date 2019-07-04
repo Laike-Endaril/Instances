@@ -70,6 +70,8 @@ public class Instances
     public void preInit(FMLPreInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
+
 
         //Biomes
         BiomeVoid.init();

@@ -1,12 +1,14 @@
-Create teleporter block
+Add functionality to instance portals
+
+Fix textures for instance portals
+
+
 
 Build permissions for owner and nobody else
-
 Interact permissions for owner and nobody else
 
-Command-based whitelist per owned instance for who is allowed to visit
+Whitelist per owned instance for who is allowed to visit
 
-Command to go to an instance of a specified owner (can probably just use existing /tpd with specially named instances using player UUIDs)
 
 
 Non-Faerun
