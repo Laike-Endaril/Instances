@@ -3,8 +3,10 @@ package com.fantasticsource.instances.blocksanditems.blocks;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
+import com.fantasticsource.instances.commands.CmdEscape;
 import com.fantasticsource.instances.commands.CmdTPD;
 import com.fantasticsource.instances.commands.Commands;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -51,7 +53,14 @@ public class BlockInstancePortal extends Block
             {
                 if (portal.destinations.size() == 0)
                 {
-                    Commands.joinPossiblyCreating((EntityPlayerMP) playerIn, worldIn.getMinecraftServer());
+                    if (playerIn.world.provider.getDimensionType() == InstanceTypes.skyroomDimType)
+                    {
+                        CmdEscape.escape(playerIn);
+                    }
+                    else
+                    {
+                        Commands.joinPossiblyCreating((EntityPlayerMP) playerIn, worldIn.getMinecraftServer());
+                    }
                 }
                 else if (portal.destinations.size() == 1)
                 {
