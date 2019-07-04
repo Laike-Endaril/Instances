@@ -368,7 +368,7 @@ public class CommandTeleportD extends CommandBase
         return Instances.MODID + ".commands.tpd.usage";
     }
 
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args)
     {
         tpd(this, server, sender, null, args);
     }

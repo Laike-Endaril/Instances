@@ -8,7 +8,6 @@ import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -53,29 +52,13 @@ public class Commands extends CommandBase
         {
             if (entry.getValue().getOwner().equals(id))
             {
-                try
-                {
-                    CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + entry.getKey()});
-                    return true;
-                }
-                catch (CommandException e)
-                {
-                    return false;
-                }
+                return CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + entry.getKey()});
             }
         }
 
         //Not found
         Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(entity, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
-        try
-        {
-            CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + pair.getKey()});
-            return true;
-        }
-        catch (CommandException e)
-        {
-            return false;
-        }
+        return CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + pair.getKey()});
     }
 
     @Override
