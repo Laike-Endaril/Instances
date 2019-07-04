@@ -1,11 +1,13 @@
+Fix spinny camera bug in dedicated mode
+
+
+
 Build permissions for owner and nobody else
 Interact permissions for owner and nobody else
 
 Whitelist per owned instance for who is allowed to visit
 
 
-
-Track last non-instance position each player was in
 
 Add "Hub" dim type
 Hub has portals to...
