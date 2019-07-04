@@ -1,4 +1,6 @@
-Full creation + ownership command (no gui)
+All-in-one command to join a personal instance, creating it if it doesn't exist...
+.../instances personal (your own)
+.../instances personal <playername>
 
 Build permissions for owner and nobody else
 
@@ -11,4 +13,4 @@ Command to go to an instance of a specified owner (can probably just use existin
 
 Non-Faerun
 
-Make sure player spawns at 0, 0, 0 in void and skyroom world types
+Rename or remove all commands, so we don't get any conflicts with Simple Dimensions

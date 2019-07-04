@@ -93,7 +93,7 @@ public class InstanceHandler extends WorldSavedData
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
     }
 
-    public static void createDimension(ICommandSender sender, DimensionType type, EntityPlayer owner, String name)
+    public static void createDimension(ICommandSender sender, DimensionType type, UUID owner, String name)
     {
         name = name.replaceAll(" ", "_");
 
@@ -101,7 +101,7 @@ public class InstanceHandler extends WorldSavedData
 
         WorldInfo tempInfo = DimensionManager.getWorld(0).getWorldInfo();
         WorldInfoSimple worldInfo = new WorldInfoSimple(new WorldSettings(new Random().nextLong(), GameType.SURVIVAL, true, false, tempInfo.getTerrainType()), name, type);
-        worldInfo.setOwner(owner.getPersistentID());
+        worldInfo.setOwner(owner);
 
         instanceInfo.put(dimensionID, worldInfo);
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());

@@ -7,7 +7,6 @@ import com.fantasticsource.instances.util.WorldInfoSimple;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -31,7 +30,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <create:delete:list:setowner>";
+        return "Usage: /instances <create:delete:list:setowner:personal>";
     }
 
     @Override
@@ -51,6 +50,10 @@ public class Commands extends CommandBase
 
         switch (args[0])
         {
+            case "personal":
+
+                break;
+
             case "list":
                 for (String s : InstanceHandler.list())
                 {
@@ -72,8 +75,7 @@ public class Commands extends CommandBase
                 else if (args.length == 3)
                 {
                     //No GUI
-                    EntityPlayer player = PlayerData.get(args[2]).player;
-                    InstanceHandler.createDimension(sender, DimensionType.byName(args[1]), player, player.getName() + "'s " + args[1]);
+                    InstanceHandler.createDimension(sender, DimensionType.byName(args[1]), PlayerData.getID(args[2]), args[2] + "'s " + args[1]);
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
@@ -132,7 +134,7 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "create", "delete", "list", "setowner");
+            return getListOfStringsMatchingLastWord(args, "create", "delete", "list", "setowner", "personal");
         }
         else if (args.length == 2)
         {
@@ -155,20 +157,17 @@ public class Commands extends CommandBase
 
                 return getListOfStringsMatchingLastWord(args, strings);
             }
+            else if (args[0].equals("personal"))
+            {
+                return getListOfStringsMatchingLastWord(args, playernames());
+            }
             else return new ArrayList<>();
         }
         else if (args.length == 3)
         {
             if (args[0].equals("setowner") || args[0].equals("create"))
             {
-                ArrayList<String> strings = new ArrayList<>();
-
-                for (PlayerData data : PlayerData.playerData.values())
-                {
-                    strings.add(data.name);
-                }
-
-                return getListOfStringsMatchingLastWord(args, strings);
+                return getListOfStringsMatchingLastWord(args, playernames());
             }
             else return new ArrayList<>();
         }
@@ -176,5 +175,17 @@ public class Commands extends CommandBase
         {
             return new ArrayList<>();
         }
+    }
+
+    private static ArrayList<String> playernames()
+    {
+        ArrayList<String> strings = new ArrayList<>();
+
+        for (PlayerData data : PlayerData.playerData.values())
+        {
+            strings.add(data.name);
+        }
+
+        return strings;
     }
 }
