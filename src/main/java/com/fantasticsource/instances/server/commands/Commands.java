@@ -1,11 +1,14 @@
 package com.fantasticsource.instances.server.commands;
 
+import com.fantasticsource.instances.dimension.InstanceTypes;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageOpenGui;
 import com.fantasticsource.instances.server.InstanceHandler;
 import com.fantasticsource.instances.util.WorldInfoSimple;
 import com.fantasticsource.mctools.PlayerData;
+import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -16,10 +19,23 @@ import net.minecraftforge.common.util.FakePlayer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class Commands extends CommandBase
 {
+
+    private static ArrayList<String> playernames()
+    {
+        ArrayList<String> strings = new ArrayList<>();
+
+        for (PlayerData data : PlayerData.playerData.values())
+        {
+            strings.add(data.name);
+        }
+
+        return strings;
+    }
 
     @Override
     public String getName()
@@ -51,7 +67,47 @@ public class Commands extends CommandBase
         switch (args[0])
         {
             case "personal":
+                if (args.length == 1)
+                {
+                    if (sender instanceof EntityPlayerMP)
+                    {
+                        EntityPlayerMP player = (EntityPlayerMP) sender;
+                        UUID id = player.getPersistentID();
 
+                        //Try finding any instance owned by the player
+                        for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
+                        {
+                            if (entry.getValue().getOwner().equals(id))
+                            {
+                                try
+                                {
+                                    CommandTeleportD.tpd(null, server, server, player, new String[]{"" + entry.getKey()});
+                                }
+                                catch (CommandException e)
+                                {
+                                    e.printStackTrace();
+                                }
+                                return;
+                            }
+                        }
+
+                        //Not found
+                        Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(sender, InstanceTypes.skyroomDimType, player.getPersistentID(), player.getName() + "'s " + InstanceTypes.skyroomDimType.name());
+                        try
+                        {
+                            CommandTeleportD.tpd(null, server, server, player, new String[]{"" + pair.getKey()});
+                        }
+                        catch (CommandException e)
+                        {
+                            e.printStackTrace();
+                        }
+                        return;
+                    }
+                }
+                else if (args.length == 2)
+                {
+                }
+                else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
 
             case "list":
@@ -175,17 +231,5 @@ public class Commands extends CommandBase
         {
             return new ArrayList<>();
         }
-    }
-
-    private static ArrayList<String> playernames()
-    {
-        ArrayList<String> strings = new ArrayList<>();
-
-        for (PlayerData data : PlayerData.playerData.values())
-        {
-            strings.add(data.name);
-        }
-
-        return strings;
     }
 }

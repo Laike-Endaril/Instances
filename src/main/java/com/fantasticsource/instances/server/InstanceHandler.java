@@ -4,7 +4,7 @@ import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.network.messages.MessageDimensionSync;
 import com.fantasticsource.instances.util.TeleporterSimple;
 import com.fantasticsource.instances.util.WorldInfoSimple;
-import com.fantasticsource.mctools.PlayerData;
+import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -93,7 +93,7 @@ public class InstanceHandler extends WorldSavedData
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
     }
 
-    public static void createDimension(ICommandSender sender, DimensionType type, UUID owner, String name)
+    public static Pair<Integer, WorldInfoSimple> createDimension(ICommandSender sender, DimensionType type, UUID owner, String name)
     {
         name = name.replaceAll(" ", "_");
 
@@ -107,6 +107,8 @@ public class InstanceHandler extends WorldSavedData
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
 
         sender.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
+
+        return new Pair<>(dimensionID, worldInfo);
     }
 
     private static void loadDimension(int dimensionID, WorldInfo worldInfo)
