@@ -16,9 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.ServerWorldEventHandler;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.*;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraft.world.storage.WorldSavedData;
@@ -31,10 +29,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class InstanceHandler extends WorldSavedData
@@ -95,6 +90,19 @@ public class InstanceHandler extends WorldSavedData
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
+    }
+
+    public static void createDimension(ICommandSender sender, DimensionType type, EntityPlayer owner, String name)
+    {
+        int dimensionID = Instances.nextFreeDimID();
+
+        WorldInfo tempInfo = DimensionManager.getWorld(0).getWorldInfo();
+        WorldInfoSimple worldInfo = new WorldInfoSimple(new WorldSettings(new Random().nextLong(), tempInfo.getGameType(), true, false, tempInfo.getTerrainType()), name, type);
+
+        instanceInfo.put(dimensionID, worldInfo);
+        DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
+
+        sender.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
     }
 
     private static void loadDimension(int dimensionID, WorldInfo worldInfo)

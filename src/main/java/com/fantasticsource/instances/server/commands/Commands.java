@@ -7,10 +7,12 @@ import com.fantasticsource.instances.util.WorldInfoSimple;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.util.FakePlayer;
 
 import java.util.ArrayList;
@@ -57,12 +59,23 @@ public class Commands extends CommandBase
                 break;
 
             case "create":
-                if (sender instanceof EntityPlayerMP && !(sender instanceof FakePlayer))
+                if (args.length == 1)
                 {
-                    EntityPlayerMP player = (EntityPlayerMP) sender;
+                    //GUI
+                    if (sender instanceof EntityPlayerMP && !(sender instanceof FakePlayer))
+                    {
+                        EntityPlayerMP player = (EntityPlayerMP) sender;
 
-                    PacketHandler.INSTANCE.sendTo(new MessageOpenGui(), player);
+                        PacketHandler.INSTANCE.sendTo(new MessageOpenGui(), player);
+                    }
                 }
+                else if (args.length == 3)
+                {
+                    //No GUI
+                    EntityPlayer player = PlayerData.get(args[2]).player;
+                    InstanceHandler.createDimension(sender, DimensionType.byName(args[1]), player, player.getName() + "'s " + args[1]);
+                }
+                else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
 
             case "delete":
@@ -131,11 +144,22 @@ public class Commands extends CommandBase
 
                 return getListOfStringsMatchingLastWord(args, strings);
             }
+            else if (args[0].equals("create"))
+            {
+                ArrayList<String> strings = new ArrayList<>();
+
+                for (DimensionType type : DimensionType.values())
+                {
+                    strings.add(type.getName());
+                }
+
+                return getListOfStringsMatchingLastWord(args, strings);
+            }
             else return new ArrayList<>();
         }
         else if (args.length == 3)
         {
-            if (args[0].equals("setowner"))
+            if (args[0].equals("setowner") || args[0].equals("create"))
             {
                 ArrayList<String> strings = new ArrayList<>();
 
