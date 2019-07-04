@@ -1,7 +1,9 @@
 package com.fantasticsource.instances.server.commands;
 
 import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.server.InstanceHandler;
 import com.fantasticsource.instances.util.TeleporterSimple;
+import com.fantasticsource.instances.util.WorldInfoSimple;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -16,10 +18,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.DimensionManager;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
 public class CommandTeleportD extends CommandBase
 {
@@ -73,6 +78,14 @@ public class CommandTeleportD extends CommandBase
             }
             catch (NumberFormatException exception)
             {
+                for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
+                {
+                    if (entry.getValue().getWorldName().equals(args[0]))
+                    {
+                        dimensionID = entry.getKey();
+                        dimensionThere = true;
+                    }
+                }
             }
 
             if (dimensionThere)
@@ -303,7 +316,16 @@ public class CommandTeleportD extends CommandBase
 
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length != 1 && args.length != 2 ? null : getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
+        if (args.length == 1)
+        {
+            ArrayList<String> strings = new ArrayList<>();
+
+            for (WorldInfoSimple info : InstanceHandler.instanceInfo.values()) strings.add(info.getWorldName());
+            for (int id : DimensionManager.getIDs()) strings.add("" + id);
+
+            return getListOfStringsMatchingLastWord(args, strings);
+        }
+        return new ArrayList<>();
     }
 
     public boolean isUsernameIndex(String[] args, int index)

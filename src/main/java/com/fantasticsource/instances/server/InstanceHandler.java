@@ -4,6 +4,7 @@ import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.network.messages.MessageDimensionSync;
 import com.fantasticsource.instances.util.TeleporterSimple;
 import com.fantasticsource.instances.util.WorldInfoSimple;
+import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -94,10 +95,13 @@ public class InstanceHandler extends WorldSavedData
 
     public static void createDimension(ICommandSender sender, DimensionType type, EntityPlayer owner, String name)
     {
+        name = name.replaceAll(" ", "_");
+
         int dimensionID = Instances.nextFreeDimID();
 
         WorldInfo tempInfo = DimensionManager.getWorld(0).getWorldInfo();
         WorldInfoSimple worldInfo = new WorldInfoSimple(new WorldSettings(new Random().nextLong(), GameType.SURVIVAL, true, false, tempInfo.getTerrainType()), name, type);
+        worldInfo.setOwner(owner.getPersistentID());
 
         instanceInfo.put(dimensionID, worldInfo);
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
