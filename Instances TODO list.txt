@@ -1,3 +1,8 @@
+Fix issue where teleporting to instance in Faerun doesn't load terrain client-side
+
+Fix exp desync when teleporting back to overworld
+Try possible inventory desync fix using a packet to force an inventory update
+
 Build permissions for owner and nobody else
 Interact permissions for owner and nobody else
 
