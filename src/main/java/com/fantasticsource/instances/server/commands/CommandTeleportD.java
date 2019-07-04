@@ -1,6 +1,7 @@
 package com.fantasticsource.instances.server.commands;
 
 import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
 import com.fantasticsource.instances.server.InstanceHandler;
 import com.fantasticsource.instances.util.TeleporterSimple;
 import com.fantasticsource.instances.util.WorldInfoSimple;
@@ -20,6 +21,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -42,6 +44,17 @@ public class CommandTeleportD extends CommandBase
         {
             e.printStackTrace();
         }
+    }
+
+    public static boolean tpd(Entity entity, TEInstancePortal.Destination destination)
+    {
+        return tpd(entity, destination.dimension, destination.x, destination.y, destination.z, destination.yaw, destination.pitch);
+    }
+
+    public static boolean tpd(Entity entity, int dimension, double x, double y, double z, float yaw, float pitch)
+    {
+        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        return tpd(null, server, server, entity, new String[]{"" + dimension, "" + x, "" + y, "" + z, "" + yaw, "" + pitch});
     }
 
     public static boolean tpd(CommandTeleportD command, MinecraftServer server, ICommandSender sender, Entity entity, String[] args)
@@ -255,7 +268,7 @@ public class CommandTeleportD extends CommandBase
         }
         else
         {
-            Entity entity2 = null;
+            Entity entity2;
             try
             {
                 entity2 = getEntity(server, entity, args[args.length - 1]);

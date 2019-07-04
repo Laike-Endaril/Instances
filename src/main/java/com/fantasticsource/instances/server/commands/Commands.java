@@ -52,13 +52,13 @@ public class Commands extends CommandBase
         {
             if (entry.getValue().getOwner().equals(id))
             {
-                return CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + entry.getKey()});
+                return CommandTeleportD.tpd(entity, entry.getKey(), 0, 76, 0, 0, 0);
             }
         }
 
         //Not found
         Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(entity, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
-        return CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + pair.getKey()});
+        return CommandTeleportD.tpd(entity, pair.getKey(), 0, 76, 0, 0, 0);
     }
 
     @Override

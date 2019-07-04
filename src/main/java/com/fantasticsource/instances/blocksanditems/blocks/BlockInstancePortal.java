@@ -4,18 +4,18 @@ import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
 import com.fantasticsource.instances.server.commands.CommandTeleportD;
+import com.fantasticsource.instances.server.commands.Commands;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
 
@@ -45,11 +45,17 @@ public class BlockInstancePortal extends Block
             }
             else
             {
-                if (portal.destinations.size() == 1)
+                if (portal.destinations.size() == 0)
                 {
-                    TEInstancePortal.Destination destination = portal.destinations.get(0);
-                    MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-//                    CommandTeleportD.tpd(null, server, server, playerIn, new String[]{"" + destination.dimension, "" + destination.x, "" + destination.y, "" + destination.z});
+                    Commands.joinPossiblyCreating((EntityPlayerMP) playerIn, worldIn.getMinecraftServer());
+                }
+                else if (portal.destinations.size() == 1)
+                {
+                    CommandTeleportD.tpd(playerIn, portal.destinations.get(0));
+                }
+                else
+                {
+                    System.out.println("Behavior for more than one destination is not yet implemented");
                 }
             }
         }
