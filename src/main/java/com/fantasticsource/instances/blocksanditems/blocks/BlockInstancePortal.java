@@ -3,16 +3,19 @@ package com.fantasticsource.instances.blocksanditems.blocks;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
+import com.fantasticsource.instances.server.commands.CommandTeleportD;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
 
@@ -32,7 +35,26 @@ public class BlockInstancePortal extends Block
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-        return false;
+        if (!worldIn.isRemote)
+        {
+            TEInstancePortal portal = ((TEInstancePortal) worldIn.getTileEntity(pos));
+
+            if (playerIn.isSneaking())
+            {
+
+            }
+            else
+            {
+                if (portal.destinations.size() == 1)
+                {
+                    TEInstancePortal.Destination destination = portal.destinations.get(0);
+                    MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+//                    CommandTeleportD.tpd(null, server, server, playerIn, new String[]{"" + destination.dimension, "" + destination.x, "" + destination.y, "" + destination.z});
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
