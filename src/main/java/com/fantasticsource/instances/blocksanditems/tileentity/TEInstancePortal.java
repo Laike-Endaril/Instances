@@ -1,9 +1,6 @@
 package com.fantasticsource.instances.blocksanditems.tileentity;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagIntArray;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 
@@ -21,8 +18,16 @@ public class TEInstancePortal extends TileEntity
         NBTTagList list = new NBTTagList();
         for (Destination destination : destinations)
         {
-            NBTTagIntArray array = new NBTTagIntArray(new int[]{destination.dimension, destination.x, destination.y, destination.z, destination.facing});
-            list.appendTag(array);
+            NBTTagList list1 = new NBTTagList();
+
+            list1.appendTag(new NBTTagInt(destination.dimension));
+            list1.appendTag(new NBTTagDouble(destination.x));
+            list1.appendTag(new NBTTagDouble(destination.y));
+            list1.appendTag(new NBTTagDouble(destination.z));
+            list1.appendTag(new NBTTagFloat(destination.yaw));
+            list1.appendTag(new NBTTagFloat(destination.pitch));
+
+            list.appendTag(list1);
         }
         compound.setTag("destinations", list);
 
@@ -34,25 +39,36 @@ public class TEInstancePortal extends TileEntity
     {
         super.readFromNBT(compound);
 
-        for (NBTBase array : compound.getTagList("destinations", Constants.NBT.TAG_INT_ARRAY))
+        for (NBTBase element : compound.getTagList("destinations", Constants.NBT.TAG_INT_ARRAY))
         {
-            int[] ints = ((NBTTagIntArray) array).getIntArray();
-            destinations.add(new Destination(ints[0], ints[1], ints[2], ints[3], ints[4]));
+            NBTTagList list = (NBTTagList) element;
+
+            int dimension = ((NBTTagInt) list.get(0)).getInt();
+            double x = ((NBTTagDouble) list.get(1)).getDouble();
+            double y = ((NBTTagDouble) list.get(2)).getDouble();
+            double z = ((NBTTagDouble) list.get(3)).getDouble();
+            float yaw = ((NBTTagFloat) list.get(4)).getFloat();
+            float pitch = ((NBTTagFloat) list.get(5)).getFloat();
+
+            destinations.add(new Destination(dimension, x, y, z, yaw, pitch));
         }
     }
 
 
     public static class Destination
     {
-        public int dimension, x, y, z, facing;
+        public int dimension;
+        public double x, y, z;
+        public float yaw, pitch;
 
-        public Destination(int dimension, int x, int y, int z, int facing)
+        public Destination(int dimension, double x, double y, double z, float yaw, float pitch)
         {
             this.dimension = dimension;
             this.x = x;
             this.y = y;
             this.z = z;
-            this.facing = facing;
+            this.yaw = yaw;
+            this.pitch = pitch;
         }
     }
 }
