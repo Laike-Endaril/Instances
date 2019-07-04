@@ -1,10 +1,9 @@
-package com.fantasticsource.instances.server.commands;
+package com.fantasticsource.instances.commands;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
-import com.fantasticsource.instances.server.InstanceHandler;
-import com.fantasticsource.instances.util.TeleporterSimple;
-import com.fantasticsource.instances.util.WorldInfoSimple;
+import com.fantasticsource.instances.world.InstanceHandler;
+import com.fantasticsource.instances.world.WorldInfoSimple;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

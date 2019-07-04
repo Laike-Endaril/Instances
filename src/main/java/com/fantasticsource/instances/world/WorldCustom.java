@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.server;
+package com.fantasticsource.instances.world;
 
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;

@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.util;
+package com.fantasticsource.instances.world;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;

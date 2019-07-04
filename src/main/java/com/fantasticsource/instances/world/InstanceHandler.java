@@ -1,9 +1,8 @@
-package com.fantasticsource.instances.server;
+package com.fantasticsource.instances.world;
 
 import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.commands.TeleporterSimple;
 import com.fantasticsource.instances.network.messages.MessageDimensionSync;
-import com.fantasticsource.instances.util.TeleporterSimple;
-import com.fantasticsource.instances.util.WorldInfoSimple;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;

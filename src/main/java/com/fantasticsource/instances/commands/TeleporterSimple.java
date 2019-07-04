@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.util;
+package com.fantasticsource.instances.commands;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.world.Teleporter;

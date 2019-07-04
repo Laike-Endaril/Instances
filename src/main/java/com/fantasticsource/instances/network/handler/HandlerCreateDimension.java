@@ -1,7 +1,7 @@
 package com.fantasticsource.instances.network.handler;
 
 import com.fantasticsource.instances.network.messages.MessageCreateDimension;
-import com.fantasticsource.instances.server.InstanceHandler;
+import com.fantasticsource.instances.world.InstanceHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

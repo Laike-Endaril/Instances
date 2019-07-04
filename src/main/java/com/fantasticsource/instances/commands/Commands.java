@@ -1,9 +1,9 @@
-package com.fantasticsource.instances.server.commands;
+package com.fantasticsource.instances.commands;
 
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageOpenGui;
-import com.fantasticsource.instances.server.InstanceHandler;
-import com.fantasticsource.instances.util.WorldInfoSimple;
+import com.fantasticsource.instances.world.InstanceHandler;
+import com.fantasticsource.instances.world.WorldInfoSimple;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.datastructures.Pair;
@@ -24,7 +24,6 @@ import java.util.UUID;
 
 public class Commands extends CommandBase
 {
-
     private static ArrayList<String> playernames()
     {
         ArrayList<String> strings = new ArrayList<>();

@@ -3,7 +3,7 @@ package com.fantasticsource.instances.client.gui;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageCreateDimension;
-import com.fantasticsource.instances.util.WorldInfoSimple;
+import com.fantasticsource.instances.world.WorldInfoSimple;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;

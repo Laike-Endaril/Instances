@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.server.commands;
+package com.fantasticsource.instances.commands;
 
 import com.fantasticsource.instances.Instances;
 import net.minecraft.command.CommandBase;
