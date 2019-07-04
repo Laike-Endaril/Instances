@@ -1,7 +1,3 @@
-Fix spinny camera bug in dedicated mode
-
-
-
 Build permissions for owner and nobody else
 Interact permissions for owner and nobody else
 
@@ -20,3 +16,9 @@ Hub has portals to...
 Non-Faerun
 
 Rename or remove all commands, so we don't get any conflicts with Simple Dimensions
+
+
+
+Low priority
+
+Fix spinny camera bug when changing yaw/pitch during a teleport (currently avoiding by not changing yaw/pitch)
