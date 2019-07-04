@@ -24,10 +24,14 @@ public class BlockInstancePortal extends Block
     public BlockInstancePortal()
     {
         super(Material.ROCK);
-        setUnlocalizedName(Instances.MODID + ":instancePortal");
-        setSoundType(SoundType.GLASS);
+        setSoundType(SoundType.STONE);
+
+        setBlockUnbreakable();
+        setResistance(Float.MAX_VALUE);
+
         setCreativeTab(BlocksAndItems.creativeTab);
 
+        setUnlocalizedName(Instances.MODID + ":instancePortal");
         setRegistryName("instancePortal");
     }
 
