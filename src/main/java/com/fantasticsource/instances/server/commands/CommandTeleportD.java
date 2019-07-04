@@ -7,7 +7,7 @@ import com.fantasticsource.instances.util.WorldInfoSimple;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
+import net.minecraft.command.NumberInvalidException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -16,6 +16,7 @@ import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -43,17 +44,24 @@ public class CommandTeleportD extends CommandBase
         }
     }
 
-    public static void tpd(CommandTeleportD command, MinecraftServer server, ICommandSender sender, Entity entity, String[] args) throws CommandException
+    public static boolean tpd(CommandTeleportD command, MinecraftServer server, ICommandSender sender, Entity entity, String[] args)
     {
         if (entity == null)
         {
             if (sender instanceof Entity) entity = (Entity) sender;
-            else throw new WrongUsageException(Instances.MODID + ".commands.tpd.usage");
+            else
+            {
+                sender.sendMessage(new TextComponentString("Tried to teleport non-entity sender: " + sender.getClass().getSimpleName()));
+                return false;
+            }
         }
+
+        if (sender == null) sender = server;
 
         if (args.length < 1)
         {
-            throw new WrongUsageException(Instances.MODID + ".commands.tpd.usage");
+            sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.tpd.usage"));
+            return false;
         }
 
         byte b0 = 2;
@@ -87,21 +95,33 @@ public class CommandTeleportD extends CommandBase
 
                     if (player.dimension != dimensionID)
                     {
-                        teleportEntityToDimension(server, player, dimensionID);
+                        return teleportEntityToDimension(server, sender, player, dimensionID) != null;
                     }
 
-                    return;
+                    return false; //Same dimension and no coords; do nothing
                 }
             }
 
             if (args.length == 5 || args.length == 7)
             {
-                entity = getEntity(server, entity, args[1]);
+                try
+                {
+                    entity = getEntity(server, sender, args[1]);
+                }
+                catch (CommandException e)
+                {
+                    sender.sendMessage(new TextComponentString("Could not find entity \"" + args[1]));
+                    return false;
+                }
                 b0 = 2;
             }
             else
             {
-                entity = getCommandSenderAsPlayer(entity);
+                if (!(entity instanceof EntityPlayerMP))
+                {
+                    sender.sendMessage(new TextComponentString("Entity is not a player: " + entity.getName()));
+                    return false;
+                }
                 b0 = 1;
             }
         }
@@ -109,11 +129,23 @@ public class CommandTeleportD extends CommandBase
         {
             if (args.length == 1)
             {
-                entity = getCommandSenderAsPlayer(entity);
+                if (!(entity instanceof EntityPlayerMP))
+                {
+                    sender.sendMessage(new TextComponentString("Entity is not a player: " + entity.getName()));
+                    return false;
+                }
             }
             else if (args.length == 2)
             {
-                entity = getEntity(server, entity, args[0]);
+                try
+                {
+                    entity = getEntity(server, entity, args[0]);
+                }
+                catch (CommandException e)
+                {
+                    sender.sendMessage(new TextComponentString("Could not find entity \"" + args[0]));
+                    return false;
+                }
             }
         }
 
@@ -121,105 +153,125 @@ public class CommandTeleportD extends CommandBase
         {
             if (args.length < b0 + 3 || !dimensionThere)
             {
-                throw new WrongUsageException(Instances.MODID + ".commands.tpd.usage");
+                sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.tpd.usage"));
+                return false;
             }
-            else if (entity.world != null)
+
+            int i = b0 + 1;
+            CoordinateArg coordinatearg, coordinatearg1, coordinatearg2, coordinatearg3, coordinatearg4;
+            try
             {
-                int i = b0 + 1;
-                CommandBase.CoordinateArg coordinatearg = parseCoordinate(entity.posX, args[b0], true);
-                CommandBase.CoordinateArg coordinatearg1 = parseCoordinate(entity.posY, args[i++], 0, 0, false);
-                CommandBase.CoordinateArg coordinatearg2 = parseCoordinate(entity.posZ, args[i++], true);
-                CommandBase.CoordinateArg coordinatearg3 = parseCoordinate(entity.rotationYaw, args.length > i ? args[i++] : "~", false);
-                CommandBase.CoordinateArg coordinatearg4 = parseCoordinate(entity.rotationPitch, args.length > i ? args[i] : "~", false);
-                float f;
-
-                if (entity.dimension != dimensionID)
-                {
-                    entity = teleportEntityToDimension(server, entity, dimensionID);
-                }
-
-                if (entity instanceof EntityPlayerMP)
-                {
-                    EnumSet enumset = EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class);
-
-                    if (coordinatearg.isRelative())
-                    {
-                        enumset.add(SPacketPlayerPosLook.EnumFlags.X);
-                    }
-
-                    if (coordinatearg1.isRelative())
-                    {
-                        enumset.add(SPacketPlayerPosLook.EnumFlags.Y);
-                    }
-
-                    if (coordinatearg2.isRelative())
-                    {
-                        enumset.add(SPacketPlayerPosLook.EnumFlags.Z);
-                    }
-
-                    if (coordinatearg4.isRelative())
-                    {
-                        enumset.add(SPacketPlayerPosLook.EnumFlags.X_ROT);
-                    }
-
-                    if (coordinatearg3.isRelative())
-                    {
-                        enumset.add(SPacketPlayerPosLook.EnumFlags.Y_ROT);
-                    }
-
-                    f = (float) coordinatearg3.getAmount();
-
-                    if (!coordinatearg3.isRelative())
-                    {
-                        f = MathHelper.wrapDegrees(f);
-                    }
-
-                    float f1 = (float) coordinatearg4.getAmount();
-
-                    if (!coordinatearg4.isRelative())
-                    {
-                        f1 = MathHelper.wrapDegrees(f1);
-                    }
-
-                    if (f1 > 90 || f1 < -90)
-                    {
-                        f1 = MathHelper.wrapDegrees(180 - f1);
-                        f = MathHelper.wrapDegrees(f + 180);
-                    }
-
-                    entity.dismountRidingEntity();
-                    ((EntityPlayerMP) entity).connection.setPlayerLocation(coordinatearg.getAmount(), coordinatearg1.getAmount(), coordinatearg2.getAmount(), f, f1, enumset);
-                    entity.setRotationYawHead(f);
-                }
-                else
-                {
-                    float f2 = (float) MathHelper.wrapDegrees(coordinatearg3.getResult());
-                    f = (float) MathHelper.wrapDegrees(coordinatearg4.getResult());
-
-                    if (f > 90 || f < -90)
-                    {
-                        f = MathHelper.wrapDegrees(180 - f);
-                        f2 = MathHelper.wrapDegrees(f2 + 180);
-                    }
-
-                    entity.setLocationAndAngles(coordinatearg.getResult(), coordinatearg1.getResult(), coordinatearg2.getResult(), f2, f);
-                    entity.setRotationYawHead(f2);
-
-                    entity.world.updateEntityWithOptionalForce(entity, false);
-                }
-
-                if (command != null) notifyCommandListener(sender, command, "commands.tp.success.coordinates", entity.getName(), coordinatearg.getResult(), coordinatearg1.getResult(), coordinatearg2.getResult());
+                coordinatearg = parseCoordinate(entity.posX, args[b0], true);
+                coordinatearg1 = parseCoordinate(entity.posY, args[i++], 0, 0, false);
+                coordinatearg2 = parseCoordinate(entity.posZ, args[i++], true);
+                coordinatearg3 = parseCoordinate(entity.rotationYaw, args.length > i ? args[i++] : "~", false);
+                coordinatearg4 = parseCoordinate(entity.rotationPitch, args.length > i ? args[i] : "~", false);
             }
+            catch (NumberInvalidException e)
+            {
+                sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.tpd.usage"));
+                return false;
+            }
+
+            if (entity.dimension != dimensionID)
+            {
+                entity = teleportEntityToDimension(server, sender, entity, dimensionID);
+                if (entity == null) return false;
+            }
+
+            float f;
+            if (entity instanceof EntityPlayerMP)
+            {
+                EnumSet enumset = EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class);
+
+                if (coordinatearg.isRelative())
+                {
+                    enumset.add(SPacketPlayerPosLook.EnumFlags.X);
+                }
+
+                if (coordinatearg1.isRelative())
+                {
+                    enumset.add(SPacketPlayerPosLook.EnumFlags.Y);
+                }
+
+                if (coordinatearg2.isRelative())
+                {
+                    enumset.add(SPacketPlayerPosLook.EnumFlags.Z);
+                }
+
+                if (coordinatearg4.isRelative())
+                {
+                    enumset.add(SPacketPlayerPosLook.EnumFlags.X_ROT);
+                }
+
+                if (coordinatearg3.isRelative())
+                {
+                    enumset.add(SPacketPlayerPosLook.EnumFlags.Y_ROT);
+                }
+
+                f = (float) coordinatearg3.getAmount();
+
+                if (!coordinatearg3.isRelative())
+                {
+                    f = MathHelper.wrapDegrees(f);
+                }
+
+                float f1 = (float) coordinatearg4.getAmount();
+
+                if (!coordinatearg4.isRelative())
+                {
+                    f1 = MathHelper.wrapDegrees(f1);
+                }
+
+                if (f1 > 90 || f1 < -90)
+                {
+                    f1 = MathHelper.wrapDegrees(180 - f1);
+                    f = MathHelper.wrapDegrees(f + 180);
+                }
+
+                entity.dismountRidingEntity();
+                ((EntityPlayerMP) entity).connection.setPlayerLocation(coordinatearg.getAmount(), coordinatearg1.getAmount(), coordinatearg2.getAmount(), f, f1, enumset);
+                entity.setRotationYawHead(f);
+            }
+            else
+            {
+                float f2 = (float) MathHelper.wrapDegrees(coordinatearg3.getResult());
+                f = (float) MathHelper.wrapDegrees(coordinatearg4.getResult());
+
+                if (f > 90 || f < -90)
+                {
+                    f = MathHelper.wrapDegrees(180 - f);
+                    f2 = MathHelper.wrapDegrees(f2 + 180);
+                }
+
+                entity.setLocationAndAngles(coordinatearg.getResult(), coordinatearg1.getResult(), coordinatearg2.getResult(), f2, f);
+                entity.setRotationYawHead(f2);
+
+                entity.world.updateEntityWithOptionalForce(entity, false);
+            }
+
+            if (command != null) notifyCommandListener(sender, command, "commands.tp.success.coordinates", entity.getName(), coordinatearg.getResult(), coordinatearg1.getResult(), coordinatearg2.getResult());
+            return true;
         }
         else
         {
-            Entity entity2 = getEntity(server, entity, args[args.length - 1]);
+            Entity entity2 = null;
+            try
+            {
+                entity2 = getEntity(server, entity, args[args.length - 1]);
+            }
+            catch (CommandException e)
+            {
+                sender.sendMessage(new TextComponentString("Could not find entity \"" + args[args.length - 1]));
+                return false;
+            }
 
             if (entity2.world != entity.world)
             {
                 if (entity2.dimension != entity.dimension)
                 {
-                    entity = teleportEntityToDimension(server, entity, entity2.dimension);
+                    entity = teleportEntityToDimension(server, sender, entity, entity2.dimension);
+                    if (entity == null) return false;
                 }
             }
 
@@ -235,16 +287,18 @@ public class CommandTeleportD extends CommandBase
             }
 
             if (command != null) notifyCommandListener(sender, command, "commands.tp.success", entity.getName(), entity2.getName());
+            return true;
         }
     }
 
-    private static Entity teleportEntityToDimension(MinecraftServer server, Entity entity, int dimension) throws CommandException
+    private static Entity teleportEntityToDimension(MinecraftServer server, ICommandSender sender, Entity entity, int dimension)
     {
         World world = server.getWorld(dimension);
 
         if (world == null)
         {
-            throw new CommandException("Couldn't find dimension " + dimension);
+            if (sender != null) sender.sendMessage(new TextComponentString("Couldn't find dimension " + dimension));
+            return null;
         }
 
         if (entity instanceof EntityPlayerMP)
