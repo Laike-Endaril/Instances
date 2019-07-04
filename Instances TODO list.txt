@@ -1,5 +1,4 @@
-Create commands...
-/instances personal <playername>
+Create teleporter block
 
 Build permissions for owner and nobody else
 

@@ -6,10 +6,12 @@ import com.fantasticsource.instances.network.messages.MessageOpenGui;
 import com.fantasticsource.instances.server.InstanceHandler;
 import com.fantasticsource.instances.util.WorldInfoSimple;
 import com.fantasticsource.mctools.PlayerData;
+import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -67,45 +69,17 @@ public class Commands extends CommandBase
         switch (args[0])
         {
             case "personal":
-                if (args.length == 1)
+                if (sender instanceof EntityPlayerMP)
                 {
-                    if (sender instanceof EntityPlayerMP)
+                    if (args.length == 1)
                     {
-                        EntityPlayerMP player = (EntityPlayerMP) sender;
-                        UUID id = player.getPersistentID();
-
-                        //Try finding any instance owned by the player
-                        for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
-                        {
-                            if (entry.getValue().getOwner().equals(id))
-                            {
-                                try
-                                {
-                                    CommandTeleportD.tpd(null, server, server, player, new String[]{"" + entry.getKey()});
-                                }
-                                catch (CommandException e)
-                                {
-                                    e.printStackTrace();
-                                }
-                                return;
-                            }
-                        }
-
-                        //Not found
-                        Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(sender, InstanceTypes.skyroomDimType, player.getPersistentID(), player.getName() + "'s " + InstanceTypes.skyroomDimType.name());
-                        try
-                        {
-                            CommandTeleportD.tpd(null, server, server, player, new String[]{"" + pair.getKey()});
-                        }
-                        catch (CommandException e)
-                        {
-                            e.printStackTrace();
-                        }
-                        return;
+                        joinPossiblyCreating((EntityPlayerMP) sender, server);
                     }
-                }
-                else if (args.length == 2)
-                {
+                    else if (args.length == 2)
+                    {
+                        joinPossiblyCreating((EntityPlayerMP) sender, args[1], server);
+                    }
+                    else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
@@ -231,5 +205,49 @@ public class Commands extends CommandBase
         {
             return new ArrayList<>();
         }
+    }
+
+    public static void joinPossiblyCreating(EntityPlayerMP owner, MinecraftServer server)
+    {
+        joinPossiblyCreating(owner, owner.getName(), server);
+    }
+
+    public static void joinPossiblyCreating(Entity entity, String ownername, MinecraftServer server)
+    {
+        UUID id = PlayerData.getID(ownername);
+        if (id == null)
+        {
+            Tools.printStackTrace();
+            return;
+        }
+
+        //Try finding any instance owned by the player
+        for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
+        {
+            if (entry.getValue().getOwner().equals(id))
+            {
+                try
+                {
+                    CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + entry.getKey()});
+                }
+                catch (CommandException e)
+                {
+                    e.printStackTrace();
+                }
+                return;
+            }
+        }
+
+        //Not found
+        Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(entity, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
+        try
+        {
+            CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + pair.getKey()});
+        }
+        catch (CommandException e)
+        {
+            e.printStackTrace();
+        }
+        return;
     }
 }
