@@ -1,6 +1,5 @@
-package com.fantasticsource.instances.world.dimensions.voided;
+package com.fantasticsource.instances.world.dimensions.skyhub;
 
-import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -13,12 +12,12 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChunkGeneratorVoid implements IChunkGenerator
+public class ChunkGeneratorSkyhub implements IChunkGenerator
 {
     protected World world;
     private ChunkPrimer chunkPrimer = new ChunkPrimer();
 
-    public ChunkGeneratorVoid(World worldIn)
+    public ChunkGeneratorSkyhub(World worldIn)
     {
         world = worldIn;
     }
@@ -28,13 +27,7 @@ public class ChunkGeneratorVoid implements IChunkGenerator
     {
         Chunk chunk = new Chunk(world, chunkPrimer, chunkX, chunkZ);
 
-
-        byte[] bytes = chunk.getBiomeArray();
-        for (int i = 0; i < bytes.length; ++i)
-        {
-            bytes[i] = (byte) Biome.getIdForBiome(BiomeVoid.voidBiome);
-        }
-
+        //TODO hub gen
 
         chunk.generateSkylightMap();
         return chunk;

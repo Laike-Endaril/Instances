@@ -23,7 +23,6 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
     public ChunkGeneratorSkyroom(World worldIn)
     {
         world = worldIn;
-        world.setSeaLevel(63);
     }
 
     @Override

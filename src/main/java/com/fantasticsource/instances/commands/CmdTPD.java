@@ -4,6 +4,7 @@ import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.WorldInfoSimple;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -17,16 +18,14 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CmdTPD extends CommandBase
 {
@@ -67,6 +66,24 @@ public class CmdTPD extends CommandBase
                 return false;
             }
         }
+
+
+        DimensionType dimType = entity.world.provider.getDimensionType();
+        if (dimType != InstanceTypes.skyroomDimType && dimType != InstanceTypes.skyhubDimType)
+        {
+            Set<String> strings = entity.getTags();
+            for (String s : strings.toArray(new String[0]))
+            {
+                if (s.contains("instances.lastgoodpos"))
+                {
+                    strings.remove(s);
+                    break;
+                }
+            }
+            BlockPos pos = entity.getPosition();
+            strings.add("instances.lastgoodpos" + entity.dimension + "," + pos.getX() + "," + pos.getY() + "," + pos.getZ());
+        }
+
 
         if (sender == null) sender = server;
 
