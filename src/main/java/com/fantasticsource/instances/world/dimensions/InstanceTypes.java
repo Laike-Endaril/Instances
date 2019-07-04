@@ -1,8 +1,8 @@
-package com.fantasticsource.instances.dimension;
+package com.fantasticsource.instances.world.dimensions;
 
 import com.fantasticsource.instances.Instances;
-import com.fantasticsource.instances.dimension.skyroom.WorldProviderSkyroom;
-import com.fantasticsource.instances.dimension.voided.WorldProviderVoid;
+import com.fantasticsource.instances.world.dimensions.skyroom.WorldProviderSkyroom;
+import com.fantasticsource.instances.world.dimensions.voided.WorldProviderVoid;
 import net.minecraft.world.DimensionType;
 
 public class InstanceTypes

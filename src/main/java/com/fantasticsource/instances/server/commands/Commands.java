@@ -1,10 +1,10 @@
 package com.fantasticsource.instances.server.commands;
 
-import com.fantasticsource.instances.dimension.InstanceTypes;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageOpenGui;
 import com.fantasticsource.instances.server.InstanceHandler;
 import com.fantasticsource.instances.util.WorldInfoSimple;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.CommandBase;
@@ -36,6 +36,46 @@ public class Commands extends CommandBase
         }
 
         return strings;
+    }
+
+    public static boolean joinPossiblyCreating(EntityPlayerMP owner, MinecraftServer server)
+    {
+        return joinPossiblyCreating(owner, owner.getName(), server);
+    }
+
+    public static boolean joinPossiblyCreating(Entity entity, String ownername, MinecraftServer server)
+    {
+        UUID id = PlayerData.getID(ownername);
+        if (id == null) return false;
+
+        //Try finding any instance owned by the player
+        for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
+        {
+            if (entry.getValue().getOwner().equals(id))
+            {
+                try
+                {
+                    CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + entry.getKey()});
+                    return true;
+                }
+                catch (CommandException e)
+                {
+                    return false;
+                }
+            }
+        }
+
+        //Not found
+        Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(entity, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
+        try
+        {
+            CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + pair.getKey()});
+            return true;
+        }
+        catch (CommandException e)
+        {
+            return false;
+        }
     }
 
     @Override
@@ -209,46 +249,6 @@ public class Commands extends CommandBase
         else
         {
             return new ArrayList<>();
-        }
-    }
-
-    public static boolean joinPossiblyCreating(EntityPlayerMP owner, MinecraftServer server)
-    {
-        return joinPossiblyCreating(owner, owner.getName(), server);
-    }
-
-    public static boolean joinPossiblyCreating(Entity entity, String ownername, MinecraftServer server)
-    {
-        UUID id = PlayerData.getID(ownername);
-        if (id == null) return false;
-
-        //Try finding any instance owned by the player
-        for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
-        {
-            if (entry.getValue().getOwner().equals(id))
-            {
-                try
-                {
-                    CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + entry.getKey()});
-                    return true;
-                }
-                catch (CommandException e)
-                {
-                    return false;
-                }
-            }
-        }
-
-        //Not found
-        Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(entity, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
-        try
-        {
-            CommandTeleportD.tpd(null, server, server, entity, new String[]{"" + pair.getKey()});
-            return true;
-        }
-        catch (CommandException e)
-        {
-            return false;
         }
     }
 }

@@ -1,7 +1,5 @@
 Add functionality to instance portals
 
-Fix textures for instance portals
-
 
 
 Build permissions for owner and nobody else

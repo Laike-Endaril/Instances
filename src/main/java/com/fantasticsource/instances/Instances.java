@@ -1,14 +1,15 @@
 package com.fantasticsource.instances;
 
-import com.fantasticsource.instances.boime.BiomeVoid;
+import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.client.ClientHandler;
-import com.fantasticsource.instances.dimension.InstanceTypes;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.server.InstanceHandler;
 import com.fantasticsource.instances.server.commands.CommandTeleportD;
 import com.fantasticsource.instances.server.commands.CommandTimeD;
 import com.fantasticsource.instances.server.commands.CommandWeatherD;
 import com.fantasticsource.instances.server.commands.Commands;
+import com.fantasticsource.instances.world.boimes.BiomeVoid;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;

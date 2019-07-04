@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.boime;
+package com.fantasticsource.instances.world.boimes;
 
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.world.biome.Biome;

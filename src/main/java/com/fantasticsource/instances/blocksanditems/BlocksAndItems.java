@@ -1,7 +1,8 @@
-package com.fantasticsource.instances;
+package com.fantasticsource.instances.blocksanditems;
 
-import com.fantasticsource.instances.block.BlockInstancePortal;
-import com.fantasticsource.instances.item.ItemInstancePortal;
+import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.blocksanditems.blocks.BlockInstancePortal;
+import com.fantasticsource.instances.blocksanditems.items.ItemInstancePortal;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
@@ -58,6 +59,6 @@ public class BlocksAndItems
     @SubscribeEvent
     public static void onModelRegistry(ModelRegistryEvent event)
     {
-        ModelLoader.setCustomModelResourceLocation(itemInstancePortal, 0, new ModelResourceLocation("instances:instancePortal", "inventory"));
+        ModelLoader.setCustomModelResourceLocation(itemInstancePortal, 0, new ModelResourceLocation("instances:instanceportal", "inventory"));
     }
 }
