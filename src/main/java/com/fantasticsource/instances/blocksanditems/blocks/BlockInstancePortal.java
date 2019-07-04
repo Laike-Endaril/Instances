@@ -3,7 +3,7 @@ package com.fantasticsource.instances.blocksanditems.blocks;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
-import com.fantasticsource.instances.commands.CommandTeleportD;
+import com.fantasticsource.instances.commands.CmdTPD;
 import com.fantasticsource.instances.commands.Commands;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -55,7 +55,7 @@ public class BlockInstancePortal extends Block
                 }
                 else if (portal.destinations.size() == 1)
                 {
-                    CommandTeleportD.tpd(playerIn, portal.destinations.get(0));
+                    CmdTPD.tpd(playerIn, portal.destinations.get(0));
                 }
                 else
                 {

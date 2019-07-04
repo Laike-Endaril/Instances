@@ -14,7 +14,7 @@ import net.minecraftforge.common.DimensionManager;
 import java.util.List;
 import java.util.Random;
 
-public class CommandWeatherD extends CommandBase
+public class CMDWeatherD extends CommandBase
 {
     /**
      * Get the name of the command

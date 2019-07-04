@@ -2,10 +2,7 @@ package com.fantasticsource.instances;
 
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.client.ClientHandler;
-import com.fantasticsource.instances.commands.CommandTeleportD;
-import com.fantasticsource.instances.commands.CommandTimeD;
-import com.fantasticsource.instances.commands.CommandWeatherD;
-import com.fantasticsource.instances.commands.Commands;
+import com.fantasticsource.instances.commands.*;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
@@ -91,9 +88,10 @@ public class Instances
     public void serverStarting(FMLServerStartingEvent event)
     {
         event.registerServerCommand(new Commands());
-        event.registerServerCommand(new CommandWeatherD());
-        event.registerServerCommand(new CommandTimeD());
-        event.registerServerCommand(new CommandTeleportD());
+        event.registerServerCommand(new CMDWeatherD());
+        event.registerServerCommand(new CmdTimeD());
+        event.registerServerCommand(new CmdTPD());
+        event.registerServerCommand(new CmdEscape());
 
         InstanceHandler.registerInstances();
     }

@@ -28,7 +28,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-public class CommandTeleportD extends CommandBase
+public class CmdTPD extends CommandBase
 {
     private static Method copyDataFromOld;
 
@@ -56,7 +56,7 @@ public class CommandTeleportD extends CommandBase
         return tpd(null, server, server, entity, new String[]{"" + dimension, "" + x, "" + y, "" + z, "" + yaw, "" + pitch});
     }
 
-    public static boolean tpd(CommandTeleportD command, MinecraftServer server, ICommandSender sender, Entity entity, String[] args)
+    public static boolean tpd(CmdTPD command, MinecraftServer server, ICommandSender sender, Entity entity, String[] args)
     {
         if (entity == null)
         {

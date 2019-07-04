@@ -5,6 +5,8 @@ Whitelist per owned instance for who is allowed to visit
 
 
 
+Track last non-instance position each player was in
+
 Add command to escape a personal instance
 
 Add "Hub" dim type

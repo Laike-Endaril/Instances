@@ -9,7 +9,7 @@ import net.minecraftforge.common.DimensionManager;
 
 import java.util.List;
 
-public class CommandTimeD extends CommandBase
+public class CmdTimeD extends CommandBase
 {
 
     @Override
