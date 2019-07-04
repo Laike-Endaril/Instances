@@ -1,6 +1,5 @@
 Create commands...
 /instances personal <playername>
-/instances personal <playerToTP> <ownerPlayer>
 
 Build permissions for owner and nobody else
 
