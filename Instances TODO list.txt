@@ -20,6 +20,8 @@ Fix crash when deleting an unloaded personal instance from the dedicated console
 
 Non-Faerun
 
+Disallow duplicate instance names?
+
 Rename or remove all commands, so we don't get any conflicts with Simple Dimensions
 
 Fix vanilla's BS allow-nether server setting in server.properties...setting it to false disables ALL dimension types besides the overworld!
