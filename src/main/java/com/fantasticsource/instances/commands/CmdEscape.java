@@ -6,6 +6,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.DimensionType;
 
 import java.util.Set;
 
@@ -14,7 +15,8 @@ public class CmdEscape extends CommandBase
 
     public static void escape(Entity entity)
     {
-        if (entity.world.provider.getDimensionType() != InstanceTypes.skyroomDimType) return;
+        DimensionType type = entity.world.provider.getDimensionType();
+        if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.skyhubDimType) return;
 
         Set<String> strings = entity.getTags();
         for (String s : strings.toArray(new String[0]))
