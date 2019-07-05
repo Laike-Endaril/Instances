@@ -145,9 +145,25 @@ public class Commands extends CommandBase
             case "delete":
                 if (args.length == 2)
                 {
-                    int dimensionID = Integer.parseInt(args[1]);
+                    int dimensionID;
+                    try
+                    {
+                        dimensionID = Integer.parseInt(args[1]);
+                        InstanceHandler.deleteDimension(sender, dimensionID);
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
+                        {
+                            if (entry.getValue().getWorldName().equals(args[1]))
+                            {
+                                InstanceHandler.deleteDimension(sender, entry.getKey());
+                                return;
+                            }
+                        }
+                        sender.sendMessage(new TextComponentString(getUsage(sender)));
+                    }
 
-                    InstanceHandler.deleteDimension(sender, dimensionID);
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
@@ -155,28 +171,33 @@ public class Commands extends CommandBase
             case "setowner":
                 if (args.length == 3)
                 {
-                    int dimID;
+                    WorldInfoSimple info = null;
                     try
                     {
-                        dimID = Integer.parseInt(args[1]);
+                        info = InstanceHandler.get(Integer.parseInt(args[1]));
                     }
                     catch (NumberFormatException e)
                     {
-                        sender.sendMessage(new TextComponentString(args[1] + " is not a (instance ID) number"));
-                        return;
+                        for (WorldInfoSimple info2 : InstanceHandler.instanceInfo.values())
+                        {
+                            if (info2.getWorldName().equals(args[1]))
+                            {
+                                info = info2;
+                                break;
+                            }
+                        }
                     }
 
-                    WorldInfoSimple info = InstanceHandler.get(dimID);
                     if (info == null)
                     {
-                        sender.sendMessage(new TextComponentString("Instance ID (" + args[1] + ") not found"));
+                        sender.sendMessage(new TextComponentString("Instance not found: " + args[1]));
                         return;
                     }
 
                     UUID id = PlayerData.getID(args[2]);
                     if (id == null)
                     {
-                        sender.sendMessage(new TextComponentString("Player (" + args[2] + ") not found"));
+                        sender.sendMessage(new TextComponentString("Player not found: " + args[2]));
                         return;
                     }
 
@@ -204,6 +225,7 @@ public class Commands extends CommandBase
             {
                 ArrayList<String> strings = new ArrayList<>();
 
+                for (WorldInfoSimple info : InstanceHandler.instanceInfo.values()) strings.add(info.getWorldName());
                 for (int i : InstanceHandler.instanceInfo.keySet()) strings.add("" + i);
 
                 return getListOfStringsMatchingLastWord(args, strings);
