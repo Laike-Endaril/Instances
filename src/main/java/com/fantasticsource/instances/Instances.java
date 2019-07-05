@@ -96,6 +96,7 @@ public class Instances
         event.registerServerCommand(new CmdTimeD());
         event.registerServerCommand(new CmdTPD());
         event.registerServerCommand(new CmdEscape());
+        event.registerServerCommand(new CmdVisitors());
 
         InstanceHandler.registerInstances();
     }

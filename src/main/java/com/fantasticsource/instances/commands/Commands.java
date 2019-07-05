@@ -24,7 +24,7 @@ import java.util.UUID;
 
 public class Commands extends CommandBase
 {
-    private static ArrayList<String> playernames()
+    public static ArrayList<String> playernames()
     {
         ArrayList<String> strings = new ArrayList<>();
 
