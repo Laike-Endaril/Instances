@@ -335,9 +335,12 @@ public class CmdTPD extends CommandBase
         if (entity instanceof EntityPlayerMP)
         {
             EntityPlayerMP player = (EntityPlayerMP) entity;
+            int oldDim = player.dimension;
 
             server.getPlayerList().transferPlayerToDimension(player, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
 
+
+            //After successful cross-dimensional player teleportation
             WorldInfoSimple info = InstanceHandler.get(dimension);
             if (info != null)
             {
@@ -345,6 +348,13 @@ public class CmdTPD extends CommandBase
                 else player.setGameType(GameType.ADVENTURE);
             }
             else player.setGameType(DimensionManager.getWorld(dimension).getWorldInfo().getGameType());
+
+            WorldInfoSimple oldInfo = InstanceHandler.get(oldDim);
+            if (oldInfo != null && oldInfo.getDimensionType() == InstanceTypes.skyhubDimType)
+            {
+                InstanceHandler.deleteDimension(server, oldDim);
+            }
+
 
             return player;
         }
