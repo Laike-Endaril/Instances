@@ -86,7 +86,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <create:delete:list:setowner:personal>";
+        return "Usage: /instances <create:delete:list:setowner:personal:hub>";
     }
 
     @Override
@@ -106,6 +106,10 @@ public class Commands extends CommandBase
 
         switch (args[0])
         {
+            case "hub":
+                if (sender instanceof EntityPlayerMP) gotoHub((EntityPlayerMP) sender);
+                break;
+
             case "personal":
                 if (sender instanceof EntityPlayerMP)
                 {
@@ -234,7 +238,7 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "create", "delete", "list", "setowner", "personal");
+            return getListOfStringsMatchingLastWord(args, "create", "delete", "list", "setowner", "personal", "hub");
         }
         else if (args.length == 2)
         {
