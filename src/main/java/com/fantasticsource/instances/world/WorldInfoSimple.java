@@ -51,10 +51,10 @@ public class WorldInfoSimple extends WorldInfo
     @Override
     public NBTTagCompound cloneNBTCompound(@Nullable NBTTagCompound nbt)
     {
-        NBTTagCompound superNbt = super.cloneNBTCompound(nbt);
-        superNbt.setString("dimType", dimensionType.getName());
-        superNbt.setString("owner", owner == null ? "null" : owner.toString());
-        return superNbt;
+        NBTTagCompound result = super.cloneNBTCompound(nbt);
+        result.setString("dimType", dimensionType.getName());
+        result.setString("owner", owner == null ? "null" : owner.toString());
+        return result;
     }
 
     public DimensionType getDimensionType()

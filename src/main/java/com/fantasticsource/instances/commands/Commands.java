@@ -38,6 +38,7 @@ public class Commands extends CommandBase
 
     public static boolean gotoHub(EntityPlayerMP player)
     {
+        //If we're already in the hub, just teleport locally
         if (player.world.provider.getDimensionType() == InstanceTypes.skyhubDimType)
         {
             return CmdTPD.tpd(player, player.world.provider.getDimension(), 0, 77, 0, player.rotationYaw, player.rotationPitch);
