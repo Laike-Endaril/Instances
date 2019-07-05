@@ -59,7 +59,7 @@ public class BlockInstancePortal extends Block
                     }
                     else
                     {
-                        Commands.joinPossiblyCreating((EntityPlayerMP) playerIn, worldIn.getMinecraftServer());
+                        Commands.joinPossiblyCreating((EntityPlayerMP) playerIn);
                     }
                 }
                 else if (portal.destinations.size() == 1)

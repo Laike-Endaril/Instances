@@ -36,12 +36,12 @@ public class Commands extends CommandBase
         return strings;
     }
 
-    public static boolean joinPossiblyCreating(EntityPlayerMP owner, MinecraftServer server)
+    public static boolean joinPossiblyCreating(EntityPlayerMP owner)
     {
-        return joinPossiblyCreating(owner, owner.getName(), server);
+        return joinPossiblyCreating(owner, owner.getName());
     }
 
-    public static boolean joinPossiblyCreating(Entity entity, String ownername, MinecraftServer server)
+    public static boolean joinPossiblyCreating(Entity entity, String ownername)
     {
         UUID id = PlayerData.getID(ownername);
         if (id == null) return false;
@@ -94,14 +94,14 @@ public class Commands extends CommandBase
                 {
                     if (args.length == 1)
                     {
-                        if (!joinPossiblyCreating((EntityPlayerMP) sender, server))
+                        if (!joinPossiblyCreating((EntityPlayerMP) sender))
                         {
                             sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
                         }
                     }
                     else if (args.length == 2)
                     {
-                        if (!joinPossiblyCreating((EntityPlayerMP) sender, args[1], server))
+                        if (!joinPossiblyCreating((EntityPlayerMP) sender, args[1]))
                         {
                             sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
                         }
