@@ -54,9 +54,10 @@ public class CmdEscape extends CommandBase
         if (sender instanceof Entity)
         {
             Entity entity = (Entity) sender;
-            if (entity.world.provider.getDimensionType() != InstanceTypes.skyroomDimType)
+            DimensionType type = entity.world.provider.getDimensionType();
+            if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.skyhubDimType)
             {
-                sender.sendMessage(new TextComponentString("This command can only be used when in a skyroom instance"));
+                sender.sendMessage(new TextComponentString("This command can only be used when in a skyroom or skyhub instance"));
                 return;
             }
 
