@@ -1,13 +1,11 @@
-Add "Hub" dim type
-
 Hub portal to where you came from
 Hub portal to your personal instance
 
-Block interactions of all non-owners except for instance portal interaction
+Hub portals to any other instances you have permission to visit
 
 Whitelist per owned instance for who is allowed to visit
 
-Hub portal to any other instances you have permission to visit
+Block visitor interaction for items with inventories
 
 
 
