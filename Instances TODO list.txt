@@ -14,6 +14,8 @@ Try possible inventory desync fix using a packet to force an inventory update
 
 
 
+Make sure deleting an instance with offline players in it works correctly
+
 Fix crash when deleting an unloaded personal instance from the dedicated console with no players online...only happens sometimes?
 
 
