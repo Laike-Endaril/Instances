@@ -341,7 +341,7 @@ public class CmdTPD extends CommandBase
             WorldInfoSimple info = InstanceHandler.get(dimension);
             if (info != null)
             {
-                if (info.getOwner().equals(player.getPersistentID())) player.setGameType(GameType.SURVIVAL);
+                if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
                 else player.setGameType(GameType.ADVENTURE);
             }
             else player.setGameType(DimensionManager.getWorld(dimension).getWorldInfo().getGameType());

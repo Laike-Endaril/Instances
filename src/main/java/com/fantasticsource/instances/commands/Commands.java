@@ -72,7 +72,7 @@ public class Commands extends CommandBase
         //Try finding any instance owned by the player
         for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
         {
-            if (entry.getValue().getOwner().equals(id))
+            if (id.equals(entry.getValue().getOwner()))
             {
                 return CmdTPD.tpd(entity, entry.getKey(), 0, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
             }
