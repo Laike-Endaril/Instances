@@ -20,10 +20,11 @@ Non-Faerun
 
 Rename or remove all commands, so we don't get any conflicts with Simple Dimensions
 
+Fix vanilla's BS allow-nether server setting in server.properties...setting it to false disables ALL dimension types besides the overworld!
+https://bugs.mojang.com/browse/MC-85267
+
 
 
 Low priority
 
 Fix spinny camera bug when changing yaw/pitch during a teleport (currently avoiding by not changing yaw/pitch)
-
-Fix client not loading chunks when teleporting to an instance with use-native-transport=true in server config
