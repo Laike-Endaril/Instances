@@ -1,5 +1,6 @@
-Fix exp desync when teleporting back to overworld
-Try possible inventory desync fix using a packet to force an inventory update
+Fix gamemode issue
+
+
 
 Build permissions for owner and nobody else
 Interact permissions for owner and nobody else
@@ -13,6 +14,15 @@ Hub has portals to...
 ...where you came from (very important)
 ...your personal instance
 ...any other instances you have permission to visit
+
+
+
+Fix crash when deleting an unloaded personal instance from the dedicated console with no players online...only happens sometimes?
+
+
+
+Fix exp desync when teleporting back to overworld
+Try possible inventory desync fix using a packet to force an inventory update
 
 
 
