@@ -1,20 +1,20 @@
 package com.fantasticsource.instances.network.messages;
 
-import com.fantasticsource.instances.world.WorldInfoSimple;
+import com.fantasticsource.instances.world.InstanceWorldInfo;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class MessageCreateDimension implements IMessage
 {
-    WorldInfoSimple worldInfo;
+    InstanceWorldInfo worldInfo;
 
     public MessageCreateDimension()
     {
         //Required IIRC (Laike_Endaril)
     }
 
-    public MessageCreateDimension(WorldInfoSimple worldInfo)
+    public MessageCreateDimension(InstanceWorldInfo worldInfo)
     {
         this.worldInfo = worldInfo;
     }
@@ -22,7 +22,7 @@ public class MessageCreateDimension implements IMessage
     @Override
     public void fromBytes(ByteBuf buf)
     {
-        this.worldInfo = new WorldInfoSimple(ByteBufUtils.readTag(buf));
+        this.worldInfo = new InstanceWorldInfo(ByteBufUtils.readTag(buf));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class MessageCreateDimension implements IMessage
         ByteBufUtils.writeTag(buf, worldInfo.cloneNBTCompound(null));
     }
 
-    public WorldInfoSimple getWorldInfo()
+    public InstanceWorldInfo getWorldInfo()
     {
         return worldInfo;
     }

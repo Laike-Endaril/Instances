@@ -3,7 +3,7 @@ package com.fantasticsource.instances.commands;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
 import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.instances.world.WorldInfoSimple;
+import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -106,7 +106,7 @@ public class CmdTPD extends CommandBase
         }
         catch (NumberFormatException exception)
         {
-            for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
+            for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
             {
                 if (entry.getValue().getWorldName().equals(args[0]))
                 {
@@ -341,7 +341,7 @@ public class CmdTPD extends CommandBase
 
 
             //After successful cross-dimensional player teleportation
-            WorldInfoSimple info = InstanceHandler.get(dimension);
+            InstanceWorldInfo info = InstanceHandler.get(dimension);
             if (info != null)
             {
                 if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
@@ -349,7 +349,7 @@ public class CmdTPD extends CommandBase
             }
             else player.setGameType(DimensionManager.getWorld(dimension).getWorldInfo().getGameType());
 
-            WorldInfoSimple oldInfo = InstanceHandler.get(oldDim);
+            InstanceWorldInfo oldInfo = InstanceHandler.get(oldDim);
             if (oldInfo != null && oldInfo.getDimensionType() == InstanceTypes.skyhubDimType)
             {
                 InstanceHandler.deleteDimension(server, oldDim);
@@ -431,7 +431,7 @@ public class CmdTPD extends CommandBase
         {
             ArrayList<String> strings = new ArrayList<>();
 
-            for (WorldInfoSimple info : InstanceHandler.instanceInfo.values()) strings.add(info.getWorldName());
+            for (InstanceWorldInfo info : InstanceHandler.instanceInfo.values()) strings.add(info.getWorldName());
             for (int id : DimensionManager.getIDs()) strings.add("" + id);
 
             return getListOfStringsMatchingLastWord(args, strings);

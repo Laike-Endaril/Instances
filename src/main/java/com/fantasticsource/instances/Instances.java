@@ -5,7 +5,7 @@ import com.fantasticsource.instances.client.ClientHandler;
 import com.fantasticsource.instances.commands.*;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.instances.world.WorldInfoSimple;
+import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.entity.player.EntityPlayer;
@@ -123,7 +123,7 @@ public class Instances
     {
         EntityPlayer player = event.player;
 
-        WorldInfoSimple info = InstanceHandler.get(player.world.provider.getDimension());
+        InstanceWorldInfo info = InstanceHandler.get(player.world.provider.getDimension());
         if (info == null) return;
 
         if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);

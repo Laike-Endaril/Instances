@@ -3,7 +3,7 @@ package com.fantasticsource.instances.commands;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageOpenGui;
 import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.instances.world.WorldInfoSimple;
+import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.datastructures.Pair;
@@ -45,9 +45,9 @@ public class Commands extends CommandBase
         }
 
         //Try finding an existing hub for said player
-        for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
         {
-            WorldInfoSimple info = entry.getValue();
+            InstanceWorldInfo info = entry.getValue();
             if (info.getDimensionType() == InstanceTypes.skyhubDimType && info.getWorldName().equals((player.getName() + "'s " + InstanceTypes.skyhubDimType.name()).replace(" ", "_")))
             {
                 return CmdTPD.tpd(player, entry.getKey(), 0, 77, 0, player.rotationYaw, player.rotationPitch);
@@ -55,7 +55,7 @@ public class Commands extends CommandBase
         }
 
         //Not found
-        Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(player, InstanceTypes.skyhubDimType, null, player.getName() + "'s " + InstanceTypes.skyhubDimType.name());
+        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createDimension(player, InstanceTypes.skyhubDimType, null, player.getName() + "'s " + InstanceTypes.skyhubDimType.name());
         return CmdTPD.tpd(player, pair.getKey(), 0, 77, 0, player.rotationYaw, player.rotationPitch);
     }
 
@@ -70,7 +70,7 @@ public class Commands extends CommandBase
         if (id == null) return false;
 
         //Try finding any instance owned by the player
-        for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
         {
             if (id.equals(entry.getValue().getOwner()))
             {
@@ -79,7 +79,7 @@ public class Commands extends CommandBase
         }
 
         //Not found
-        Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(entity, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
+        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createDimension(entity, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
         return CmdTPD.tpd(entity, pair.getKey(), 0, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
     }
 
@@ -180,7 +180,7 @@ public class Commands extends CommandBase
                     }
                     catch (NumberFormatException e)
                     {
-                        for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
+                        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
                         {
                             if (entry.getValue().getWorldName().equals(args[1]))
                             {
@@ -198,14 +198,14 @@ public class Commands extends CommandBase
             case "setowner":
                 if (args.length == 3)
                 {
-                    WorldInfoSimple info = null;
+                    InstanceWorldInfo info = null;
                     try
                     {
                         info = InstanceHandler.get(Integer.parseInt(args[1]));
                     }
                     catch (NumberFormatException e)
                     {
-                        for (WorldInfoSimple info2 : InstanceHandler.instanceInfo.values())
+                        for (InstanceWorldInfo info2 : InstanceHandler.instanceInfo.values())
                         {
                             if (info2.getWorldName().equals(args[1]))
                             {
@@ -252,7 +252,7 @@ public class Commands extends CommandBase
             {
                 ArrayList<String> strings = new ArrayList<>();
 
-                for (WorldInfoSimple info : InstanceHandler.instanceInfo.values()) strings.add(info.getWorldName());
+                for (InstanceWorldInfo info : InstanceHandler.instanceInfo.values()) strings.add(info.getWorldName());
                 for (int i : InstanceHandler.instanceInfo.keySet()) strings.add("" + i);
 
                 return getListOfStringsMatchingLastWord(args, strings);

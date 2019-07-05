@@ -3,7 +3,7 @@ package com.fantasticsource.instances.client.gui;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageCreateDimension;
-import com.fantasticsource.instances.world.WorldInfoSimple;
+import com.fantasticsource.instances.world.InstanceWorldInfo;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -235,7 +235,7 @@ public class GuiCreateDimension extends GuiScreen
 
                 if (allowCheats) worldsettings.enableCommands();
 
-                WorldInfoSimple worldInfo = new WorldInfoSimple(worldsettings, dimensionNameTextField.getText().trim(), DimensionType.values()[selectedInstanceTypeIndex]);
+                InstanceWorldInfo worldInfo = new InstanceWorldInfo(worldsettings, dimensionNameTextField.getText().trim(), DimensionType.values()[selectedInstanceTypeIndex]);
                 MessageCreateDimension createMessage = new MessageCreateDimension(worldInfo);
 
                 PacketHandler.INSTANCE.sendToServer(createMessage);

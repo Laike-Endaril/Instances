@@ -34,7 +34,7 @@ import java.util.Map.Entry;
 
 public class InstanceHandler extends WorldSavedData
 {
-    public static LinkedHashMap<Integer, WorldInfoSimple> instanceInfo = new LinkedHashMap<>();
+    public static LinkedHashMap<Integer, InstanceWorldInfo> instanceInfo = new LinkedHashMap<>();
     private static String NAME = "InstanceHandler";
     private static InstanceHandler instanceHandler = null;
 
@@ -60,10 +60,10 @@ public class InstanceHandler extends WorldSavedData
             FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().setData(NAME, instanceHandler);
         }
 
-        for (Entry<Integer, WorldInfoSimple> entry : instanceInfo.entrySet())
+        for (Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
         {
             int dimensionID = entry.getKey();
-            WorldInfoSimple worldInfo = entry.getValue();
+            InstanceWorldInfo worldInfo = entry.getValue();
 
             DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
             DimensionManager.keepDimensionLoaded(dimensionID, false);
@@ -74,7 +74,7 @@ public class InstanceHandler extends WorldSavedData
     {
         instanceHandler = null;
 
-        for (Map.Entry<Integer, WorldInfoSimple> entry : instanceInfo.entrySet())
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
         {
             int id = entry.getKey();
             DimensionManager.unregisterDimension(id);
@@ -82,7 +82,7 @@ public class InstanceHandler extends WorldSavedData
         instanceInfo.clear();
     }
 
-    public static void createDimension(EntityPlayerMP playerEntity, WorldInfoSimple worldInfo)
+    public static void createDimension(EntityPlayerMP playerEntity, InstanceWorldInfo worldInfo)
     {
         int dimensionID = Instances.nextFreeDimID();
         instanceInfo.put(dimensionID, worldInfo);
@@ -92,14 +92,14 @@ public class InstanceHandler extends WorldSavedData
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
     }
 
-    public static Pair<Integer, WorldInfoSimple> createDimension(ICommandSender sender, DimensionType type, UUID owner, String name)
+    public static Pair<Integer, InstanceWorldInfo> createDimension(ICommandSender sender, DimensionType type, UUID owner, String name)
     {
         name = name.replaceAll(" ", "_");
 
         int dimensionID = Instances.nextFreeDimID();
 
         WorldInfo tempInfo = DimensionManager.getWorld(0).getWorldInfo();
-        WorldInfoSimple worldInfo = new WorldInfoSimple(new WorldSettings(new Random().nextLong(), GameType.SURVIVAL, true, false, tempInfo.getTerrainType()), name, type);
+        InstanceWorldInfo worldInfo = new InstanceWorldInfo(new WorldSettings(new Random().nextLong(), GameType.SURVIVAL, true, false, tempInfo.getTerrainType()), name, type);
         worldInfo.setOwner(owner);
 
         instanceInfo.put(dimensionID, worldInfo);
@@ -236,7 +236,7 @@ public class InstanceHandler extends WorldSavedData
     {
         MessageDimensionSync message = new MessageDimensionSync();
 
-        for (Map.Entry<Integer, WorldInfoSimple> entry : instanceInfo.entrySet())
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
         {
             message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
         }
@@ -247,15 +247,15 @@ public class InstanceHandler extends WorldSavedData
     public static ArrayList<String> list()
     {
         ArrayList<String> result = new ArrayList<>();
-        for (Map.Entry<Integer, WorldInfoSimple> entry : instanceInfo.entrySet())
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
         {
-            WorldInfoSimple info = entry.getValue();
+            InstanceWorldInfo info = entry.getValue();
             result.add(entry.getKey() + " (" + info.getWorldName() + ") Type = " + info.getDimensionType());
         }
         return result;
     }
 
-    public static WorldInfoSimple get(int id)
+    public static InstanceWorldInfo get(int id)
     {
         return instanceInfo.get(id);
     }
@@ -275,7 +275,7 @@ public class InstanceHandler extends WorldSavedData
         {
             NBTTagCompound compound = nbtList.getCompoundTagAt(i);
 
-            instanceInfo.put(compound.getInteger("dimensionID"), new WorldInfoSimple(compound.getCompoundTag("worldInfo")));
+            instanceInfo.put(compound.getInteger("dimensionID"), new InstanceWorldInfo(compound.getCompoundTag("worldInfo")));
         }
     }
 
@@ -284,7 +284,7 @@ public class InstanceHandler extends WorldSavedData
     {
         NBTTagList nbtList = new NBTTagList();
 
-        for (Entry<Integer, WorldInfoSimple> entry : instanceInfo.entrySet())
+        for (Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
         {
             NBTTagCompound compound = new NBTTagCompound();
 
