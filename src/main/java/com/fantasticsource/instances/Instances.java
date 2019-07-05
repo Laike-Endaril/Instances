@@ -19,12 +19,12 @@ import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.020,)")
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.020,)", acceptableRemoteVersions = "*")
 public class Instances
 {
     public static final String MODID = "instances";
     public static final String NAME = "Instances";
-    public static final String VERSION = "1.12.2.000a";
+    public static final String VERSION = "1.12.2.000b";
 
     public static Integer nextFreeDimID()
     {
