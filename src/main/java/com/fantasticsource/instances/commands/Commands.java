@@ -51,13 +51,13 @@ public class Commands extends CommandBase
         {
             if (entry.getValue().getOwner().equals(id))
             {
-                return CmdTPD.tpd(entity, entry.getKey(), -14.5, 76, -14.5, entity.rotationYaw, entity.rotationPitch);
+                return CmdTPD.tpd(entity, entry.getKey(), 0, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
             }
         }
 
         //Not found
         Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(entity, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
-        return CmdTPD.tpd(entity, pair.getKey(), -14.5, 76, -14.5, entity.rotationYaw, entity.rotationPitch);
+        return CmdTPD.tpd(entity, pair.getKey(), 0, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
     }
 
     @Override

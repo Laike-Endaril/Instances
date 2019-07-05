@@ -41,6 +41,8 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
         if (chunkX >= -1 && chunkX <= 0 && chunkZ >= -1 && chunkZ <= 0)
         {
             int bottom = 75, top = 106;
+
+
             //Floor and ceiling
             for (int x = 0; x < 16; x++)
             {
@@ -51,10 +53,7 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
                     chunk.setBlockState(new BlockPos(x, top, z), Blocks.BARRIER.getDefaultState());
                 }
             }
-            if (chunkX == -1 && chunkZ == -1)
-            {
-                chunk.setBlockState(new BlockPos(1, bottom, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
-            }
+
 
             //Walls
             if (chunkX == -1)
@@ -77,8 +76,6 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
                     }
                 }
             }
-
-            //Walls
             if (chunkZ == -1)
             {
                 for (int y = bottom; y < top; y++)
@@ -97,6 +94,24 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
                     {
                         chunk.setBlockState(new BlockPos(x, y, 15), Blocks.BARRIER.getDefaultState());
                     }
+                }
+            }
+
+
+            //Portal
+            if (chunkZ == -1)
+            {
+                if (chunkX == -1)
+                {
+                    chunk.setBlockState(new BlockPos(15, bottom + 2, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
+                    chunk.setBlockState(new BlockPos(15, bottom + 3, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
+                    chunk.setBlockState(new BlockPos(15, bottom + 4, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
+                }
+                else
+                {
+                    chunk.setBlockState(new BlockPos(0, bottom + 2, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
+                    chunk.setBlockState(new BlockPos(0, bottom + 3, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
+                    chunk.setBlockState(new BlockPos(0, bottom + 4, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
                 }
             }
         }
