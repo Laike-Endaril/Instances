@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -333,8 +334,18 @@ public class CmdTPD extends CommandBase
 
         if (entity instanceof EntityPlayerMP)
         {
-            server.getPlayerList().transferPlayerToDimension((EntityPlayerMP) entity, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
-            return entity;
+            EntityPlayerMP player = (EntityPlayerMP) entity;
+
+            server.getPlayerList().transferPlayerToDimension(player, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
+
+            WorldInfoSimple info = InstanceHandler.get(dimension);
+            if (info != null)
+            {
+                if (info.getOwner() == player.getPersistentID()) player.setGameType(GameType.SURVIVAL);
+                else player.setGameType(GameType.ADVENTURE);
+            }
+
+            return player;
         }
         else
         {
