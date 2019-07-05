@@ -48,7 +48,7 @@ public class Commands extends CommandBase
         for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
         {
             WorldInfoSimple info = entry.getValue();
-            if (info.getDimensionType() == InstanceTypes.skyhubDimType && info.getWorldName().equals(player.getName() + "'s " + InstanceTypes.skyhubDimType.name()))
+            if (info.getDimensionType() == InstanceTypes.skyhubDimType && info.getWorldName().equals((player.getName() + "'s " + InstanceTypes.skyhubDimType.name()).replace(" ", "_")))
             {
                 return CmdTPD.tpd(player, entry.getKey(), 0, 77, 0, player.rotationYaw, player.rotationPitch);
             }
