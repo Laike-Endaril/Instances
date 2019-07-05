@@ -5,9 +5,12 @@ import com.fantasticsource.instances.client.ClientHandler;
 import com.fantasticsource.instances.commands.*;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.world.InstanceHandler;
+import com.fantasticsource.instances.world.WorldInfoSimple;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.GameType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -17,6 +20,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 @Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.020,)", acceptableRemoteVersions = "*")
@@ -112,5 +116,17 @@ public class Instances
     public void clientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
     {
         if (!event.getManager().isLocalChannel()) ClientHandler.cleanUp();
+    }
+
+    @SubscribeEvent
+    public void playerLogin(PlayerEvent.PlayerLoggedInEvent event)
+    {
+        EntityPlayer player = event.player;
+
+        WorldInfoSimple info = InstanceHandler.get(player.world.provider.getDimension());
+        if (info == null) return;
+
+        if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
+        else player.setGameType(GameType.ADVENTURE);
     }
 }

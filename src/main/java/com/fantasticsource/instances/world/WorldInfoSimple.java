@@ -1,12 +1,17 @@
 package com.fantasticsource.instances.world;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.GameType;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.common.DimensionManager;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.UUID;
 
 public class WorldInfoSimple extends WorldInfo
@@ -60,6 +65,21 @@ public class WorldInfoSimple extends WorldInfo
     public void setOwner(UUID id)
     {
         owner = id;
+
+        for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
+        {
+            if (entry.getValue() == this)
+            {
+                World world = DimensionManager.getWorld(entry.getKey());
+                if (world == null) break;
+
+                for (EntityPlayer player : world.playerEntities)
+                {
+                    if (player.getPersistentID().equals(id)) player.setGameType(GameType.SURVIVAL);
+                    else player.setGameType(GameType.ADVENTURE);
+                }
+            }
+        }
     }
 
     public UUID getOwner()
