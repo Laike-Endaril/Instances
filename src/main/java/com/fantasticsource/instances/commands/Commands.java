@@ -38,19 +38,24 @@ public class Commands extends CommandBase
 
     public static boolean gotoHub(EntityPlayerMP player)
     {
+        if (player.world.provider.getDimensionType() == InstanceTypes.skyhubDimType)
+        {
+            return CmdTPD.tpd(player, player.world.provider.getDimension(), 0, 77, 0, player.rotationYaw, player.rotationPitch);
+        }
+
         //Try finding an existing hub for said player
         for (Map.Entry<Integer, WorldInfoSimple> entry : InstanceHandler.instanceInfo.entrySet())
         {
             WorldInfoSimple info = entry.getValue();
             if (info.getDimensionType() == InstanceTypes.skyhubDimType && info.getWorldName().equals(player.getName() + "'s " + InstanceTypes.skyhubDimType.name()))
             {
-                return CmdTPD.tpd(player, entry.getKey(), 0, 77, -13.5, player.rotationYaw, player.rotationPitch);
+                return CmdTPD.tpd(player, entry.getKey(), 0, 77, 0, player.rotationYaw, player.rotationPitch);
             }
         }
 
         //Not found
         Pair<Integer, WorldInfoSimple> pair = InstanceHandler.createDimension(player, InstanceTypes.skyhubDimType, null, player.getName() + "'s " + InstanceTypes.skyhubDimType.name());
-        return CmdTPD.tpd(player, pair.getKey(), 0, 77, -13.5, player.rotationYaw, player.rotationPitch);
+        return CmdTPD.tpd(player, pair.getKey(), 0, 77, 0, player.rotationYaw, player.rotationPitch);
     }
 
     public static boolean joinPossiblyCreating(EntityPlayerMP player)
