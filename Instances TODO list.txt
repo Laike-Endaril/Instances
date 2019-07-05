@@ -1,5 +1,3 @@
-Whitelist per owned instance for who is allowed to visit
-
 Hub portal to where you came from
 Hub portal to your personal instance
 
