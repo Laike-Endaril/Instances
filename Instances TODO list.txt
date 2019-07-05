@@ -1,8 +1,3 @@
-Fix gamemode issue
-
-
-
-Build permissions for owner and nobody else
 Interact permissions for owner and nobody else
 
 Whitelist per owned instance for who is allowed to visit
@@ -32,6 +27,8 @@ Rename or remove all commands, so we don't get any conflicts with Simple Dimensi
 
 Fix vanilla's BS allow-nether server setting in server.properties...setting it to false disables ALL dimension types besides the overworld!
 https://bugs.mojang.com/browse/MC-85267
+
+May need to fix gametype upon teleporting to a normal dimension
 
 
 
