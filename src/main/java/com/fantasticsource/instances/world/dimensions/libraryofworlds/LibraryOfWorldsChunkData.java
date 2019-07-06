@@ -1,6 +1,7 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import com.fantasticsource.mctools.PlayerData;
+import com.fantasticsource.tools.Tools;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -43,7 +44,11 @@ public class LibraryOfWorldsChunkData
 
     private void recalc()
     {
-        //TODO recalc chunk minimums and maximums
+        int chunkXTotal = size() / 8;
+        chunkXMin = Tools.min(-chunkXTotal / 2, -1);
+        chunkXMax = Tools.max((chunkXTotal - 1) / 2, 0);
+
+        //TODO recreate chunkZ arrays and populate them
     }
 
     public int getChunkXMin()
