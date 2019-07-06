@@ -41,7 +41,7 @@ public class Commands extends CommandBase
         //If we're already in the hub, just teleport locally
         if (player.world.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
         {
-            return CmdTPD.tpd(player, player.world.provider.getDimension(), 0, 77, 0, player.rotationYaw, player.rotationPitch);
+            return CmdTPD.tpd(player, player.world.provider.getDimension(), 0, 2, 0, player.rotationYaw, player.rotationPitch);
         }
 
         //Try finding an existing hub for said player
@@ -50,13 +50,13 @@ public class Commands extends CommandBase
             InstanceWorldInfo info = entry.getValue();
             if (info.getDimensionType() == InstanceTypes.libraryOfWorldsDimType && info.getWorldName().equals((player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.name()).replace(" ", "_")))
             {
-                return CmdTPD.tpd(player, entry.getKey(), 0, 77, 0, player.rotationYaw, player.rotationPitch);
+                return CmdTPD.tpd(player, entry.getKey(), 0, 2, 0, player.rotationYaw, player.rotationPitch);
             }
         }
 
         //Not found
         Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createDimension(player, InstanceTypes.libraryOfWorldsDimType, null, player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.name());
-        return CmdTPD.tpd(player, pair.getKey(), 0, 77, 0, player.rotationYaw, player.rotationPitch);
+        return CmdTPD.tpd(player, pair.getKey(), 0, 2, 0, player.rotationYaw, player.rotationPitch);
     }
 
     public static boolean joinPossiblyCreating(EntityPlayerMP player)

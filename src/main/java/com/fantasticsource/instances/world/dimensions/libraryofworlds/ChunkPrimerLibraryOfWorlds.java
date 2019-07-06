@@ -21,16 +21,19 @@ public class ChunkPrimerLibraryOfWorlds extends ChunkPrimer
         FLOORBLOCKS.put(Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CRACKED), 1);
     }
 
+
+    private int worldHeight;
+
     private ArrayList<IBlockState> floorblocks = new ArrayList<>();
 
-    public ChunkPrimerLibraryOfWorlds()
+
+    public ChunkPrimerLibraryOfWorlds(int worldHeight)
     {
+        this.worldHeight = worldHeight;
+
         for (Map.Entry<IBlockState, Integer> entry : FLOORBLOCKS.entrySet())
         {
-            for (int i = entry.getValue(); i > 0; i--)
-            {
-                floorblocks.add(entry.getKey());
-            }
+            for (int i = entry.getValue(); i > 0; i--) floorblocks.add(entry.getKey());
         }
     }
 
@@ -39,10 +42,10 @@ public class ChunkPrimerLibraryOfWorlds extends ChunkPrimer
     {
         if (y == 0) return Blocks.BEDROCK.getDefaultState();
 
-        if (y == 1) return Tools.choose(floorblocks);
+        if (y == 1 || y == worldHeight - 1) return Tools.choose(floorblocks);
 
+        if (((x - 1) >> 1) % 2 == 0) return Blocks.BOOKSHELF.getDefaultState();
         return Blocks.AIR.getDefaultState();
-//        return Blocks.BOOKSHELF.getDefaultState();
     }
 
     @Override

@@ -17,11 +17,12 @@ import java.util.UUID;
 public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 {
     protected World world;
-    private ChunkPrimer chunkPrimer = new ChunkPrimerLibraryOfWorlds();
+    private ChunkPrimer chunkPrimer;
 
     public ChunkGeneratorLibraryOfWorlds(World world)
     {
         this.world = world;
+        chunkPrimer = new ChunkPrimerLibraryOfWorlds(world.getHeight());
     }
 
     @Override
