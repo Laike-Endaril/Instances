@@ -5,8 +5,6 @@ Hub portals to any other instances you have permission to visit
 
 Block visitor interaction for items with inventories
 
-Remove skylight from hub dimension
-
 
 
 Fix exp desync when teleporting back to overworld
