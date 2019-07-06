@@ -1,6 +1,7 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import com.fantasticsource.instances.world.InstanceHandler;
+import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
@@ -33,14 +34,26 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     {
         Chunk chunk = new Chunk(world, chunkPrimer, chunkX, chunkZ);
 
+
+        //Force void biome
+        byte[] bytes = chunk.getBiomeArray();
+        for (int i = 0; i < bytes.length; ++i)
+        {
+            bytes[i] = (byte) Biome.getIdForBiome(BiomeVoid.voidBiome);
+        }
+
+
         //Clear bookshelves from main hall
         if (chunkZ == -1)
         {
             for (int x = 0; x < 16; x++)
             {
-                for (int y = world.getHeight() - 1; y > 1; y--)
+                for (int z = 11; z < 16; z++)
                 {
-                    for (int z = 11; z < 16; z++) chunk.setBlockState(new BlockPos(x, y, z), AIR);
+                    for (int y = world.getHeight() - 1; y > 1; y--)
+                    {
+                        chunk.setBlockState(new BlockPos(x, y, z), AIR);
+                    }
                 }
             }
         }
@@ -48,9 +61,12 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
         {
             for (int x = 0; x < 16; x++)
             {
-                for (int y = world.getHeight() - 1; y > 1; y--)
+                for (int z = 0; z < 5; z++)
                 {
-                    for (int z = 0; z < 5; z++) chunk.setBlockState(new BlockPos(x, y, z), AIR);
+                    for (int y = world.getHeight() - 1; y > 1; y--)
+                    {
+                        chunk.setBlockState(new BlockPos(x, y, z), AIR);
+                    }
                 }
             }
         }
@@ -94,7 +110,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 //            }
 //        }
 
-        chunk.generateSkylightMap();
+        chunk.enqueueRelightChecks();
         return chunk;
     }
 

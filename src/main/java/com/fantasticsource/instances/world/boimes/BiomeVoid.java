@@ -13,7 +13,7 @@ public class BiomeVoid extends Biome
 
     public BiomeVoid()
     {
-        super(new BiomeProperties("Void"));
+        super(new BiomeProperties("Void").setBaseBiome("Void").setRainDisabled());
     }
 
     public static void init()

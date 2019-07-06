@@ -1,7 +1,13 @@
+Efficient terrain gen...or rather...terrain copying?
+
+
+
 Hub portal to where you came from
 Hub portal to your personal instance
 
 Hub portals to any other instances you have permission to visit
+
+
 
 Block visitor interaction for items with inventories
 
@@ -34,3 +40,5 @@ May need to fix gametype upon teleporting to a normal dimension
 Low priority
 
 Fix spinny camera bug when changing yaw/pitch during a teleport (currently avoiding by not changing yaw/pitch)
+
+Get the client F3 to show the biome correctly
