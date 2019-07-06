@@ -2,39 +2,49 @@ package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.Tools;
+import com.fantasticsource.tools.datastructures.SortableTable;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.UUID;
 
 public class LibraryOfWorldsChunkData
 {
-    private LinkedHashMap<Character, ArrayList<String>> visitablePlayers = new LinkedHashMap<>();
-    private int chunkXMin = -1, chunkXMax = 0, chunkZMin = -1, chunkZMax = 0;
+    private SortableTable visitablePlayers = new SortableTable(Character.class, ArrayList.class);
+    private int chunkXMin = -1, chunkXMax = 0, chunkZMins[] = new int[]{-1, 0}, chunkZMaxes[] = new int[]{-1, 0};
+
+    public LibraryOfWorldsChunkData()
+    {
+        visitablePlayers.startSorting(0);
+    }
 
     public void add(UUID id)
     {
-        int isles = visitablePlayers.size();
-
         String name = PlayerData.getName(id);
-        visitablePlayers.computeIfAbsent(name.charAt(0), o -> new ArrayList<>()).add(name);
+        char c = name.charAt(0);
 
-        if (visitablePlayers.size() != isles) recalc();
+        ArrayList<String> list = (ArrayList<String>) visitablePlayers.get(0, c, 1);
+        if (list == null)
+        {
+            list = new ArrayList<>();
+            visitablePlayers.add(c, list);
+        }
+        list.add(name);
+
+        recalc();
     }
 
     public void remove(UUID id)
     {
-        int isles = visitablePlayers.size();
-
         String name = PlayerData.getName(id);
         char c = name.charAt(0);
-        ArrayList<String> list = visitablePlayers.get(c);
+
+        ArrayList<String> list = (ArrayList<String>) visitablePlayers.get(0, c, 1);
         if (list == null) return;
 
         list.remove(name);
-        if (list.size() == 0) visitablePlayers.remove(c);
+        if (list.size() == 0) visitablePlayers.delete(c, 0);
 
-        if (visitablePlayers.size() != isles) recalc();
+        recalc();
     }
 
     public int size()
@@ -48,7 +58,13 @@ public class LibraryOfWorldsChunkData
         chunkXMin = Tools.min(-chunkXTotal / 2, -1);
         chunkXMax = Tools.max((chunkXTotal - 1) / 2, 0);
 
-        //TODO recreate chunkZ arrays and populate them
+
+        ArrayList<String>[] nameArrays = (ArrayList<String>[]) visitablePlayers.getColumn(1);
+        for (int i = 0; i < nameArrays.length; i++)
+        {
+            //TODO
+//            nameArrays[i].size()
+        }
     }
 
     public int getChunkXMin()
@@ -61,13 +77,13 @@ public class LibraryOfWorldsChunkData
         return chunkXMax;
     }
 
-    public int getChunkZMin()
+    public int getChunkZMin(int chunkX)
     {
-        return chunkZMin;
+        return chunkZMins[chunkX - chunkXMin];
     }
 
-    public int getChunkZMax()
+    public int getChunkZMax(int chunkX)
     {
-        return chunkZMax;
+        return chunkZMaxes[chunkX - chunkXMin];
     }
 }

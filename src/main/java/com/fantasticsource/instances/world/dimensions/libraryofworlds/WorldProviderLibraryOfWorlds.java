@@ -24,4 +24,10 @@ public class WorldProviderLibraryOfWorlds extends WorldProvider
     {
         return false;
     }
+
+    @Override
+    public boolean canRespawnHere()
+    {
+        return false;
+    }
 }

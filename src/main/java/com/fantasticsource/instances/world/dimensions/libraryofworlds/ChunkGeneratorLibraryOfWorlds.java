@@ -31,7 +31,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 
         UUID visitor = world.playerEntities.get(0).getPersistentID();
         LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(visitor, new LibraryOfWorldsChunkData());
-        if (chunkX < chunkData.getChunkXMin() || chunkX > chunkData.getChunkXMax() || chunkZ < chunkData.getChunkZMin() || chunkZ > chunkData.getChunkZMax()) return chunk;
+        if (chunkX < chunkData.getChunkXMin() || chunkX > chunkData.getChunkXMax() || chunkZ < chunkData.getChunkZMin(chunkX) || chunkZ > chunkData.getChunkZMax(chunkX)) return chunk;
 
 
 //        LinkedHashMap<String, ArrayList<String>> listings = new LinkedHashMap<>();
