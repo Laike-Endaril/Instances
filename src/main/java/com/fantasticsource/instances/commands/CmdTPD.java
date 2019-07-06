@@ -71,7 +71,7 @@ public class CmdTPD extends CommandBase
 
 
         DimensionType dimType = entity.world.provider.getDimensionType();
-        if (dimType != InstanceTypes.skyroomDimType && dimType != InstanceTypes.skyhubDimType)
+        if (dimType != InstanceTypes.skyroomDimType && dimType != InstanceTypes.libraryOfWorldsDimType)
         {
             Set<String> strings = entity.getTags();
             for (String s : strings.toArray(new String[0]))
@@ -350,7 +350,7 @@ public class CmdTPD extends CommandBase
             else player.setGameType(DimensionManager.getWorld(dimension).getWorldInfo().getGameType());
 
             InstanceWorldInfo oldInfo = InstanceHandler.get(oldDim);
-            if (oldInfo != null && oldInfo.getDimensionType() == InstanceTypes.skyhubDimType)
+            if (oldInfo != null && oldInfo.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
             {
                 InstanceHandler.deleteDimension(server, oldDim);
             }

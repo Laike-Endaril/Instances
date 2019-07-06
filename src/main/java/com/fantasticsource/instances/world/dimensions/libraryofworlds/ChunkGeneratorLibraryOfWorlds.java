@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.world.dimensions.skyhub;
+package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.mctools.PlayerData;
@@ -14,12 +14,12 @@ import net.minecraft.world.gen.IChunkGenerator;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class ChunkGeneratorSkyhub implements IChunkGenerator
+public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 {
     protected World world;
-    private ChunkPrimer chunkPrimer = new SkyhubChunkPrimer();
+    private ChunkPrimer chunkPrimer = new ChunkPrimerLibraryOfWorlds();
 
-    public ChunkGeneratorSkyhub(World world)
+    public ChunkGeneratorLibraryOfWorlds(World world)
     {
         this.world = world;
     }
@@ -45,7 +45,7 @@ public class ChunkGeneratorSkyhub implements IChunkGenerator
             {
                 for (int z = 0; z < 16; z++)
                 {
-                    chunk.setBlockState(new BlockPos(x, y, z), Blocks.WATER.getDefaultState());
+                    chunk.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
                 }
             }
         }

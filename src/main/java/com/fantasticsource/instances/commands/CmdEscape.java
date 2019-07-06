@@ -16,7 +16,7 @@ public class CmdEscape extends CommandBase
     public static void escape(Entity entity)
     {
         DimensionType type = entity.world.provider.getDimensionType();
-        if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.skyhubDimType) return;
+        if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.libraryOfWorldsDimType) return;
 
         Set<String> strings = entity.getTags();
         for (String s : strings.toArray(new String[0]))
@@ -55,9 +55,9 @@ public class CmdEscape extends CommandBase
         {
             Entity entity = (Entity) sender;
             DimensionType type = entity.world.provider.getDimensionType();
-            if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.skyhubDimType)
+            if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.libraryOfWorldsDimType)
             {
-                sender.sendMessage(new TextComponentString("This command can only be used when in a skyroom or skyhub instance"));
+                sender.sendMessage(new TextComponentString("This command can only be used when in a skyroom or Library of Worlds instance"));
                 return;
             }
 

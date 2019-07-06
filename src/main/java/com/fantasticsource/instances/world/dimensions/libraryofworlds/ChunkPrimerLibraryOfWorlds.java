@@ -1,11 +1,11 @@
-package com.fantasticsource.instances.world.dimensions.skyhub;
+package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.chunk.ChunkPrimer;
 
-public class SkyhubChunkPrimer extends ChunkPrimer
+public class ChunkPrimerLibraryOfWorlds extends ChunkPrimer
 {
     private static final IBlockState DEFAULT_STATE = Blocks.BOOKSHELF.getDefaultState();
     private final char[] data = new char[65536];
