@@ -1,9 +1,6 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
-import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -12,7 +9,8 @@ import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 {
@@ -29,41 +27,41 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     {
         Chunk chunk = new Chunk(world, chunkPrimer, chunkX, chunkZ);
 
-        UUID visitor = world.playerEntities.get(0).getPersistentID();
-        ArrayList<UUID> ids = InstanceHandler.visitablePlayers.computeIfAbsent(visitor, o -> new ArrayList<>());
-        LinkedHashMap<String, ArrayList<String>> listings = new LinkedHashMap<>();
-        for (UUID id : ids)
-        {
-            String otherOwnerName = PlayerData.getName(id);
-            listings.computeIfAbsent(otherOwnerName.substring(0, 1), o -> new ArrayList<>()).add(otherOwnerName);
-        }
-
-
-        for (int x = 0; x < 16; x++)
-        {
-            for (int y = 0; y < world.getHeight(); y++)
-            {
-                for (int z = 0; z < 16; z++)
-                {
+//        UUID visitor = world.playerEntities.get(0).getPersistentID();
+//        LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.computeIfAbsent(visitor, o -> new LibraryOfWorldsChunkData());
+//        LinkedHashMap<String, ArrayList<String>> listings = new LinkedHashMap<>();
+//        for (UUID id : ids)
+//        {
+//            String otherOwnerName = PlayerData.getName(id);
+//            listings.computeIfAbsent(otherOwnerName.substring(0, 1), o -> new ArrayList<>()).add(otherOwnerName);
+//        }
+//
+//
+//        for (int x = 0; x < 16; x++)
+//        {
+//            for (int y = 0; y < world.getHeight(); y++)
+//            {
+//                for (int z = 0; z < 16; z++)
+//                {
 //                    chunk.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
-                }
-            }
-        }
+//                }
+//            }
+//        }
 
 
         //8 Isles (letters) handled per chunkX value, starting with -1 and 0, then 1, then -2, 2, -3, etc
 //        if (chunkX)
-        {
-        }
+//        {
+//        }
 
-        for (Map.Entry<String, ArrayList<String>> entry : listings.entrySet())
-        {
-            //Isles
-            for (String s : entry.getValue())
-            {
-                //Portals
-            }
-        }
+//        for (Map.Entry<String, ArrayList<String>> entry : listings.entrySet())
+//        {
+//            //Isles
+//            for (String s : entry.getValue())
+//            {
+//                //Portals
+//            }
+//        }
 
         chunk.generateSkylightMap();
         return chunk;

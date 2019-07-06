@@ -3,6 +3,7 @@ package com.fantasticsource.instances.world;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.commands.TeleporterSimple;
 import com.fantasticsource.instances.network.messages.MessageDimensionSync;
+import com.fantasticsource.instances.world.dimensions.libraryofworlds.LibraryOfWorldsChunkData;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -36,7 +37,7 @@ public class InstanceHandler extends WorldSavedData
 {
     private static final String NAME = "InstanceHandler";
     public static LinkedHashMap<Integer, InstanceWorldInfo> instanceInfo = new LinkedHashMap<>();
-    public static LinkedHashMap<UUID, ArrayList<UUID>> visitablePlayers = new LinkedHashMap<>();
+    public static LinkedHashMap<UUID, LibraryOfWorldsChunkData> libraryOfWorldsData = new LinkedHashMap<>();
     private static InstanceHandler instanceHandler = null;
 
     public InstanceHandler(String name)
@@ -57,7 +58,7 @@ public class InstanceHandler extends WorldSavedData
 
 
         instanceInfo.clear();
-        visitablePlayers.clear();
+        libraryOfWorldsData.clear();
 
 
         instanceHandler = (InstanceHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(InstanceHandler.class, NAME);
@@ -79,7 +80,7 @@ public class InstanceHandler extends WorldSavedData
             UUID owner = worldInfo.getOwner();
             for (UUID id : worldInfo.visitorWhitelist)
             {
-                visitablePlayers.computeIfAbsent(id, o -> new ArrayList<>()).add(owner);
+                libraryOfWorldsData.computeIfAbsent(id, o -> new LibraryOfWorldsChunkData()).add(owner);
             }
         }
     }

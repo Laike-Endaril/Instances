@@ -3,6 +3,7 @@ package com.fantasticsource.instances.commands;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
+import com.fantasticsource.instances.world.dimensions.libraryofworlds.LibraryOfWorldsChunkData;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -98,8 +99,9 @@ public class CmdVisitors extends CommandBase
                 }
 
                 info.visitorWhitelist.add(data.id);
-                InstanceHandler.visitablePlayers.computeIfAbsent(data.id, o -> new ArrayList<>()).add(player.getPersistentID());
                 player.sendMessage(new TextComponentString(args[0] + " can now visit you"));
+
+                InstanceHandler.libraryOfWorldsData.computeIfAbsent(data.id, o -> new LibraryOfWorldsChunkData()).add(player.getPersistentID());
             }
             else if (args[1].toLowerCase().equals("deny"))
             {
@@ -110,8 +112,14 @@ public class CmdVisitors extends CommandBase
                 }
 
                 info.visitorWhitelist.remove(data.id);
-                InstanceHandler.visitablePlayers.computeIfAbsent(data.id, o -> new ArrayList<>()).remove(player.getPersistentID());
                 player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));
+
+                LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.get(data.id);
+                if (chunkData != null)
+                {
+                    chunkData.remove(data.id);
+                    if (chunkData.size() == 0) InstanceHandler.libraryOfWorldsData.remove(data.id);
+                }
             }
             else player.sendMessage(new TextComponentString(getUsage(player)));
         }
