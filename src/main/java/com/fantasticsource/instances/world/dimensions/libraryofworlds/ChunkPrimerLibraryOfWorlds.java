@@ -27,15 +27,11 @@ public class ChunkPrimerLibraryOfWorlds extends ChunkPrimer
     }
 
 
-    private int worldHeight;
-
     private ArrayList<IBlockState> floorblocks = new ArrayList<>();
 
 
-    public ChunkPrimerLibraryOfWorlds(int worldHeight)
+    public ChunkPrimerLibraryOfWorlds()
     {
-        this.worldHeight = worldHeight;
-
         for (Map.Entry<IBlockState, Integer> entry : FLOORBLOCKS.entrySet())
         {
             for (int i = entry.getValue(); i > 0; i--) floorblocks.add(entry.getKey());
@@ -47,7 +43,7 @@ public class ChunkPrimerLibraryOfWorlds extends ChunkPrimer
     {
         if (y == 0) return BEDROCK;
 
-        if (y == 1 || y == worldHeight - 1) return Tools.choose(floorblocks);
+        if (y == 1) return Tools.choose(floorblocks);
 
         if (((x - 1) >> 1) % 2 == 0) return BOOKSHELF;
         return AIR;

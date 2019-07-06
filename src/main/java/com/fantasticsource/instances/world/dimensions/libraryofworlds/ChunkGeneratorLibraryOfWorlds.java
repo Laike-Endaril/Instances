@@ -25,7 +25,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     public ChunkGeneratorLibraryOfWorlds(World world)
     {
         this.world = world;
-        chunkPrimer = new ChunkPrimerLibraryOfWorlds(world.getHeight());
+        chunkPrimer = new ChunkPrimerLibraryOfWorlds();
     }
 
     @Override
@@ -38,7 +38,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
         {
             for (int x = 0; x < 16; x++)
             {
-                for (int y = world.getHeight() - 2; y > 1; y--)
+                for (int y = world.getHeight() - 1; y > 1; y--)
                 {
                     for (int z = 11; z < 16; z++) chunk.setBlockState(new BlockPos(x, y, z), AIR);
                 }
@@ -48,7 +48,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
         {
             for (int x = 0; x < 16; x++)
             {
-                for (int y = world.getHeight() - 2; y > 1; y--)
+                for (int y = world.getHeight() - 1; y > 1; y--)
                 {
                     for (int z = 0; z < 5; z++) chunk.setBlockState(new BlockPos(x, y, z), AIR);
                 }
