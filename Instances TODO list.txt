@@ -1,11 +1,11 @@
-Efficient terrain gen...or rather...terrain copying?
-
-
-
 Hub portal to where you came from
 Hub portal to your personal instance
 
 Hub portals to any other instances you have permission to visit
+
+
+
+Library of Worlds lighting
 
 
 
@@ -15,6 +15,10 @@ Block visitor interaction for items with inventories
 
 Fix exp desync when teleporting back to overworld
 Try possible inventory desync fix using a packet to force an inventory update
+
+
+
+More efficient Library of Worlds terrain gen...or rather...terrain copying?
 
 
 

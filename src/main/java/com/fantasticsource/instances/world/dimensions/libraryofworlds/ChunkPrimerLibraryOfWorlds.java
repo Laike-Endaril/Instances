@@ -44,7 +44,7 @@ public class ChunkPrimerLibraryOfWorlds extends ChunkPrimer
 
         if (y == 1) return Tools.choose(floorblocks);
 
-        if (((x - 1) >> 1) % 2 == 0) return BOOKSHELF;
+        if (((x + 1) >> 1) % 2 == 0) return BOOKSHELF;
 
         return AIR;
     }
