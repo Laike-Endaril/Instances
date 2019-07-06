@@ -82,7 +82,6 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
             {
                 pos = pos.add(chunkX << 4, 0, chunkZ << 4);
                 world.setBlockState(pos, PORTAL, 2);
-                world.checkLight(pos);
             }
         }
 
