@@ -98,6 +98,7 @@ public class CmdVisitors extends CommandBase
                 }
 
                 info.visitorWhitelist.add(data.id);
+                InstanceHandler.visitablePlayers.computeIfAbsent(data.id, o -> new ArrayList<>()).add(player.getPersistentID());
                 player.sendMessage(new TextComponentString(args[0] + " can now visit you"));
             }
             else if (args[1].toLowerCase().equals("deny"))
@@ -109,6 +110,7 @@ public class CmdVisitors extends CommandBase
                 }
 
                 info.visitorWhitelist.remove(data.id);
+                InstanceHandler.visitablePlayers.computeIfAbsent(data.id, o -> new ArrayList<>()).remove(player.getPersistentID());
                 player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));
             }
             else player.sendMessage(new TextComponentString(getUsage(player)));

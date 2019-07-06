@@ -34,8 +34,9 @@ import java.util.Map.Entry;
 
 public class InstanceHandler extends WorldSavedData
 {
+    private static final String NAME = "InstanceHandler";
     public static LinkedHashMap<Integer, InstanceWorldInfo> instanceInfo = new LinkedHashMap<>();
-    private static String NAME = "InstanceHandler";
+    public static LinkedHashMap<UUID, ArrayList<UUID>> visitablePlayers = new LinkedHashMap<>();
     private static InstanceHandler instanceHandler = null;
 
     public InstanceHandler(String name)
@@ -48,9 +49,16 @@ public class InstanceHandler extends WorldSavedData
         this(NAME);
     }
 
-    public static void registerInstances()
+    public static void init()
     {
+        //Happens on server start event
+
         if (instanceHandler != null) return;
+
+
+        instanceInfo.clear();
+        visitablePlayers.clear();
+
 
         instanceHandler = (InstanceHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getMapStorage().getOrLoadData(InstanceHandler.class, NAME);
 
@@ -67,6 +75,12 @@ public class InstanceHandler extends WorldSavedData
 
             DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
             DimensionManager.keepDimensionLoaded(dimensionID, false);
+
+            UUID owner = worldInfo.getOwner();
+            for (UUID id : worldInfo.visitorWhitelist)
+            {
+                visitablePlayers.computeIfAbsent(id, o -> new ArrayList<>()).add(owner);
+            }
         }
     }
 

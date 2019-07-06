@@ -1,7 +1,6 @@
 package com.fantasticsource.instances.world.dimensions.skyhub;
 
 import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
@@ -30,22 +29,28 @@ public class ChunkGeneratorSkyhub implements IChunkGenerator
         Chunk chunk = new Chunk(world, chunkPrimer, chunkX, chunkZ);
 
         UUID visitor = world.playerEntities.get(0).getPersistentID();
+        ArrayList<UUID> ids = InstanceHandler.visitablePlayers.computeIfAbsent(visitor, o -> new ArrayList<>());
         LinkedHashMap<String, ArrayList<String>> listings = new LinkedHashMap<>();
-        for (InstanceWorldInfo info : InstanceHandler.instanceInfo.values())
+        for (UUID id : ids)
         {
-            if (!info.visitorWhitelist.contains(visitor)) break;
-
-            String otherOwnerName = PlayerData.getName(info.getOwner());
+            String otherOwnerName = PlayerData.getName(id);
             listings.computeIfAbsent(otherOwnerName.substring(0, 1), o -> new ArrayList<>()).add(otherOwnerName);
+        }
+
+        //8 Isles (letters) handled per chunkX value, starting with -1 and 0, then 1, then -2, 2, -3, etc
+//        if (chunkX)
+        {
+
         }
 
         for (Map.Entry<String, ArrayList<String>> entry : listings.entrySet())
         {
-            System.out.println(entry.getKey());
-            for (String s : entry.getValue()) System.out.println(s);
-            System.out.println();
+            //Isles
+            for (String s : entry.getValue())
+            {
+                //Portals
+            }
         }
-        //TODO hub gen
 
         chunk.generateSkylightMap();
         return chunk;
