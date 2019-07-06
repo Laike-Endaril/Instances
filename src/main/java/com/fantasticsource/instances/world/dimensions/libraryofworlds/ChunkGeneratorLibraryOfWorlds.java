@@ -45,7 +45,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
             {
                 for (int z = 0; z < 16; z++)
                 {
-                    chunk.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
+//                    chunk.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
                 }
             }
         }
