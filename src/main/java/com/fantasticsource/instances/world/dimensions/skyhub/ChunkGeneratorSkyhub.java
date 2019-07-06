@@ -3,6 +3,7 @@ package com.fantasticsource.instances.world.dimensions.skyhub;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -16,7 +17,7 @@ import java.util.*;
 public class ChunkGeneratorSkyhub implements IChunkGenerator
 {
     protected World world;
-    private ChunkPrimer chunkPrimer = new ChunkPrimer();
+    private ChunkPrimer chunkPrimer = new SkyhubChunkPrimer();
 
     public ChunkGeneratorSkyhub(World world)
     {
@@ -37,10 +38,22 @@ public class ChunkGeneratorSkyhub implements IChunkGenerator
             listings.computeIfAbsent(otherOwnerName.substring(0, 1), o -> new ArrayList<>()).add(otherOwnerName);
         }
 
+
+        for (int x = 0; x < 16; x++)
+        {
+            for (int y = 0; y < world.getHeight(); y++)
+            {
+                for (int z = 0; z < 16; z++)
+                {
+                    chunk.setBlockState(new BlockPos(x, y, z), Blocks.WATER.getDefaultState());
+                }
+            }
+        }
+
+
         //8 Isles (letters) handled per chunkX value, starting with -1 and 0, then 1, then -2, 2, -3, etc
 //        if (chunkX)
         {
-
         }
 
         for (Map.Entry<String, ArrayList<String>> entry : listings.entrySet())
