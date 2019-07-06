@@ -12,6 +12,11 @@ import java.util.Map;
 
 public class ChunkPrimerLibraryOfWorlds extends ChunkPrimer
 {
+    private static final IBlockState
+            BEDROCK = Blocks.BEDROCK.getDefaultState(),
+            AIR = Blocks.AIR.getDefaultState(),
+            BOOKSHELF = Blocks.BOOKSHELF.getDefaultState();
+
     //Each of these is blockstate, weight
     public static final LinkedHashMap<IBlockState, Integer> FLOORBLOCKS = new LinkedHashMap<>();
 
@@ -40,12 +45,12 @@ public class ChunkPrimerLibraryOfWorlds extends ChunkPrimer
     @Override
     public IBlockState getBlockState(int x, int y, int z)
     {
-        if (y == 0) return Blocks.BEDROCK.getDefaultState();
+        if (y == 0) return BEDROCK;
 
         if (y == 1 || y == worldHeight - 1) return Tools.choose(floorblocks);
 
-        if (((x - 1) >> 1) % 2 == 0) return Blocks.BOOKSHELF.getDefaultState();
-        return Blocks.AIR.getDefaultState();
+        if (((x - 1) >> 1) % 2 == 0) return BOOKSHELF;
+        return AIR;
     }
 
     @Override

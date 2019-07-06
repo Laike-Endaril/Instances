@@ -1,7 +1,9 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import com.fantasticsource.instances.world.InstanceHandler;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -16,6 +18,7 @@ import java.util.UUID;
 
 public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 {
+    private static final IBlockState AIR = Blocks.AIR.getDefaultState();
     protected World world;
     private ChunkPrimer chunkPrimer;
 
@@ -29,6 +32,28 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     public Chunk generateChunk(int chunkX, int chunkZ)
     {
         Chunk chunk = new Chunk(world, chunkPrimer, chunkX, chunkZ);
+
+        //Clear bookshelves from main hall
+        if (chunkZ == -1)
+        {
+            for (int x = 0; x < 16; x++)
+            {
+                for (int y = world.getHeight() - 2; y > 1; y--)
+                {
+                    for (int z = 11; z < 16; z++) chunk.setBlockState(new BlockPos(x, y, z), AIR);
+                }
+            }
+        }
+        else if (chunkZ == 0)
+        {
+            for (int x = 0; x < 16; x++)
+            {
+                for (int y = world.getHeight() - 2; y > 1; y--)
+                {
+                    for (int z = 0; z < 5; z++) chunk.setBlockState(new BlockPos(x, y, z), AIR);
+                }
+            }
+        }
 
         UUID visitor = world.playerEntities.get(0).getPersistentID();
         LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(visitor, new LibraryOfWorldsChunkData());
