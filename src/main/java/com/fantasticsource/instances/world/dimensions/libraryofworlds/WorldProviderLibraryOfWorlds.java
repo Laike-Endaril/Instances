@@ -1,7 +1,6 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
@@ -13,6 +12,7 @@ import javax.annotation.Nullable;
 public class WorldProviderLibraryOfWorlds extends WorldProvider
 {
     private static final Vec3d SKY_COLOR = new Vec3d(0, 0, 0);
+    private static final Vec3d FOG_COLOR = new Vec3d(0, 0, 0);
 
     @Override
     public DimensionType getDimensionType()
@@ -38,28 +38,23 @@ public class WorldProviderLibraryOfWorlds extends WorldProvider
         return false;
     }
 
-    @Override
-    public boolean isSkyColored()
-    {
-        return true;
-    }
-
-    @Override
-    public Vec3d getSkyColor(Entity cameraEntity, float partialTicks)
-    {
-        return SKY_COLOR;
-    }
-
     @Nullable
     @Override
     public IRenderHandler getSkyRenderer()
     {
-        return null;
+        return BlankRenderer.BLANK_RENDERER;
+    }
+
+    @Nullable
+    @Override
+    public IRenderHandler getCloudRenderer()
+    {
+        return BlankRenderer.BLANK_RENDERER;
     }
 
     @Override
-    public float getCloudHeight()
+    public Vec3d getFogColor(float p_76562_1_, float p_76562_2_)
     {
-        return -1000;
+        return FOG_COLOR;
     }
 }
