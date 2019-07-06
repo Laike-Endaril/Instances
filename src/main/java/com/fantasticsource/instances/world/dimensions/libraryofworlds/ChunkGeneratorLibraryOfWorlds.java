@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
+import com.fantasticsource.instances.world.InstanceHandler;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -11,6 +12,7 @@ import net.minecraft.world.gen.IChunkGenerator;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 {
@@ -27,8 +29,11 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     {
         Chunk chunk = new Chunk(world, chunkPrimer, chunkX, chunkZ);
 
-//        UUID visitor = world.playerEntities.get(0).getPersistentID();
-//        LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.computeIfAbsent(visitor, o -> new LibraryOfWorldsChunkData());
+        UUID visitor = world.playerEntities.get(0).getPersistentID();
+        LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(visitor, new LibraryOfWorldsChunkData());
+        if (chunkX < chunkData.getChunkXMin() || chunkX > chunkData.getChunkXMax() || chunkZ < chunkData.getChunkZMin() || chunkZ > chunkData.getChunkZMax()) return chunk;
+
+
 //        LinkedHashMap<String, ArrayList<String>> listings = new LinkedHashMap<>();
 //        for (UUID id : ids)
 //        {
