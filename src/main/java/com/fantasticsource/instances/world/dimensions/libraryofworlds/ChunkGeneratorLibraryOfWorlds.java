@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
+import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
@@ -17,7 +18,10 @@ import java.util.List;
 
 public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 {
-    private static final IBlockState AIR = Blocks.AIR.getDefaultState();
+    private static final IBlockState
+            AIR = Blocks.AIR.getDefaultState(),
+            PORTAL = BlocksAndItems.blockInstancePortal.getDefaultState();
+
     protected World world;
     private ChunkPrimer chunkPrimer;
 
@@ -41,7 +45,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
         }
 
 
-        //Clear bookshelves from main hall and generate escape/personal portals
+        //Clear bookshelves from main hall and generate central portals
         if (chunkZ == 0)
         {
             for (int x = 0; x < 16; x++)
@@ -56,15 +60,30 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
             }
         }
 
+        return chunk;
+    }
 
-        //Temp/testing
-        if (chunkZ < 0)
+    @Override
+    public void populate(int chunkX, int chunkZ)
+    {
+        Chunk chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
+
+        //Clear bookshelves from main hall and generate central portals
+        if (chunkZ == 0)
         {
+            BlockPos[] portals = new BlockPos[]{
+                    new BlockPos(7, 3, 3),
+                    new BlockPos(7, 3, 12),
+                    new BlockPos(8, 3, 3),
+                    new BlockPos(8, 3, 12)
+            };
 
-        }
-        else
-        {
-
+            for (BlockPos pos : portals)
+            {
+                pos = pos.add(chunkX << 4, 0, chunkZ << 4);
+                world.setBlockState(pos, PORTAL, 2);
+                world.checkLight(pos);
+            }
         }
 
 
@@ -107,14 +126,6 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 //                //Portals
 //            }
 //        }
-
-        chunk.checkLight();
-        return chunk;
-    }
-
-    @Override
-    public void populate(int parChunkX, int parChunkZ)
-    {
     }
 
     @Override
