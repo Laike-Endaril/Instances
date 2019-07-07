@@ -3,6 +3,10 @@ Fix lighting issue in Library of Worlds
 
 
 
+Fix terrain not loading on Faerun until you relog
+
+
+
 Fix not being able to visit other ppl in Faerun for some reason
 
 
