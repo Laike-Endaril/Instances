@@ -1,8 +1,16 @@
+Label portals!
+
+
+
 Library of Worlds lighting
 
 
 
-Block visitor interaction for items with inventories
+Deny block visitor interaction for items with inventories
+
+
+
+Preserve creative mode for OPs
 
 
 
