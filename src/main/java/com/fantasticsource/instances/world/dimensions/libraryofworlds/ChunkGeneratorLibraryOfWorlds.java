@@ -8,6 +8,7 @@ import com.fantasticsource.tools.Tools;
 import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumFacing;
@@ -34,7 +35,8 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     private static final TextComponentString
             HOUSE_STRING = new TextComponentString("House"),
             XXX_STRING = new TextComponentString("x-x-x-x-x-x-x-x-x-x-x"),
-            BLANK_STRING = new TextComponentString("");
+            BLANK_STRING = new TextComponentString(""),
+            ESCAPE_STRING = new TextComponentString("Escape");
 
     protected World world;
     private ChunkPrimer chunkPrimer;
@@ -84,8 +86,9 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
         Chunk chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
 
 
-        UUID visitor = world.playerEntities.get(0).getPersistentID();
-        LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(visitor, new LibraryOfWorldsChunkData());
+        EntityPlayer player = world.playerEntities.get(0);
+        UUID id = player.getPersistentID();
+        LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(id, new LibraryOfWorldsChunkData());
         Object[] indexLetters = chunkData.visitablePlayers.getColumn(0);
 
         boolean haveVisitables = indexLetters.length > 0;
@@ -94,8 +97,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
         //Isle Signs (in index order) and personal portals
         if (chunkZ == 0)
         {
-            TextComponentString text = null;
-            TileEntitySign sign;
+            TextComponentString text;
 
             for (int i = 0; i < 4; i++)
             {
@@ -118,17 +120,22 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 
 
                 //Personal portals
+                text = new TextComponentString(player.getName() + "'s");
                 pos = new BlockPos(xx + (i << 2), 3, zz + 1);
                 chunk.setBlockState(pos, PORTAL);
+                createSign(chunk, pos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, text, HOUSE_STRING, XXX_STRING);
                 pos = pos.east(3);
                 chunk.setBlockState(pos, PORTAL);
                 ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination());
+                createSign(chunk, pos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, BLANK_STRING, ESCAPE_STRING, XXX_STRING);
 
                 pos = pos.south(13);
                 chunk.setBlockState(pos, PORTAL);
+                createSign(chunk, pos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, text, HOUSE_STRING, XXX_STRING);
                 pos = pos.west(3);
                 chunk.setBlockState(pos, PORTAL);
                 ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination());
+                createSign(chunk, pos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, BLANK_STRING, ESCAPE_STRING, XXX_STRING);
             }
         }
         else if (haveVisitables)
