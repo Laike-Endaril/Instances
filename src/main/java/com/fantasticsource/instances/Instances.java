@@ -29,7 +29,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 //;required-after:phosphor-lighting@[0.2.2,)
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.020a,);required-after:phosphor-lighting@[0.2.2,)")
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,);required-after:phosphor-lighting@[0.2.2,)")
 public class Instances
 {
     public static final String MODID = "instances";
