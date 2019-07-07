@@ -78,18 +78,27 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
         LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(visitor, new LibraryOfWorldsChunkData());
 
 
-        //Isle Signs (in index order)
+        //Isle Signs (in index order) and personal portals
         if (chunkZ == 0)
         {
             int size = chunkData.visitablePlayers.size();
 
             for (int i = 0; i < 4; i++)
             {
+                //Signs
                 world.setBlockState(new BlockPos(xx + (i << 2), 3, zz + 3), SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
                 world.setBlockState(new BlockPos(xx + (i << 2) + 3, 3, zz + 3), SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
 
                 world.setBlockState(new BlockPos(xx + (i << 2), 3, zz + 12), SIGN);
                 world.setBlockState(new BlockPos(xx + (i << 2) + 3, 3, zz + 12), SIGN);
+
+
+                //Personal portals
+                world.setBlockState(new BlockPos(xx + (i << 2), 3, zz + 1), PORTAL);
+                world.setBlockState(new BlockPos(xx + (i << 2) + 3, 3, zz + 1), PORTAL);
+
+                world.setBlockState(new BlockPos(xx + (i << 2), 3, zz + 14), PORTAL);
+                world.setBlockState(new BlockPos(xx + (i << 2) + 3, 3, zz + 14), PORTAL);
             }
         }
 
