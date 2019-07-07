@@ -20,12 +20,12 @@ public class TEInstancePortal extends TileEntity
         {
             NBTTagList list1 = new NBTTagList();
 
-            list1.appendTag(new NBTTagInt(destination.dimension));
+            list1.appendTag(new NBTTagDouble(destination.dimension));
             list1.appendTag(new NBTTagDouble(destination.x));
             list1.appendTag(new NBTTagDouble(destination.y));
             list1.appendTag(new NBTTagDouble(destination.z));
-            list1.appendTag(new NBTTagFloat(destination.yaw));
-            list1.appendTag(new NBTTagFloat(destination.pitch));
+            list1.appendTag(new NBTTagDouble(destination.yaw));
+            list1.appendTag(new NBTTagDouble(destination.pitch));
 
             list.appendTag(list1);
         }
@@ -43,12 +43,12 @@ public class TEInstancePortal extends TileEntity
         {
             NBTTagList list = (NBTTagList) element;
 
-            int dimension = ((NBTTagInt) list.get(0)).getInt();
+            int dimension = ((NBTTagDouble) list.get(0)).getInt();
             double x = ((NBTTagDouble) list.get(1)).getDouble();
             double y = ((NBTTagDouble) list.get(2)).getDouble();
             double z = ((NBTTagDouble) list.get(3)).getDouble();
-            float yaw = ((NBTTagFloat) list.get(4)).getFloat();
-            float pitch = ((NBTTagFloat) list.get(5)).getFloat();
+            float yaw = ((NBTTagDouble) list.get(4)).getFloat();
+            float pitch = ((NBTTagDouble) list.get(5)).getFloat();
 
             destinations.add(new Destination(dimension, x, y, z, yaw, pitch));
         }
