@@ -3,12 +3,15 @@ package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
+import com.fantasticsource.tools.Tools;
 import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
@@ -76,21 +79,39 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 
         UUID visitor = world.playerEntities.get(0).getPersistentID();
         LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(visitor, new LibraryOfWorldsChunkData());
+        Object[] indexLetters = chunkData.visitablePlayers.getColumn(0);
 
 
         //Isle Signs (in index order) and personal portals
         if (chunkZ == 0)
         {
-            int size = chunkData.visitablePlayers.size();
+            boolean doText = indexLetters.length > 0;
+            TextComponentString text = null;
 
             for (int i = 0; i < 4; i++)
             {
                 //Signs
-                world.setBlockState(new BlockPos(xx + (i << 2), 3, zz + 3), SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
-                world.setBlockState(new BlockPos(xx + (i << 2) + 3, 3, zz + 3), SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
+                BlockPos pos = new BlockPos(xx + (i << 2), 3, zz + 3);
+                world.setBlockState(pos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
+                if (doText)
+                {
+                    text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length)]);
+                    ((TileEntitySign) world.getTileEntity(pos)).signText[1] = text;
+                }
+                pos = pos.east(3);
+                world.setBlockState(pos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
+                if (doText) ((TileEntitySign) world.getTileEntity(pos)).signText[1] = text;
 
-                world.setBlockState(new BlockPos(xx + (i << 2), 3, zz + 12), SIGN);
-                world.setBlockState(new BlockPos(xx + (i << 2) + 3, 3, zz + 12), SIGN);
+                pos = pos.south(9);
+                world.setBlockState(pos, SIGN);
+                if (doText)
+                {
+                    text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1) + 1, indexLetters.length)]);
+                    ((TileEntitySign) world.getTileEntity(pos)).signText[1] = text;
+                }
+                pos = pos.west(3);
+                world.setBlockState(pos, SIGN);
+                if (doText) ((TileEntitySign) world.getTileEntity(pos)).signText[1] = text;
 
 
                 //Personal portals
