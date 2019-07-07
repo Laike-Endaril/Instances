@@ -33,7 +33,8 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 
     private static final TextComponentString
             HOUSE_STRING = new TextComponentString("House"),
-            XXX_STRING = new TextComponentString("x-x-x-x-x-x-x-x-x-x-x");
+            XXX_STRING = new TextComponentString("x-x-x-x-x-x-x-x-x-x-x"),
+            BLANK_STRING = new TextComponentString("");
 
     protected World world;
     private ChunkPrimer chunkPrimer;
@@ -98,45 +99,21 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 
             for (int i = 0; i < 4; i++)
             {
+                BlockPos pos;
                 //Signs
-                BlockPos pos = new BlockPos(xx + (i << 2), 3, zz + 3);
-                world.setBlockState(pos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
                 if (haveVisitables)
                 {
                     text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length)]);
-                    sign = (TileEntitySign) world.getTileEntity(pos);
-                    sign.signText[0] = XXX_STRING;
-                    sign.signText[1] = text;
-                    sign.signText[3] = XXX_STRING;
-                }
-                pos = pos.east(3);
-                world.setBlockState(pos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
-                if (haveVisitables)
-                {
-                    sign = (TileEntitySign) world.getTileEntity(pos);
-                    sign.signText[0] = XXX_STRING;
-                    sign.signText[1] = text;
-                    sign.signText[3] = XXX_STRING;
-                }
+                    pos = new BlockPos(xx + (i << 2), 3, zz + 3);
+                    createSign(chunk, pos, EnumFacing.SOUTH, XXX_STRING, text, BLANK_STRING, XXX_STRING);
+                    pos = pos.east(3);
+                    createSign(chunk, pos, EnumFacing.SOUTH, XXX_STRING, text, BLANK_STRING, XXX_STRING);
 
-                pos = pos.south(9);
-                world.setBlockState(pos, SIGN);
-                if (haveVisitables)
-                {
                     text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1) + 1, indexLetters.length)]);
-                    sign = (TileEntitySign) world.getTileEntity(pos);
-                    sign.signText[0] = XXX_STRING;
-                    sign.signText[1] = text;
-                    sign.signText[3] = XXX_STRING;
-                }
-                pos = pos.west(3);
-                world.setBlockState(pos, SIGN);
-                if (haveVisitables)
-                {
-                    sign = (TileEntitySign) world.getTileEntity(pos);
-                    sign.signText[0] = XXX_STRING;
-                    sign.signText[1] = text;
-                    sign.signText[3] = XXX_STRING;
+                    pos = pos.south(9);
+                    createSign(chunk, pos, EnumFacing.NORTH, XXX_STRING, text, BLANK_STRING, XXX_STRING);
+                    pos = pos.west(3);
+                    createSign(chunk, pos, EnumFacing.NORTH, XXX_STRING, text, BLANK_STRING, XXX_STRING);
                 }
 
 
@@ -161,9 +138,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
             ArrayList<String> isleNames;
             String name;
             int index;
-            BlockPos portalPos, signPos;
-            TileEntitySign sign;
-            TextComponentString houseString = new TextComponentString("House");
+            BlockPos portalPos;
 
             if (chunkZ < 0)
             {
@@ -179,13 +154,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         index = Tools.posMod(15 - z, isleNames.size());
                         name = isleNames.get(index);
                         ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
-                        signPos = portalPos.add(1, 1, 0);
-                        chunk.setBlockState(signPos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.EAST));
-                        sign = (TileEntitySign) world.getTileEntity(signPos);
-                        sign.signText[0] = XXX_STRING;
-                        sign.signText[1] = new TextComponentString(name + "'s");
-                        sign.signText[2] = HOUSE_STRING;
-                        sign.signText[3] = XXX_STRING;
+                        createSign(chunk, portalPos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
 
                         //Eastern
                         portalPos = portalPos.east(3);
@@ -193,13 +162,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         index = Tools.posMod(++index, isleNames.size());
                         name = isleNames.get(index);
                         ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
-                        signPos = portalPos.add(-1, 1, 0);
-                        chunk.setBlockState(signPos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.WEST));
-                        sign = (TileEntitySign) world.getTileEntity(signPos);
-                        sign.signText[0] = XXX_STRING;
-                        sign.signText[1] = new TextComponentString(name + "'s");
-                        sign.signText[2] = HOUSE_STRING;
-                        sign.signText[3] = XXX_STRING;
+                        createSign(chunk, portalPos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
                     }
                 }
             }
@@ -217,13 +180,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         index = Tools.posMod(z, isleNames.size());
                         name = isleNames.get(index);
                         ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
-                        signPos = portalPos.add(-1, 1, 0);
-                        chunk.setBlockState(signPos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.WEST));
-                        sign = (TileEntitySign) world.getTileEntity(signPos);
-                        sign.signText[0] = XXX_STRING;
-                        sign.signText[1] = new TextComponentString(name + "'s");
-                        sign.signText[2] = HOUSE_STRING;
-                        sign.signText[3] = XXX_STRING;
+                        createSign(chunk, portalPos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
 
                         //Western
                         portalPos = portalPos.west(3);
@@ -231,17 +188,18 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         index = Tools.posMod(++index, isleNames.size());
                         name = isleNames.get(index);
                         ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
-                        signPos = portalPos.add(1, 1, 0);
-                        chunk.setBlockState(signPos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.EAST));
-                        sign = (TileEntitySign) world.getTileEntity(signPos);
-                        sign.signText[0] = XXX_STRING;
-                        sign.signText[1] = new TextComponentString(name + "'s");
-                        sign.signText[2] = HOUSE_STRING;
-                        sign.signText[3] = XXX_STRING;
+                        createSign(chunk, portalPos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
                     }
                 }
             }
         }
+    }
+
+    private void createSign(Chunk chunk, BlockPos pos, EnumFacing facing, TextComponentString... text)
+    {
+        chunk.setBlockState(pos, SIGN.withProperty(BlockWallSign.FACING, facing));
+        TileEntitySign sign = (TileEntitySign) world.getTileEntity(pos);
+        System.arraycopy(text, 0, sign.signText, 0, 4);
     }
 
     @Override
