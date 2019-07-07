@@ -148,7 +148,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         //Western
                         BlockPos pos = new BlockPos(xx + (i << 2), 3, zz + z);
                         chunk.setBlockState(pos, PORTAL);
-                        int index = Tools.posMod(15 - (z >> 1), isleNames.size());
+                        int index = Tools.posMod(15 - z, isleNames.size());
                         ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination(isleNames.get(index)));
 
                         //Eastern
@@ -170,7 +170,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         //Eastern
                         BlockPos pos = new BlockPos(xx + (i << 2) + 3, 3, zz + z);
                         chunk.setBlockState(pos, PORTAL);
-                        int index = Tools.posMod(z >> 1, isleNames.size());
+                        int index = Tools.posMod(z, isleNames.size());
                         ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination(isleNames.get(index)));
 
                         //Western
