@@ -8,6 +8,7 @@ import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.DimensionType;
@@ -22,7 +23,6 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -138,26 +138,21 @@ public class Instances
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    public void playerInteract(PlayerInteractEvent event)
+    public void playerInteract(PlayerInteractEvent.RightClickBlock event)
     {
         World world = event.getWorld();
-        if (world.isRemote) return;
-        if (world.provider.getDimensionType() != InstanceTypes.skyroomDimType) return;
-
-        if (((EntityPlayerMP) event.getEntityPlayer()).interactionManager.getGameType() != GameType.ADVENTURE)
+        DimensionType dimType = world.provider.getDimensionType();
+        if (dimType == InstanceTypes.skyroomDimType)
         {
-            //Visitor
-            if (world.getBlockState(event.getPos()).getBlock().getRegistryName().toString().contains("malisisdoors"))
+            GameType gameType = world.isRemote ? Minecraft.getMinecraft().playerController.getCurrentGameType() : ((EntityPlayerMP) event.getEntityPlayer()).interactionManager.getGameType();
+            if (gameType == GameType.ADVENTURE)
             {
-                event.setCanceled(false);
-                event.setResult(Event.Result.ALLOW);
+                //Visitor
+                if (world.getBlockState(event.getPos()).getBlock().getRegistryName().toString().contains("armourers_workshop:tile.skinnable"))
+                {
+                    event.setCanceled(true);
+                }
             }
-        }
-        else
-        {
-            //Owner or OP
-            event.setCanceled(false);
-            event.setResult(Event.Result.ALLOW);
         }
     }
 }

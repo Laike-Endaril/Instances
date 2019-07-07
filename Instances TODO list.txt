@@ -1,8 +1,13 @@
-Library of Worlds lighting
+Add Library of Worlds lighting
+Fix lighting issue in Library of Worlds
 
 
 
-Deny block visitor interaction for items with inventories
+Fix not being able to visit other ppl in Faerun for some reason
+
+
+
+Deny block visitor interaction for items with inventories (test this)
 
 
 
