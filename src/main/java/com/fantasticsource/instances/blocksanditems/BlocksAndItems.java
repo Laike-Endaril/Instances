@@ -19,11 +19,11 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class BlocksAndItems
 {
-    @GameRegistry.ObjectHolder("instances:instancePortal")
+    @GameRegistry.ObjectHolder("instances:instanceportal")
     public static BlockInstancePortal blockInstancePortal;
 
 
-    @GameRegistry.ObjectHolder("instances:instancePortal")
+    @GameRegistry.ObjectHolder("instances:instanceportal")
     public static Item itemInstancePortal;
 
 

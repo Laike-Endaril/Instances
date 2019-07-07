@@ -10,7 +10,7 @@ public class ItemInstancePortal extends ItemBlock
     {
         super(BlocksAndItems.blockInstancePortal);
 
-        setUnlocalizedName(Instances.MODID + ":instancePortal");
-        setRegistryName("instancePortal");
+        setUnlocalizedName(Instances.MODID + ":instanceportal");
+        setRegistryName("instanceportal");
     }
 }

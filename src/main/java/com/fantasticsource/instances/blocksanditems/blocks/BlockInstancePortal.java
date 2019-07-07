@@ -34,8 +34,8 @@ public class BlockInstancePortal extends Block
 
         setCreativeTab(BlocksAndItems.creativeTab);
 
-        setUnlocalizedName(Instances.MODID + ":instancePortal");
-        setRegistryName("instancePortal");
+        setUnlocalizedName(Instances.MODID + ":instanceportal");
+        setRegistryName("instanceportal");
     }
 
 
