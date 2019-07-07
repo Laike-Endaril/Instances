@@ -9,21 +9,27 @@ import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
+import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.020,);required-after:phosphor-lighting@[0.2.2,)", acceptableRemoteVersions = "*")
+//;required-after:phosphor-lighting@[0.2.2,)
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.020a,);required-after:phosphor-lighting@[0.2.2,)")
 public class Instances
 {
     public static final String MODID = "instances";
@@ -129,5 +135,29 @@ public class Instances
 
         if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
         else player.setGameType(GameType.ADVENTURE);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    public void playerInteract(PlayerInteractEvent event)
+    {
+        World world = event.getWorld();
+        if (world.isRemote) return;
+        if (world.provider.getDimensionType() != InstanceTypes.skyroomDimType) return;
+
+        if (((EntityPlayerMP) event.getEntityPlayer()).interactionManager.getGameType() != GameType.ADVENTURE)
+        {
+            //Visitor
+            if (world.getBlockState(event.getPos()).getBlock().getRegistryName().toString().contains("malisisdoors"))
+            {
+                event.setCanceled(false);
+                event.setResult(Event.Result.ALLOW);
+            }
+        }
+        else
+        {
+            //Owner or OP
+            event.setCanceled(false);
+            event.setResult(Event.Result.ALLOW);
+        }
     }
 }

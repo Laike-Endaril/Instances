@@ -102,7 +102,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
             for (int i = 0; i < 4; i++)
             {
                 BlockPos pos;
-                //Signs
+                //Indexing Signs
                 if (haveVisitables)
                 {
                     text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length)]);
