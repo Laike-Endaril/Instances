@@ -1,10 +1,13 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
+import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
+import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -15,11 +18,13 @@ import net.minecraft.world.gen.IChunkGenerator;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 {
     private static final IBlockState
             AIR = Blocks.AIR.getDefaultState(),
+            SIGN = Blocks.WALL_SIGN.getDefaultState(),
             PORTAL = BlocksAndItems.blockInstancePortal.getDefaultState();
 
     protected World world;
@@ -45,7 +50,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
         }
 
 
-        //Clear bookshelves from main hall and generate central portals
+        //Clear bookshelves from main hall
         if (chunkZ == 0)
         {
             for (int x = 0; x < 16; x++)
@@ -66,30 +71,27 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     @Override
     public void populate(int chunkX, int chunkZ)
     {
-        Chunk chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
+        int xx = chunkX << 4, zz = chunkZ << 4;
 
-        //Clear bookshelves from main hall and generate central portals
+
+        UUID visitor = world.playerEntities.get(0).getPersistentID();
+        LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(visitor, new LibraryOfWorldsChunkData());
+
+
+        //Isle Signs (in index order)
         if (chunkZ == 0)
         {
-            BlockPos[] portals = new BlockPos[]{
-                    new BlockPos(7, 3, 3),
-                    new BlockPos(7, 3, 12),
-                    new BlockPos(8, 3, 3),
-                    new BlockPos(8, 3, 12)
-            };
+            int size = chunkData.visitablePlayers.size();
 
-            for (BlockPos pos : portals)
+            for (int i = 0; i < 4; i++)
             {
-                pos = pos.add(chunkX << 4, 0, chunkZ << 4);
-                world.setBlockState(pos, PORTAL, 2);
+                world.setBlockState(new BlockPos(xx + (i << 2), 3, zz + 3), SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
+                world.setBlockState(new BlockPos(xx + (i << 2) + 3, 3, zz + 3), SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
+
+                world.setBlockState(new BlockPos(xx + (i << 2), 3, zz + 12), SIGN);
+                world.setBlockState(new BlockPos(xx + (i << 2) + 3, 3, zz + 12), SIGN);
             }
         }
-
-
-        //Portals
-//        UUID visitor = world.playerEntities.get(0).getPersistentID();
-//        LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(visitor, new LibraryOfWorldsChunkData());
-//        if (chunkX < chunkData.getChunkXMin() || chunkX > chunkData.getChunkXMax() || chunkZ < chunkData.getChunkZMin(chunkX) || chunkZ > chunkData.getChunkZMax(chunkX)) return chunk;
 
 
 //        LinkedHashMap<String, ArrayList<String>> listings = new LinkedHashMap<>();

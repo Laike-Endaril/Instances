@@ -118,7 +118,7 @@ public class CmdVisitors extends CommandBase
                 if (chunkData != null)
                 {
                     chunkData.remove(data.id);
-                    if (chunkData.size() == 0) InstanceHandler.libraryOfWorldsData.remove(data.id);
+                    if (chunkData.visitablePlayers.size() == 0) InstanceHandler.libraryOfWorldsData.remove(data.id);
                 }
             }
             else player.sendMessage(new TextComponentString(getUsage(player)));

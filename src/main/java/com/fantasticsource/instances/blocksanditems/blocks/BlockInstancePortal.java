@@ -30,7 +30,7 @@ public class BlockInstancePortal extends Block
 
         setBlockUnbreakable();
         setResistance(Float.MAX_VALUE);
-        setLightLevel(0.5f);
+        setLightLevel(0.25f);
 
         setCreativeTab(BlocksAndItems.creativeTab);
 
