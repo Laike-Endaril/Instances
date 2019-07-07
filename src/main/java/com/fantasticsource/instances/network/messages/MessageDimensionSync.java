@@ -11,11 +11,11 @@ import java.util.Map;
 
 public class MessageDimensionSync implements IMessage
 {
-    private HashMap<Integer, DimensionType> simpleDimensions;
+    private HashMap<Integer, DimensionType> instances;
 
     public MessageDimensionSync()
     {
-        simpleDimensions = new HashMap<>();
+        instances = new HashMap<>();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class MessageDimensionSync implements IMessage
                 }
             }
 
-            simpleDimensions.put(dimID, dimType);
+            instances.put(dimID, dimType);
         }
     }
 
@@ -55,7 +55,7 @@ public class MessageDimensionSync implements IMessage
     public void toBytes(ByteBuf buf)
     {
         NBTTagCompound tag = new NBTTagCompound();
-        for (Map.Entry<Integer, DimensionType> entry : simpleDimensions.entrySet())
+        for (Map.Entry<Integer, DimensionType> entry : instances.entrySet())
         {
             tag.setString(Integer.toString(entry.getKey()), entry.getValue().getName());
         }
@@ -68,11 +68,11 @@ public class MessageDimensionSync implements IMessage
         {
             type = DimensionType.OVERWORLD;
         }
-        simpleDimensions.put(id, type);
+        instances.put(id, type);
     }
 
     public HashMap<Integer, DimensionType> getDimensions()
     {
-        return simpleDimensions;
+        return instances;
     }
 }

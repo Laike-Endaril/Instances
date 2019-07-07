@@ -9,11 +9,11 @@ import java.util.Map;
 
 public class ClientHandler
 {
-    private static HashSet<Integer> simpleDimensions = new HashSet<>();
+    private static HashSet<Integer> instances = new HashSet<>();
 
     public static void cleanUp()
     {
-        for (Integer i : simpleDimensions)
+        for (Integer i : instances)
         {
             if (DimensionManager.isDimensionRegistered(i)) DimensionManager.unregisterDimension(i);
         }
@@ -23,8 +23,8 @@ public class ClientHandler
     {
         cleanUp();
 
-        simpleDimensions = new HashSet<>();
-        simpleDimensions.addAll(dimensions.keySet());
+        instances = new HashSet<>();
+        instances.addAll(dimensions.keySet());
 
         for (Map.Entry<Integer, DimensionType> entry : dimensions.entrySet())
         {
