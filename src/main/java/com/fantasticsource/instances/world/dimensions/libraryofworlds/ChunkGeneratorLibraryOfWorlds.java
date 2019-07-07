@@ -103,6 +103,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                 world.setBlockState(pos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
                 if (haveVisitables)
                 {
+                    text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length)]);
                     sign = (TileEntitySign) world.getTileEntity(pos);
                     sign.signText[0] = XXX_STRING;
                     sign.signText[1] = text;
@@ -122,6 +123,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                 world.setBlockState(pos, SIGN);
                 if (haveVisitables)
                 {
+                    text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1) + 1, indexLetters.length)]);
                     sign = (TileEntitySign) world.getTileEntity(pos);
                     sign.signText[0] = XXX_STRING;
                     sign.signText[1] = text;
