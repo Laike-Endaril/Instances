@@ -57,9 +57,27 @@ public class TEInstancePortal extends TileEntity
 
     public static class Destination
     {
+        //Option 1; coords
         public int dimension;
         public double x, y, z;
         public float yaw, pitch;
+
+        //Option 2; player name (personal instance)
+        public String ownerName = null;
+
+        //Option 3; escape portal
+        public boolean escape = false;
+
+
+        public Destination()
+        {
+            escape = true;
+        }
+
+        public Destination(String ownerName)
+        {
+            this.ownerName = ownerName;
+        }
 
         public Destination(int dimension, double x, double y, double z, float yaw, float pitch)
         {

@@ -48,6 +48,12 @@ public class CmdTPD extends CommandBase
     public static boolean tpd(Entity entity, TEInstancePortal.Destination destination)
     {
         //TODO change yaw and pitch to destination.yaw and destination.pitch and figure out the spinny camera bug it causes in dedicated mode (angle desync?)
+
+        if (destination.ownerName != null)
+        {
+            return Commands.joinPossiblyCreating(entity, destination.ownerName);
+        }
+
         return tpd(entity, destination.dimension, destination.x, destination.y, destination.z, entity.rotationYaw, entity.rotationPitch);
     }
 

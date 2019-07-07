@@ -1,6 +1,7 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
+import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.tools.Tools;
@@ -75,17 +76,19 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     public void populate(int chunkX, int chunkZ)
     {
         int xx = chunkX << 4, zz = chunkZ << 4;
+        Chunk chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
 
 
         UUID visitor = world.playerEntities.get(0).getPersistentID();
         LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(visitor, new LibraryOfWorldsChunkData());
         Object[] indexLetters = chunkData.visitablePlayers.getColumn(0);
 
+        boolean haveVisitables = indexLetters.length > 0;
+
 
         //Isle Signs (in index order) and personal portals
         if (chunkZ == 0)
         {
-            boolean doText = indexLetters.length > 0;
             TextComponentString text = null;
 
             for (int i = 0; i < 4; i++)
@@ -93,33 +96,90 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                 //Signs
                 BlockPos pos = new BlockPos(xx + (i << 2), 3, zz + 3);
                 world.setBlockState(pos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
-                if (doText)
+                if (haveVisitables)
                 {
                     text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length)]);
                     ((TileEntitySign) world.getTileEntity(pos)).signText[1] = text;
                 }
                 pos = pos.east(3);
                 world.setBlockState(pos, SIGN.withProperty(BlockWallSign.FACING, EnumFacing.SOUTH));
-                if (doText) ((TileEntitySign) world.getTileEntity(pos)).signText[1] = text;
+                if (haveVisitables) ((TileEntitySign) world.getTileEntity(pos)).signText[1] = text;
 
                 pos = pos.south(9);
                 world.setBlockState(pos, SIGN);
-                if (doText)
+                if (haveVisitables)
                 {
                     text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1) + 1, indexLetters.length)]);
                     ((TileEntitySign) world.getTileEntity(pos)).signText[1] = text;
                 }
                 pos = pos.west(3);
                 world.setBlockState(pos, SIGN);
-                if (doText) ((TileEntitySign) world.getTileEntity(pos)).signText[1] = text;
+                if (haveVisitables) ((TileEntitySign) world.getTileEntity(pos)).signText[1] = text;
 
 
                 //Personal portals
-                world.setBlockState(new BlockPos(xx + (i << 2), 3, zz + 1), PORTAL);
-                world.setBlockState(new BlockPos(xx + (i << 2) + 3, 3, zz + 1), PORTAL);
+                pos = new BlockPos(xx + (i << 2), 3, zz + 1);
+                chunk.setBlockState(pos, PORTAL);
+                pos = pos.east(3);
+                chunk.setBlockState(pos, PORTAL);
+                ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination());
 
-                world.setBlockState(new BlockPos(xx + (i << 2), 3, zz + 14), PORTAL);
-                world.setBlockState(new BlockPos(xx + (i << 2) + 3, 3, zz + 14), PORTAL);
+                pos = pos.south(13);
+                chunk.setBlockState(pos, PORTAL);
+                pos = pos.west(3);
+                chunk.setBlockState(pos, PORTAL);
+                ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination());
+            }
+        }
+        else if (haveVisitables)
+        {
+            //Visitable portals
+
+            ArrayList<String> isleNames;
+
+            if (chunkZ < 0)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    isleNames = (ArrayList<String>) chunkData.visitablePlayers.get(1, Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length));
+
+                    for (int z = 15; z > 1; z -= 2)
+                    {
+                        //Western
+                        BlockPos pos = new BlockPos(xx + (i << 2), 3, zz + z);
+                        chunk.setBlockState(pos, PORTAL);
+                        int index = Tools.posMod(15 - (z >> 1), isleNames.size());
+                        ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination(isleNames.get(index)));
+
+                        //Eastern
+                        pos = pos.east(3);
+                        chunk.setBlockState(pos, PORTAL);
+                        index = Tools.posMod(++index, isleNames.size());
+                        ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination(isleNames.get(index)));
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    isleNames = (ArrayList<String>) chunkData.visitablePlayers.get(1, Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length));
+
+                    for (int z = 0; z < 14; z += 2)
+                    {
+                        //Eastern
+                        BlockPos pos = new BlockPos(xx + (i << 2) + 3, 3, zz + z);
+                        chunk.setBlockState(pos, PORTAL);
+                        int index = Tools.posMod(z >> 1, isleNames.size());
+                        ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination(isleNames.get(index)));
+
+                        //Western
+                        pos = pos.west(3);
+                        chunk.setBlockState(pos, PORTAL);
+                        index = Tools.posMod(++index, isleNames.size());
+                        ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination(isleNames.get(index)));
+                    }
+                }
             }
         }
 

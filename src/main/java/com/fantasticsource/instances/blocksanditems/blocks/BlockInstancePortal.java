@@ -56,7 +56,7 @@ public class BlockInstancePortal extends Block
                 {
                     if (playerIn.world.provider.getDimensionType() == InstanceTypes.skyroomDimType)
                     {
-                        CmdEscape.escape(playerIn);
+                        Commands.gotoHub((EntityPlayerMP) playerIn);
                     }
                     else
                     {
@@ -65,7 +65,9 @@ public class BlockInstancePortal extends Block
                 }
                 else if (portal.destinations.size() == 1)
                 {
-                    CmdTPD.tpd(playerIn, portal.destinations.get(0));
+                    TEInstancePortal.Destination destination = portal.destinations.get(0);
+                    if (destination.escape) CmdEscape.escape(playerIn);
+                    else CmdTPD.tpd(playerIn, destination);
                 }
                 else
                 {
