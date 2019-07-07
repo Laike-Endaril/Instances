@@ -1,10 +1,3 @@
-Hub portal to where you came from
-Hub portal to your personal instance
-
-Hub portals to any other instances you have permission to visit
-
-
-
 Library of Worlds lighting
 
 
