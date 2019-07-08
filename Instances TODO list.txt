@@ -1,9 +1,12 @@
-Fix lighting bugs on dedicated...
-...apparently they're NOT completely fixed yet, although there are far fewer of them
+If LightFixer causes performance issues in the overworld, filter it based on dim type
 
 
 
 Add Library of Worlds lighting
+
+
+
+Fix render lighting
 
 
 
