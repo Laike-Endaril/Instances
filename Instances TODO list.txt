@@ -1,3 +1,8 @@
+Fix lighting bugs on dedicated...
+...apparently they're NOT completely fixed yet, although there are far fewer of them
+
+
+
 Add Library of Worlds lighting
 
 
