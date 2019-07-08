@@ -6,6 +6,7 @@ import com.fantasticsource.instances.commands.*;
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
+import com.fantasticsource.instances.world.LightFixer;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.client.Minecraft;
@@ -28,8 +29,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
-//;required-after:phosphor-lighting@[0.2.2,)
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,);required-after:phosphor-lighting@[0.2.2,)")
+//;required-after:phosphor-lighting@[0.2.4,)
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,);required-after:phosphor-lighting@[0.2.4,)")
 public class Instances
 {
     public static final String MODID = "instances";
@@ -78,6 +79,7 @@ public class Instances
     public void preInit(FMLPreInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(LightFixer.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
 
 
