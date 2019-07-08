@@ -3,7 +3,7 @@ package com.fantasticsource.instances.blocksanditems.blocks;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.blocksanditems.tileentities.TEVisitorPortal;
-import com.fantasticsource.instances.commands.Commands;
+import com.fantasticsource.instances.server.Teleport;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -47,7 +47,7 @@ public class BlockVisitorPortal extends Block
                 TileEntity te = worldIn.getTileEntity(pos);
                 if (!(te instanceof TEVisitorPortal)) return false;
 
-                Commands.joinPossiblyCreating(player, ((TEVisitorPortal) te).ownername);
+                Teleport.joinPossiblyCreating(player, ((TEVisitorPortal) te).ownername);
             }
         }
 

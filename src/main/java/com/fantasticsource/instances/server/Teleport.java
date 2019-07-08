@@ -1,0 +1,479 @@
+package com.fantasticsource.instances.server;
+
+import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.blocksanditems.tileentities.TEInstancePortal;
+import com.fantasticsource.instances.commands.CmdTPD;
+import com.fantasticsource.instances.commands.TeleporterSimple;
+import com.fantasticsource.instances.world.InstanceHandler;
+import com.fantasticsource.instances.world.InstanceWorldInfo;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
+import com.fantasticsource.mctools.PlayerData;
+import com.fantasticsource.tools.datastructures.Pair;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.command.NumberInvalidException;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.network.play.server.SPacketPlayerPosLook;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.GameType;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+
+import java.lang.reflect.Method;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+public class Teleport
+{
+    private static Method copyDataFromOld;
+
+    static
+    {
+        try
+        {
+            copyDataFromOld = Entity.class.getDeclaredMethod((Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment") ? "copyDataFromOld" : "func_180432_n", Entity.class);
+            copyDataFromOld.setAccessible(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean gotoHub(EntityPlayerMP player)
+    {
+        //If we're already in the hub, just teleport locally
+        if (player.world.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
+        {
+            return Teleport.teleport(player, player.world.provider.getDimension(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
+        }
+
+        //Try finding an existing hub for said player
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
+        {
+            InstanceWorldInfo info = entry.getValue();
+            if (info.getDimensionType() == InstanceTypes.libraryOfWorldsDimType && info.getWorldName().equals((player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.name()).replace(" ", "_")))
+            {
+                return Teleport.teleport(player, entry.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
+            }
+        }
+
+        //Not found
+        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createDimension(player, InstanceTypes.libraryOfWorldsDimType, null, player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.name());
+        return Teleport.teleport(player, pair.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
+    }
+
+    public static void escape(Entity entity)
+    {
+        DimensionType type = entity.world.provider.getDimensionType();
+        if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.libraryOfWorldsDimType) return;
+
+        Set<String> strings = entity.getTags();
+        for (String s : strings.toArray(new String[0]))
+        {
+            if (s.contains("instances.lastgoodpos"))
+            {
+                String[] tokens = s.replace("instances.lastgoodpos", "").split(",");
+                Teleport.teleport(entity, Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), entity.rotationYaw, entity.rotationPitch);
+                break;
+            }
+        }
+    }
+
+    public static boolean joinPossiblyCreating(EntityPlayerMP player)
+    {
+        return joinPossiblyCreating(player, player.getName());
+    }
+
+    public static boolean joinPossiblyCreating(Entity entity, String ownername)
+    {
+        UUID id = PlayerData.getID(ownername);
+        if (id == null) return false;
+
+        //Try finding any instance owned by the player
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
+        {
+            if (id.equals(entry.getValue().getOwner()))
+            {
+                return Teleport.teleport(entity, entry.getKey(), 0, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
+            }
+        }
+
+        //Not found
+        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createDimension(entity, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
+        return Teleport.teleport(entity, pair.getKey(), 0, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
+    }
+
+    public static boolean teleport(Entity entity, TEInstancePortal.Destination destination)
+    {
+        //TODO change yaw and pitch to destination.yaw and destination.pitch and figure out the spinny camera bug it causes in dedicated mode (angle desync?)
+
+        return teleport(entity, destination.dimension, destination.x, destination.y, destination.z, entity.rotationYaw, entity.rotationPitch);
+    }
+
+    public static boolean teleport(Entity entity, int dimension, double x, double y, double z, float yaw, float pitch)
+    {
+        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        return teleport(null, server, server, entity, new String[]{"" + dimension, "" + x, "" + y, "" + z, "" + yaw, "" + pitch});
+    }
+
+    public static boolean teleport(CmdTPD command, MinecraftServer server, ICommandSender sender, Entity entity, String[] args)
+    {
+        if (entity == null)
+        {
+            if (sender instanceof Entity) entity = (Entity) sender;
+            else
+            {
+                sender.sendMessage(new TextComponentString("Tried to teleport non-entity sender: " + sender.getClass().getSimpleName()));
+                return false;
+            }
+        }
+
+
+        DimensionType dimType = entity.world.provider.getDimensionType();
+        if (dimType != InstanceTypes.skyroomDimType && dimType != InstanceTypes.libraryOfWorldsDimType)
+        {
+            Set<String> strings = entity.getTags();
+            for (String s : strings.toArray(new String[0]))
+            {
+                if (s.contains("instances.lastgoodpos"))
+                {
+                    strings.remove(s);
+                    break;
+                }
+            }
+            BlockPos pos = entity.getPosition();
+            strings.add("instances.lastgoodpos" + entity.dimension + "," + pos.getX() + "," + pos.getY() + "," + pos.getZ());
+        }
+
+
+        if (sender == null) sender = server;
+
+        if (args.length < 1)
+        {
+            sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.tpd.usage"));
+            return false;
+        }
+
+        byte b0 = 2;
+
+        boolean dimensionThere = false;
+        int dimensionID = 0;
+        try
+        {
+            dimensionID = Integer.parseInt(args[0]);
+            dimensionThere = true;
+        }
+        catch (NumberFormatException exception)
+        {
+            for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
+            {
+                if (entry.getValue().getWorldName().equals(args[0]))
+                {
+                    dimensionID = entry.getKey();
+                    dimensionThere = true;
+                }
+            }
+        }
+
+        if (dimensionThere)
+        {
+            if (args.length == 1)
+            {
+                if (entity instanceof EntityPlayerMP)
+                {
+                    EntityPlayerMP player = (EntityPlayerMP) entity;
+
+                    if (player.dimension != dimensionID)
+                    {
+                        return teleportEntityToDimension(server, sender, player, dimensionID) != null;
+                    }
+
+                    return false; //Same dimension and no coords; do nothing
+                }
+            }
+
+            if (args.length == 5 || args.length == 7)
+            {
+                try
+                {
+                    entity = CommandBase.getEntity(server, sender, args[1]);
+                }
+                catch (CommandException e)
+                {
+                    sender.sendMessage(new TextComponentString("Could not find entity \"" + args[1]));
+                    return false;
+                }
+                b0 = 2;
+            }
+            else
+            {
+                if (!(entity instanceof EntityPlayerMP))
+                {
+                    sender.sendMessage(new TextComponentString("Entity is not a player: " + entity.getName()));
+                    return false;
+                }
+                b0 = 1;
+            }
+        }
+        else
+        {
+            if (args.length == 1)
+            {
+                if (!(entity instanceof EntityPlayerMP))
+                {
+                    sender.sendMessage(new TextComponentString("Entity is not a player: " + entity.getName()));
+                    return false;
+                }
+            }
+            else if (args.length == 2)
+            {
+                try
+                {
+                    entity = CommandBase.getEntity(server, entity, args[0]);
+                }
+                catch (CommandException e)
+                {
+                    sender.sendMessage(new TextComponentString("Could not find entity \"" + args[0]));
+                    return false;
+                }
+            }
+        }
+
+        if (args.length != 1 && args.length != 2)
+        {
+            if (args.length < b0 + 3 || !dimensionThere)
+            {
+                sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.tpd.usage"));
+                return false;
+            }
+
+            int i = b0 + 1;
+            CommandBase.CoordinateArg coordinatearg, coordinatearg1, coordinatearg2, coordinatearg3, coordinatearg4;
+            try
+            {
+                coordinatearg = CommandBase.parseCoordinate(entity.posX, args[b0], true);
+                coordinatearg1 = CommandBase.parseCoordinate(entity.posY, args[i++], 0, 0, false);
+                coordinatearg2 = CommandBase.parseCoordinate(entity.posZ, args[i++], true);
+                coordinatearg3 = CommandBase.parseCoordinate(entity.rotationYaw, args.length > i ? args[i++] : "~", false);
+                coordinatearg4 = CommandBase.parseCoordinate(entity.rotationPitch, args.length > i ? args[i] : "~", false);
+            }
+            catch (NumberInvalidException e)
+            {
+                sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.tpd.usage"));
+                return false;
+            }
+
+            if (entity.dimension != dimensionID)
+            {
+                entity = teleportEntityToDimension(server, sender, entity, dimensionID);
+                if (entity == null) return false;
+            }
+
+            float f;
+            if (entity instanceof EntityPlayerMP)
+            {
+                EnumSet enumset = EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class);
+
+                if (coordinatearg.isRelative())
+                {
+                    enumset.add(SPacketPlayerPosLook.EnumFlags.X);
+                }
+
+                if (coordinatearg1.isRelative())
+                {
+                    enumset.add(SPacketPlayerPosLook.EnumFlags.Y);
+                }
+
+                if (coordinatearg2.isRelative())
+                {
+                    enumset.add(SPacketPlayerPosLook.EnumFlags.Z);
+                }
+
+                if (coordinatearg4.isRelative())
+                {
+                    enumset.add(SPacketPlayerPosLook.EnumFlags.X_ROT);
+                }
+
+                if (coordinatearg3.isRelative())
+                {
+                    enumset.add(SPacketPlayerPosLook.EnumFlags.Y_ROT);
+                }
+
+                f = (float) coordinatearg3.getAmount();
+
+                if (!coordinatearg3.isRelative())
+                {
+                    f = MathHelper.wrapDegrees(f);
+                }
+
+                float f1 = (float) coordinatearg4.getAmount();
+
+                if (!coordinatearg4.isRelative())
+                {
+                    f1 = MathHelper.wrapDegrees(f1);
+                }
+
+                if (f1 > 90 || f1 < -90)
+                {
+                    f1 = MathHelper.wrapDegrees(180 - f1);
+                    f = MathHelper.wrapDegrees(f + 180);
+                }
+
+                entity.dismountRidingEntity();
+                ((EntityPlayerMP) entity).connection.setPlayerLocation(coordinatearg.getAmount(), coordinatearg1.getAmount(), coordinatearg2.getAmount(), f, f1, enumset);
+                entity.setRotationYawHead(f);
+            }
+            else
+            {
+                float f2 = (float) MathHelper.wrapDegrees(coordinatearg3.getResult());
+                f = (float) MathHelper.wrapDegrees(coordinatearg4.getResult());
+
+                if (f > 90 || f < -90)
+                {
+                    f = MathHelper.wrapDegrees(180 - f);
+                    f2 = MathHelper.wrapDegrees(f2 + 180);
+                }
+
+                entity.setLocationAndAngles(coordinatearg.getResult(), coordinatearg1.getResult(), coordinatearg2.getResult(), f2, f);
+                entity.setRotationYawHead(f2);
+
+                entity.world.updateEntityWithOptionalForce(entity, false);
+            }
+
+            if (command != null) CommandBase.notifyCommandListener(sender, command, "commands.tp.success.coordinates", entity.getName(), coordinatearg.getResult(), coordinatearg1.getResult(), coordinatearg2.getResult());
+            return true;
+        }
+        else
+        {
+            Entity entity2;
+            try
+            {
+                entity2 = CommandBase.getEntity(server, entity, args[args.length - 1]);
+            }
+            catch (CommandException e)
+            {
+                sender.sendMessage(new TextComponentString("Could not find entity \"" + args[args.length - 1]));
+                return false;
+            }
+
+            if (entity2.world != entity.world)
+            {
+                if (entity2.dimension != entity.dimension)
+                {
+                    entity = teleportEntityToDimension(server, sender, entity, entity2.dimension);
+                    if (entity == null) return false;
+                }
+            }
+
+            entity.dismountRidingEntity();
+
+            if (entity instanceof EntityPlayerMP)
+            {
+                ((EntityPlayerMP) entity).connection.setPlayerLocation(entity2.posX, entity2.posY, entity2.posZ, entity2.rotationYaw, entity2.rotationPitch);
+            }
+            else
+            {
+                entity.setLocationAndAngles(entity2.posX, entity2.posY, entity2.posZ, entity2.rotationYaw, entity2.rotationPitch);
+            }
+
+            if (command != null) CommandBase.notifyCommandListener(sender, command, "commands.tp.success", entity.getName(), entity2.getName());
+            return true;
+        }
+    }
+
+    private static Entity teleportEntityToDimension(MinecraftServer server, ICommandSender sender, Entity entity, int dimension)
+    {
+        World world = server.getWorld(dimension);
+
+        if (world == null)
+        {
+            if (sender != null) sender.sendMessage(new TextComponentString("Couldn't find dimension " + dimension));
+            return null;
+        }
+
+        if (entity instanceof EntityPlayerMP)
+        {
+            EntityPlayerMP player = (EntityPlayerMP) entity;
+            int oldDim = player.dimension;
+
+            server.getPlayerList().transferPlayerToDimension(player, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
+
+
+            //After successful cross-dimensional player teleportation
+            InstanceWorldInfo info = InstanceHandler.get(dimension);
+            if (info != null)
+            {
+                if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
+                else player.setGameType(GameType.ADVENTURE);
+            }
+            else player.setGameType(DimensionManager.getWorld(dimension).getWorldInfo().getGameType());
+
+            InstanceWorldInfo oldInfo = InstanceHandler.get(oldDim);
+            if (oldInfo != null && oldInfo.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
+            {
+                InstanceHandler.deleteDimension(server, oldDim);
+            }
+
+
+            return player;
+        }
+        else
+        {
+            return travelEntity(server, entity, dimension);
+        }
+    }
+
+    private static Entity travelEntity(MinecraftServer server, Entity entity, int dimensionId)
+    {
+        if (!entity.world.isRemote && !entity.isDead)
+        {
+            entity.world.profiler.startSection("changeDimension");
+            int j = entity.dimension;
+            WorldServer worldserver = server.getWorld(j);
+            WorldServer worldserver1 = server.getWorld(dimensionId);
+            entity.dimension = dimensionId;
+
+            Entity newEntity = EntityList.createEntityByIDFromName(EntityList.getKey(entity.getClass()), worldserver1);
+
+            if (newEntity != null)
+            {
+                try
+                {
+                    copyDataFromOld.invoke(newEntity, entity);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                entity.world.removeEntity(entity);
+
+                newEntity.forceSpawn = true;
+
+                worldserver1.spawnEntity(newEntity);
+            }
+
+            worldserver1.updateEntityWithOptionalForce(newEntity, true);
+
+            worldserver.resetUpdateEntityTick();
+            worldserver1.resetUpdateEntityTick();
+            entity.world.profiler.endSection();
+            return newEntity;
+        }
+
+        return entity;
+    }
+}

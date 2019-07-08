@@ -2,14 +2,12 @@ package com.fantasticsource.instances.commands;
 
 import com.fantasticsource.instances.network.PacketHandler;
 import com.fantasticsource.instances.network.messages.MessageOpenGui;
+import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
-import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
-import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -34,53 +32,6 @@ public class Commands extends CommandBase
         }
 
         return strings;
-    }
-
-    public static boolean gotoHub(EntityPlayerMP player)
-    {
-        //If we're already in the hub, just teleport locally
-        if (player.world.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
-        {
-            return CmdTPD.tpd(player, player.world.provider.getDimension(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
-        }
-
-        //Try finding an existing hub for said player
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
-        {
-            InstanceWorldInfo info = entry.getValue();
-            if (info.getDimensionType() == InstanceTypes.libraryOfWorldsDimType && info.getWorldName().equals((player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.name()).replace(" ", "_")))
-            {
-                return CmdTPD.tpd(player, entry.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
-            }
-        }
-
-        //Not found
-        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createDimension(player, InstanceTypes.libraryOfWorldsDimType, null, player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.name());
-        return CmdTPD.tpd(player, pair.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
-    }
-
-    public static boolean joinPossiblyCreating(EntityPlayerMP player)
-    {
-        return joinPossiblyCreating(player, player.getName());
-    }
-
-    public static boolean joinPossiblyCreating(Entity entity, String ownername)
-    {
-        UUID id = PlayerData.getID(ownername);
-        if (id == null) return false;
-
-        //Try finding any instance owned by the player
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
-        {
-            if (id.equals(entry.getValue().getOwner()))
-            {
-                return CmdTPD.tpd(entity, entry.getKey(), 0, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
-            }
-        }
-
-        //Not found
-        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createDimension(entity, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
-        return CmdTPD.tpd(entity, pair.getKey(), 0, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
     }
 
     @Override
@@ -113,7 +64,7 @@ public class Commands extends CommandBase
         switch (args[0])
         {
             case "hub":
-                if (sender instanceof EntityPlayerMP) gotoHub((EntityPlayerMP) sender);
+                if (sender instanceof EntityPlayerMP) Teleport.gotoHub((EntityPlayerMP) sender);
                 break;
 
             case "personal":
@@ -121,14 +72,14 @@ public class Commands extends CommandBase
                 {
                     if (args.length == 1)
                     {
-                        if (!joinPossiblyCreating((EntityPlayerMP) sender))
+                        if (!Teleport.joinPossiblyCreating((EntityPlayerMP) sender))
                         {
                             sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
                         }
                     }
                     else if (args.length == 2)
                     {
-                        if (!joinPossiblyCreating((EntityPlayerMP) sender, args[1]))
+                        if (!Teleport.joinPossiblyCreating((EntityPlayerMP) sender, args[1]))
                         {
                             sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
                         }

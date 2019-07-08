@@ -2,7 +2,7 @@ package com.fantasticsource.instances.blocksanditems.blocks;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
-import com.fantasticsource.instances.commands.Commands;
+import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -42,8 +42,8 @@ public class BlockPersonalPortal extends Block
             }
             else
             {
-                if (worldIn.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType) Commands.joinPossiblyCreating((EntityPlayerMP) player);
-                else Commands.gotoHub((EntityPlayerMP) player);
+                if (worldIn.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType) Teleport.joinPossiblyCreating((EntityPlayerMP) player);
+                else Teleport.gotoHub((EntityPlayerMP) player);
             }
         }
 

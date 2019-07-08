@@ -2,7 +2,7 @@ package com.fantasticsource.instances.blocksanditems.blocks;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
-import com.fantasticsource.instances.commands.CmdEscape;
+import com.fantasticsource.instances.server.Teleport;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -40,7 +40,7 @@ public class BlockReturnPortal extends Block
             }
             else
             {
-                CmdEscape.escape(player);
+                Teleport.escape(player);
             }
         }
 
