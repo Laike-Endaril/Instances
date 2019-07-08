@@ -163,7 +163,8 @@ public class LightFixer
             if (DEBUG) System.out.println("Fixing chunk " + chunk.x + ", " + chunk.z);
             int x1 = chunk.x << 4, z1 = chunk.z << 4, x2 = x1 + 15, z2 = z1 + 15;
 
-            HashSet<BlockPos> positions = new HashSet<>(100);
+            HashSet<BlockPos> blockUpdates = new HashSet<>(700);
+            HashSet<BlockPos> renderUpdates = new HashSet<>(100);
             BlockPos pos;
             for (int x = x1; x <= x2; x++)
             {
@@ -175,19 +176,22 @@ public class LightFixer
                         if (world.getBlockState(pos).getLightValue() > 0)
                         {
                             if (DEBUGLIGHTS) System.out.println("Updating light at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
-                            positions.add(pos);
-                            positions.add(pos.up());
-                            positions.add(pos.down());
-                            positions.add(pos.north());
-                            positions.add(pos.south());
-                            positions.add(pos.west());
-                            positions.add(pos.east());
+                            blockUpdates.add(pos);
+                            renderUpdates.add(pos);
+
+                            blockUpdates.add(pos.up());
+                            blockUpdates.add(pos.down());
+                            blockUpdates.add(pos.north());
+                            blockUpdates.add(pos.south());
+                            blockUpdates.add(pos.west());
+                            blockUpdates.add(pos.east());
                         }
                     }
                 }
             }
 
-            for (BlockPos pos1 : positions) world.checkLightFor(EnumSkyBlock.BLOCK, pos1);
+            for (BlockPos pos1 : blockUpdates) world.checkLightFor(EnumSkyBlock.BLOCK, pos1);
+            for (BlockPos pos1 : renderUpdates) world.markBlockRangeForRenderUpdate(pos1, pos1);
         });
     }
 }

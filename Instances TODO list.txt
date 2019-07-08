@@ -1,12 +1,8 @@
-If LightFixer causes performance issues in the overworld, filter it based on dim type
+** If LightFixer causes performance issues in the overworld, filter it based on dim type
 
 
 
 Add Library of Worlds lighting
-
-
-
-Fix render lighting
 
 
 
@@ -15,7 +11,9 @@ Fix terrain not loading on Faerun until you relog...
 
 
 
-Fix not being able to visit other ppl in Faerun for some reason
+Fix not being able to visit other ppl in Faerun for some reason...
+...on all dedicated?
+...on single player?
 
 
 
