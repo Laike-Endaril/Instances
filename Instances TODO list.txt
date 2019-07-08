@@ -1,9 +1,14 @@
 Add Library of Worlds lighting
-Fix lighting issue in Library of Worlds
 
 
 
-Fix terrain not loading on Faerun until you relog
+Fix lighting issue in Library of Worlds...
+...still broken even with phosphor loading correctly
+
+
+
+Fix terrain not loading on Faerun until you relog...
+...doesn't happen if you're already in an instance when you log in
 
 
 
