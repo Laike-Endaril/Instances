@@ -1,7 +1,7 @@
 package com.fantasticsource.instances.commands;
 
 import com.fantasticsource.instances.Instances;
-import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
+import com.fantasticsource.instances.blocksanditems.tileentities.TEInstancePortal;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
@@ -48,11 +48,6 @@ public class CmdTPD extends CommandBase
     public static boolean tpd(Entity entity, TEInstancePortal.Destination destination)
     {
         //TODO change yaw and pitch to destination.yaw and destination.pitch and figure out the spinny camera bug it causes in dedicated mode (angle desync?)
-
-        if (destination.ownerName != null)
-        {
-            return Commands.joinPossiblyCreating(entity, destination.ownerName);
-        }
 
         return tpd(entity, destination.dimension, destination.x, destination.y, destination.z, entity.rotationYaw, entity.rotationPitch);
     }

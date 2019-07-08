@@ -1,7 +1,7 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
-import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
+import com.fantasticsource.instances.blocksanditems.tileentities.TEVisitorPortal;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.tools.Tools;
@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -30,7 +31,9 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     private static final IBlockState
             AIR = Blocks.AIR.getDefaultState(),
             SIGN = Blocks.WALL_SIGN.getDefaultState(),
-            PORTAL = BlocksAndItems.blockInstancePortal.getDefaultState();
+            PERSONAL_PORTAL = BlocksAndItems.blockPersonalPortal.getDefaultState(),
+            RETURN_PORTAL = BlocksAndItems.blockReturnPortal.getDefaultState(),
+            VISITOR_PORTAL = BlocksAndItems.blockVisitorPortal.getDefaultState();
 
     private static final TextComponentString
             HOUSE_STRING = new TextComponentString("House"),
@@ -120,22 +123,20 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                 }
 
 
-                //Personal portals
+                //Personal portals and return portals
                 text = new TextComponentString(player.getName() + "'s");
                 pos = new BlockPos(xx + (i << 2), 3, zz + 1);
-                chunk.setBlockState(pos, PORTAL);
+                chunk.setBlockState(pos, PERSONAL_PORTAL);
                 createSign(chunk, pos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, text, HOUSE_STRING, XXX_STRING);
                 pos = pos.east(3);
-                chunk.setBlockState(pos, PORTAL);
-                ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination());
+                chunk.setBlockState(pos, RETURN_PORTAL);
                 createSign(chunk, pos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, BLANK_STRING, ESCAPE_STRING, XXX_STRING);
 
                 pos = pos.south(13);
-                chunk.setBlockState(pos, PORTAL);
+                chunk.setBlockState(pos, PERSONAL_PORTAL);
                 createSign(chunk, pos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, text, HOUSE_STRING, XXX_STRING);
                 pos = pos.west(3);
-                chunk.setBlockState(pos, PORTAL);
-                ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination());
+                chunk.setBlockState(pos, RETURN_PORTAL);
                 createSign(chunk, pos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, BLANK_STRING, ESCAPE_STRING, XXX_STRING);
             }
         }
@@ -147,6 +148,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
             String name;
             int index;
             BlockPos portalPos;
+            TileEntity te;
 
             if (chunkZ < 0)
             {
@@ -158,18 +160,20 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                     {
                         //Western
                         portalPos = new BlockPos(xx + (i << 2), 3, zz + z);
-                        chunk.setBlockState(portalPos, PORTAL);
+                        chunk.setBlockState(portalPos, VISITOR_PORTAL);
                         index = Tools.posMod(15 - z, isleNames.size());
                         name = isleNames.get(index);
-                        ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
+                        te = world.getTileEntity(portalPos);
+                        if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
                         createSign(chunk, portalPos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
 
                         //Eastern
                         portalPos = portalPos.east(3);
-                        chunk.setBlockState(portalPos, PORTAL);
+                        chunk.setBlockState(portalPos, VISITOR_PORTAL);
                         index = Tools.posMod(++index, isleNames.size());
                         name = isleNames.get(index);
-                        ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
+                        te = world.getTileEntity(portalPos);
+                        if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
                         createSign(chunk, portalPos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
                     }
                 }
@@ -184,18 +188,20 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                     {
                         //Eastern
                         portalPos = new BlockPos(xx + (i << 2) + 3, 3, zz + z);
-                        chunk.setBlockState(portalPos, PORTAL);
+                        chunk.setBlockState(portalPos, VISITOR_PORTAL);
                         index = Tools.posMod(z, isleNames.size());
                         name = isleNames.get(index);
-                        ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
+                        te = world.getTileEntity(portalPos);
+                        if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
                         createSign(chunk, portalPos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
 
                         //Western
                         portalPos = portalPos.west(3);
-                        chunk.setBlockState(portalPos, PORTAL);
+                        chunk.setBlockState(portalPos, VISITOR_PORTAL);
                         index = Tools.posMod(++index, isleNames.size());
                         name = isleNames.get(index);
-                        ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
+                        te = world.getTileEntity(portalPos);
+                        if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
                         createSign(chunk, portalPos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
                     }
                 }

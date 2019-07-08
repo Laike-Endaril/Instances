@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.world;
+package com.fantasticsource.instances.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;

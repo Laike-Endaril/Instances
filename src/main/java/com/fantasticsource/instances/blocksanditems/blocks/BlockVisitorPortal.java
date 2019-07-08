@@ -2,8 +2,8 @@ package com.fantasticsource.instances.blocksanditems.blocks;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
-import com.fantasticsource.instances.blocksanditems.tileentities.TEInstancePortal;
-import com.fantasticsource.instances.commands.CmdTPD;
+import com.fantasticsource.instances.blocksanditems.tileentities.TEVisitorPortal;
+import com.fantasticsource.instances.commands.Commands;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -17,9 +17,9 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class BlockInstancePortal extends Block
+public class BlockVisitorPortal extends Block
 {
-    public BlockInstancePortal()
+    public BlockVisitorPortal()
     {
         super(Material.ROCK);
         setSoundType(SoundType.STONE);
@@ -29,36 +29,25 @@ public class BlockInstancePortal extends Block
 
         setCreativeTab(BlocksAndItems.creativeTab);
 
-        setUnlocalizedName(Instances.MODID + ":instanceportal");
-        setRegistryName("instanceportal");
+        setUnlocalizedName(Instances.MODID + ":visitorportal");
+        setRegistryName("visitorportal");
     }
 
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
         if (!worldIn.isRemote)
         {
-            TileEntity te = worldIn.getTileEntity(pos);
-            if (!(te instanceof TEInstancePortal)) return false;
-
-            TEInstancePortal portal = (TEInstancePortal) te;
-            if (playerIn.isSneaking())
+            if (player.isSneaking())
             {
             }
             else
             {
-                if (portal.destinations.size() == 0)
-                {
-                }
-                else if (portal.destinations.size() == 1)
-                {
-                    CmdTPD.tpd(playerIn, portal.destinations.get(0));
-                }
-                else
-                {
-                    System.out.println("Behavior for more than one destination is not yet implemented (" + pos + ")");
-                }
+                TileEntity te = worldIn.getTileEntity(pos);
+                if (!(te instanceof TEVisitorPortal)) return false;
+
+                Commands.joinPossiblyCreating(player, ((TEVisitorPortal) te).ownername);
             }
         }
 
@@ -75,6 +64,6 @@ public class BlockInstancePortal extends Block
     @Override
     public TileEntity createTileEntity(World world, IBlockState state)
     {
-        return new TEInstancePortal();
+        return new TEVisitorPortal();
     }
 }

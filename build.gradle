@@ -50,6 +50,14 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+
+    rename '(instances_at.cfg)', 'META-INF/$1'
+}
+
+jar {
+    manifest {
+        attributes 'FMLAT': 'dynamicstealth_at.cfg'
+    }
 }
 
 task deobfJar(type: Jar) {
