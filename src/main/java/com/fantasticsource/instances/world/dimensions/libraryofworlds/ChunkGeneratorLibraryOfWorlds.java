@@ -3,7 +3,6 @@ package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.blocksanditems.tileentity.TEInstancePortal;
 import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.instances.world.LightFixer;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.block.BlockWallSign;
@@ -85,6 +84,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     {
         int xx = chunkX << 4, zz = chunkZ << 4;
         Chunk chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
+        int dimension = world.provider.getDimension();
 
 
         EntityPlayer player = world.playerEntities.get(0);
@@ -124,21 +124,17 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                 text = new TextComponentString(player.getName() + "'s");
                 pos = new BlockPos(xx + (i << 2), 3, zz + 1);
                 chunk.setBlockState(pos, PORTAL);
-                LightFixer.queue(world, pos);
                 createSign(chunk, pos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, text, HOUSE_STRING, XXX_STRING);
                 pos = pos.east(3);
                 chunk.setBlockState(pos, PORTAL);
-                LightFixer.queue(world, pos);
                 ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination());
                 createSign(chunk, pos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, BLANK_STRING, ESCAPE_STRING, XXX_STRING);
 
                 pos = pos.south(13);
                 chunk.setBlockState(pos, PORTAL);
-                LightFixer.queue(world, pos);
                 createSign(chunk, pos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, text, HOUSE_STRING, XXX_STRING);
                 pos = pos.west(3);
                 chunk.setBlockState(pos, PORTAL);
-                LightFixer.queue(world, pos);
                 ((TEInstancePortal) world.getTileEntity(pos)).destinations.add(new TEInstancePortal.Destination());
                 createSign(chunk, pos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, BLANK_STRING, ESCAPE_STRING, XXX_STRING);
             }
@@ -163,7 +159,6 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         //Western
                         portalPos = new BlockPos(xx + (i << 2), 3, zz + z);
                         chunk.setBlockState(portalPos, PORTAL);
-                        LightFixer.queue(world, portalPos);
                         index = Tools.posMod(15 - z, isleNames.size());
                         name = isleNames.get(index);
                         ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
@@ -172,7 +167,6 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         //Eastern
                         portalPos = portalPos.east(3);
                         chunk.setBlockState(portalPos, PORTAL);
-                        LightFixer.queue(world, portalPos);
                         index = Tools.posMod(++index, isleNames.size());
                         name = isleNames.get(index);
                         ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
@@ -191,7 +185,6 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         //Eastern
                         portalPos = new BlockPos(xx + (i << 2) + 3, 3, zz + z);
                         chunk.setBlockState(portalPos, PORTAL);
-                        LightFixer.queue(world, portalPos);
                         index = Tools.posMod(z, isleNames.size());
                         name = isleNames.get(index);
                         ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));
@@ -200,7 +193,6 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         //Western
                         portalPos = portalPos.west(3);
                         chunk.setBlockState(portalPos, PORTAL);
-                        LightFixer.queue(world, portalPos);
                         index = Tools.posMod(++index, isleNames.size());
                         name = isleNames.get(index);
                         ((TEInstancePortal) world.getTileEntity(portalPos)).destinations.add(new TEInstancePortal.Destination(name));

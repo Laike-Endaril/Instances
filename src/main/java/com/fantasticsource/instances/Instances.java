@@ -29,8 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
-//;required-after:phosphor-lighting@[0.2.4,)
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,);required-after:phosphor-lighting@[0.2.4,)")
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,)")
 public class Instances
 {
     public static final String MODID = "instances";
@@ -143,6 +142,7 @@ public class Instances
     public void playerInteract(PlayerInteractEvent.RightClickBlock event)
     {
         World world = event.getWorld();
+
         DimensionType dimType = world.provider.getDimensionType();
         if (dimType == InstanceTypes.skyroomDimType)
         {
