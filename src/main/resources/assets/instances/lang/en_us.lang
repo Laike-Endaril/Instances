@@ -1,3 +1,10 @@
+itemGroup.instances=Instances
+
+tile.instances:personalportal.name=Personal Portal
+tile.instances:returnportal.name=Return Portal
+tile.instances:visitorportal.name=Visitor Portal
+tile.instances:instanceportal.name=Portal
+
 instances.newInstance=New Instance
 instances.create=Create New Instance
 instances.moreInstanceOptions=More Instance Options...
