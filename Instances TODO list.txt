@@ -9,8 +9,25 @@ Add Library of Worlds lighting
 
 
 
+Fix dimension type desync on dimension deletion...
+...ensuring sync of just the dimension we're travelling to when teleporting should be sufficient, WHICH WOULD ALSO FIX THE ISSUE BELOW
+...but I already tried this once and failed.  Maybe if I can delay the dimension load client-side until the dimension type is registered...
+
+
+
 Fix terrain not loading on Faerun until you relog...
 ...doesn't happen if you're already in an instance when you log in
+
+...this seems to happen when generating a dimension and then immediately sending the player there
+...the player is sent to the dim before the client has been sent the info for it
+...it doesn't happen if you were already there, because I have code to sync it early on at login
+
+...another way of handling this is probably just to make sure the dimension is created sooner
+...create personal dims upon login if they don't exist
+...create just one library that everyone goes to, and change how the portals work per-player?
+
+...ensuring sync of just the dimension we're travelling to when teleporting should be sufficient, WHICH WOULD ALSO FIX THE ISSUE ABOVE...
+...but I already tried this once and failed.  Maybe if I can delay the dimension load client-side until the dimension type is registered...
 
 
 
