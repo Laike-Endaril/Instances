@@ -1,7 +1,8 @@
 ** If necessary, more efficient Library of Worlds terrain gen...or rather...terrain copying?
 ** Check LightFixer performance; it runs near each player, no matter the dimension.  Impact factor is probably roughly <player count> * <light count> (lights near the given player)
+** Check if inventory sync on teleport is fixed or not
 
-** Check interaction protection on live!!!
+** Check interaction protection!!!
 
 
 
@@ -28,10 +29,6 @@ Fix terrain not loading on Faerun until you relog...
 
 ...ensuring sync of just the dimension we're travelling to when teleporting should be sufficient, WHICH WOULD ALSO FIX THE ISSUE ABOVE...
 ...but I already tried this once and failed.  Maybe if I can delay the dimension load client-side until the dimension type is registered...
-
-
-
-Try possible inventory desync fix using a packet to force an inventory update
 
 
 
