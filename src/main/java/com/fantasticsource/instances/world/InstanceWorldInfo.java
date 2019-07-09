@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.world;
 
+import com.fantasticsource.instances.Instances;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
@@ -7,7 +8,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.world.DimensionType;
-import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.WorldInfo;
@@ -93,8 +93,7 @@ public class InstanceWorldInfo extends WorldInfo
 
                 for (EntityPlayer player : world.playerEntities)
                 {
-                    if (player.getPersistentID().equals(id)) player.setGameType(GameType.SURVIVAL);
-                    else player.setGameType(GameType.ADVENTURE);
+                    Instances.setPlayerMode((EntityPlayerMP) player, this);
                 }
             }
         }

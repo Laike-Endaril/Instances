@@ -37,32 +37,24 @@ public class BlockInstancePortal extends Block
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-        if (!worldIn.isRemote)
-        {
-            TileEntity te = worldIn.getTileEntity(pos);
-            if (!(te instanceof TEInstancePortal)) return false;
+        if (worldIn.isRemote) return false;
 
-            TEInstancePortal portal = (TEInstancePortal) te;
-            if (playerIn.isSneaking())
-            {
-            }
-            else
-            {
-                if (portal.destinations.size() == 0)
-                {
-                }
-                else if (portal.destinations.size() == 1)
-                {
-                    Teleport.teleport(playerIn, portal.destinations.get(0));
-                }
-                else
-                {
-                    System.out.println("Behavior for more than one destination is not yet implemented (" + pos + ")");
-                }
-            }
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (!(te instanceof TEInstancePortal)) return false;
+
+        TEInstancePortal portal = (TEInstancePortal) te;
+        if (playerIn.isSneaking()) return false;
+
+        if (portal.destinations.size() == 1) return Teleport.teleport(playerIn, portal.destinations.get(0));
+
+        if (portal.destinations.size() == 0)
+        {
+            System.out.println("Behavior for no destination is not yet implemented (" + pos + ")");
+            return false;
         }
 
-        return true;
+        System.out.println("Behavior for more than one destination is not yet implemented (" + pos + ")");
+        return false;
     }
 
     @Override

@@ -35,18 +35,11 @@ public class BlockPersonalPortal extends Block
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-        if (!worldIn.isRemote)
-        {
-            if (player.isSneaking())
-            {
-            }
-            else
-            {
-                if (worldIn.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType) Teleport.joinPossiblyCreating((EntityPlayerMP) player);
-                else Teleport.gotoHub((EntityPlayerMP) player);
-            }
-        }
+        if (worldIn.isRemote) return false;
 
-        return true;
+        if (player.isSneaking()) return false;
+
+        if (worldIn.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType) return Teleport.joinPossiblyCreating((EntityPlayerMP) player);
+        return Teleport.gotoHub((EntityPlayerMP) player);
     }
 }

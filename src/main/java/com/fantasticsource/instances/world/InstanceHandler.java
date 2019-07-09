@@ -114,7 +114,7 @@ public class InstanceHandler extends WorldSavedData
         int dimensionID = Instances.nextFreeDimID();
 
         WorldInfo tempInfo = DimensionManager.getWorld(0).getWorldInfo();
-        InstanceWorldInfo worldInfo = new InstanceWorldInfo(new WorldSettings(new Random().nextLong(), GameType.SURVIVAL, true, false, tempInfo.getTerrainType()), name, type);
+        InstanceWorldInfo worldInfo = new InstanceWorldInfo(new WorldSettings(new Random().nextLong(), GameType.CREATIVE, true, false, tempInfo.getTerrainType()), name, type);
         worldInfo.setOwner(owner);
 
         instanceInfo.put(dimensionID, worldInfo);

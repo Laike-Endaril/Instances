@@ -7,6 +7,7 @@ import com.fantasticsource.instances.commands.TeleporterSimple;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.CommandBase;
@@ -26,7 +27,6 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.lang.reflect.Method;
@@ -75,10 +75,10 @@ public class Teleport
         return Teleport.teleport(player, pair.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
     }
 
-    public static void escape(Entity entity)
+    public static boolean escape(Entity entity)
     {
         DimensionType type = entity.world.provider.getDimensionType();
-        if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.libraryOfWorldsDimType) return;
+        if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.libraryOfWorldsDimType) return false;
 
         Set<String> strings = entity.getTags();
         for (String s : strings.toArray(new String[0]))
@@ -86,10 +86,11 @@ public class Teleport
             if (s.contains("instances.lastgoodpos"))
             {
                 String[] tokens = s.replace("instances.lastgoodpos", "").split(",");
-                Teleport.teleport(entity, Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), entity.rotationYaw, entity.rotationPitch);
-                break;
+                return Teleport.teleport(entity, Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), entity.rotationYaw, entity.rotationPitch);
             }
         }
+
+        return false;
     }
 
     public static boolean joinPossiblyCreating(EntityPlayerMP player)
@@ -409,18 +410,25 @@ public class Teleport
             EntityPlayerMP player = (EntityPlayerMP) entity;
             int oldDim = player.dimension;
 
-            server.getPlayerList().transferPlayerToDimension(player, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
+            if (MCTools.isOP(player))
+            {
+                GameType gameType = player.interactionManager.getGameType();
+
+                server.getPlayerList().transferPlayerToDimension(player, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
+
+                //Preserve gamemode of OP players
+                player.setGameType(gameType);
+            }
+            else
+            {
+                server.getPlayerList().transferPlayerToDimension(player, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
+
+                //Set gamemode of non-OP players
+                Instances.setPlayerMode(player, InstanceHandler.get(dimension));
+            }
 
 
             //After successful cross-dimensional player teleportation
-            InstanceWorldInfo info = InstanceHandler.get(dimension);
-            if (info != null)
-            {
-                if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
-                else player.setGameType(GameType.ADVENTURE);
-            }
-            else player.setGameType(DimensionManager.getWorld(dimension).getWorldInfo().getGameType());
-
             InstanceWorldInfo oldInfo = InstanceHandler.get(oldDim);
             if (oldInfo != null && oldInfo.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
             {

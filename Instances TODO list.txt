@@ -1,4 +1,5 @@
-** If LightFixer causes performance issues in the overworld, filter it based on dim type
+** Check LightFixer performance; it runs near each player, no matter the dimension.  Impact factor is probably roughly <player count> * <light count> (lights near the given player)
+** Check interaction protection
 
 
 
@@ -6,22 +7,12 @@ Add Library of Worlds lighting
 
 
 
+Add damage protection
+
+
+
 Fix terrain not loading on Faerun until you relog...
 ...doesn't happen if you're already in an instance when you log in
-
-
-
-Fix not being able to visit other ppl in Faerun for some reason...
-...on all dedicated?
-...on single player?
-
-
-
-Deny block visitor interaction for items with inventories (test this)
-
-
-
-Preserve creative mode for OPs
 
 
 

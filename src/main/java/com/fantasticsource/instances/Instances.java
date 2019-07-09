@@ -9,8 +9,8 @@ import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
+import com.fantasticsource.mctools.MCTools;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
@@ -76,6 +76,17 @@ public class Instances
         return null;
     }
 
+    public static void setPlayerMode(EntityPlayerMP player, InstanceWorldInfo info)
+    {
+        if (info == null) return;
+
+        //Preserve gamemode for OP players
+        if (MCTools.isOP(player)) return;
+
+        if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
+        else player.setGameType(GameType.ADVENTURE);
+    }
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
@@ -136,13 +147,8 @@ public class Instances
     @SubscribeEvent
     public void playerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
-        EntityPlayer player = event.player;
-
-        InstanceWorldInfo info = InstanceHandler.get(player.world.provider.getDimension());
-        if (info == null) return;
-
-        if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
-        else player.setGameType(GameType.ADVENTURE);
+        EntityPlayerMP player = (EntityPlayerMP) event.player;
+        setPlayerMode(player, InstanceHandler.get(player.world.provider.getDimension()));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)

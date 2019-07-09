@@ -2,6 +2,7 @@ package com.fantasticsource.instances.world.dimensions.skyroom;
 
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -17,6 +18,12 @@ import java.util.List;
 
 public class ChunkGeneratorSkyroom implements IChunkGenerator
 {
+    private static final IBlockState
+            PORTAL = BlocksAndItems.blockPersonalPortal.getDefaultState(),
+            BARRIER = Blocks.BARRIER.getDefaultState(),
+            BEDROCK = Blocks.BEDROCK.getDefaultState(),
+            FLOOR = Blocks.GRASS.getDefaultState();
+
     protected World world;
     private ChunkPrimer chunkPrimer = new ChunkPrimer();
 
@@ -48,9 +55,9 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
             {
                 for (int z = 0; z < 16; z++)
                 {
-                    chunk.setBlockState(new BlockPos(x, bottom, z), Blocks.BEDROCK.getDefaultState());
-                    chunk.setBlockState(new BlockPos(x, bottom + 1, z), Blocks.GRASS.getDefaultState());
-                    chunk.setBlockState(new BlockPos(x, top, z), Blocks.BARRIER.getDefaultState());
+                    chunk.setBlockState(new BlockPos(x, bottom, z), BEDROCK);
+                    chunk.setBlockState(new BlockPos(x, bottom + 1, z), FLOOR);
+                    chunk.setBlockState(new BlockPos(x, top, z), BARRIER);
                 }
             }
 
@@ -62,7 +69,7 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
                 {
                     for (int z = 0; z < 16; z++)
                     {
-                        chunk.setBlockState(new BlockPos(0, y, z), Blocks.BARRIER.getDefaultState());
+                        chunk.setBlockState(new BlockPos(0, y, z), BARRIER);
                     }
                 }
             }
@@ -72,7 +79,7 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
                 {
                     for (int z = 0; z < 16; z++)
                     {
-                        chunk.setBlockState(new BlockPos(15, y, z), Blocks.BARRIER.getDefaultState());
+                        chunk.setBlockState(new BlockPos(15, y, z), BARRIER);
                     }
                 }
             }
@@ -82,7 +89,7 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
                 {
                     for (int x = 0; x < 16; x++)
                     {
-                        chunk.setBlockState(new BlockPos(x, y, 0), Blocks.BARRIER.getDefaultState());
+                        chunk.setBlockState(new BlockPos(x, y, 0), BARRIER);
                     }
                 }
             }
@@ -92,7 +99,7 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
                 {
                     for (int x = 0; x < 16; x++)
                     {
-                        chunk.setBlockState(new BlockPos(x, y, 15), Blocks.BARRIER.getDefaultState());
+                        chunk.setBlockState(new BlockPos(x, y, 15), BARRIER);
                     }
                 }
             }
@@ -103,15 +110,15 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
             {
                 if (chunkX == -1)
                 {
-                    chunk.setBlockState(new BlockPos(15, bottom + 2, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
-                    chunk.setBlockState(new BlockPos(15, bottom + 3, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
-                    chunk.setBlockState(new BlockPos(15, bottom + 4, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
+                    chunk.setBlockState(new BlockPos(15, bottom + 2, 1), PORTAL);
+                    chunk.setBlockState(new BlockPos(15, bottom + 3, 1), PORTAL);
+                    chunk.setBlockState(new BlockPos(15, bottom + 4, 1), PORTAL);
                 }
                 else
                 {
-                    chunk.setBlockState(new BlockPos(0, bottom + 2, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
-                    chunk.setBlockState(new BlockPos(0, bottom + 3, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
-                    chunk.setBlockState(new BlockPos(0, bottom + 4, 1), BlocksAndItems.blockInstancePortal.getDefaultState());
+                    chunk.setBlockState(new BlockPos(0, bottom + 2, 1), PORTAL);
+                    chunk.setBlockState(new BlockPos(0, bottom + 3, 1), PORTAL);
+                    chunk.setBlockState(new BlockPos(0, bottom + 4, 1), PORTAL);
                 }
             }
         }
