@@ -6,10 +6,6 @@
 
 
 
-Move personal instances to their own directory via WorldProvider.getSaveFolder()
-
-
-
 Rethink library
 
 
