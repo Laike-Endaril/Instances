@@ -82,10 +82,15 @@ public class Instances
 
     public static void setPlayerMode(EntityPlayerMP player, InstanceWorldInfo info)
     {
-        if (info == null) return;
-
         //Preserve gamemode for OP players
         if (MCTools.isOP(player)) return;
+
+        if (info == null)
+        {
+            //Not an instance dimension; use the dimension gametype
+            player.setGameType(player.world.getWorldInfo().getGameType());
+            return;
+        }
 
         if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
         else player.setGameType(GameType.ADVENTURE);
