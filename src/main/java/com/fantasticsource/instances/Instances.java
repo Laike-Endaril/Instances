@@ -5,18 +5,22 @@ import com.fantasticsource.instances.client.ClientHandler;
 import com.fantasticsource.instances.client.LightFixer;
 import com.fantasticsource.instances.commands.*;
 import com.fantasticsource.instances.network.PacketHandler;
+import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.MCTools;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -167,6 +171,46 @@ public class Instances
                 {
                     event.setCanceled(true);
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void entityDamagePre(LivingHurtEvent event)
+    {
+        Entity entity = event.getEntity();
+        DimensionType dimType = event.getEntity().world.provider.getDimensionType();
+        if (dimType == InstanceTypes.libraryOfWorldsDimType || dimType == InstanceTypes.skyroomDimType)
+        {
+            //Cancel damage
+            event.setAmount(0);
+            event.setCanceled(true);
+
+            //Teleport out of the void if need be
+            if (entity.posY < 0 && entity instanceof EntityPlayer)
+            {
+                if (dimType == InstanceTypes.libraryOfWorldsDimType) Teleport.gotoHub((EntityPlayerMP) entity);
+                else Teleport.joinPossiblyCreating((EntityPlayerMP) entity);
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void entityDamagePost(LivingHurtEvent event)
+    {
+        Entity entity = event.getEntity();
+        DimensionType dimType = event.getEntity().world.provider.getDimensionType();
+        if (dimType == InstanceTypes.libraryOfWorldsDimType || dimType == InstanceTypes.skyroomDimType)
+        {
+            //Cancel damage
+            event.setAmount(0);
+            event.setCanceled(true);
+
+            //Teleport out of the void if need be
+            if (entity.posY < 0 && entity instanceof EntityPlayer)
+            {
+                if (dimType == InstanceTypes.libraryOfWorldsDimType) Teleport.gotoHub((EntityPlayerMP) entity);
+                else Teleport.joinPossiblyCreating((EntityPlayerMP) entity);
             }
         }
     }
