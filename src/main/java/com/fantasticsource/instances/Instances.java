@@ -69,11 +69,13 @@ public class Instances
         {
             boolean found = false;
             for (int i2 : ints)
+            {
                 if (i2 == i)
                 {
                     found = true;
                     break;
                 }
+            }
             if (!found) return i;
         }
 

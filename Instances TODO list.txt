@@ -31,7 +31,6 @@ Fix terrain not loading on Faerun until you relog...
 
 
 
-Fix exp desync when teleporting back to overworld
 Try possible inventory desync fix using a packet to force an inventory update
 
 
