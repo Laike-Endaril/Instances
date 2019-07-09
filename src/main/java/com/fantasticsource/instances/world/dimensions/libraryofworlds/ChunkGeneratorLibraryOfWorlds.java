@@ -142,6 +142,8 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
         }
         else if (haveVisitables)
         {
+            //Isles; not the main hall
+
             //Visitable portals
 
             ArrayList<String> isleNames;
@@ -156,7 +158,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                 {
                     isleNames = (ArrayList<String>) chunkData.visitablePlayers.get(1, Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length));
 
-                    for (int z = 15; z > 1; z -= 2)
+                    for (int z = 15; z >= 0; z -= 2)
                     {
                         //Western
                         portalPos = new BlockPos(xx + (i << 2), 3, zz + z);
@@ -184,7 +186,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                 {
                     isleNames = (ArrayList<String>) chunkData.visitablePlayers.get(1, Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length));
 
-                    for (int z = 0; z < 14; z += 2)
+                    for (int z = 0; z < 16; z += 2)
                     {
                         //Eastern
                         portalPos = new BlockPos(xx + (i << 2) + 3, 3, zz + z);
