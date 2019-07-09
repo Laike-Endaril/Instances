@@ -120,7 +120,7 @@ public class InstanceHandler extends WorldSavedData
         instanceInfo.put(dimensionID, worldInfo);
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
 
-        sender.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
+        if (sender != null) sender.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
 
         return new Pair<>(dimensionID, worldInfo);
     }

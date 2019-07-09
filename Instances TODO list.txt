@@ -1,11 +1,7 @@
 ** If necessary, more efficient Library of Worlds terrain gen...or rather...terrain copying?
 ** Check LightFixer performance; it runs near each player, no matter the dimension.  Impact factor is probably roughly <player count> * <light count> (lights near the given player)
 
-** Check interaction protection!!!
-
-
-
-Remove messages when using portals
+** Check interaction protection on live!!!
 
 
 
