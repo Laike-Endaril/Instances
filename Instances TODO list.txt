@@ -10,10 +10,6 @@ Move personal instances to their own directory via WorldProvider.getSaveFolder()
 
 
 
-Try fixing personal dim desync by generating upon login if it doesn't exist
-
-
-
 Rethink library
 
 

@@ -35,6 +35,8 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.util.UUID;
+
 @Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,)")
 public class Instances
 {
@@ -160,6 +162,19 @@ public class Instances
     {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         setPlayerMode(player, InstanceHandler.get(player.world.provider.getDimension()));
+
+        boolean found = false;
+        UUID playerID = player.getPersistentID();
+        for (InstanceWorldInfo info : InstanceHandler.instanceInfo.values())
+        {
+            if (playerID.equals(info.getOwner()))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) InstanceHandler.createDimension(null, InstanceTypes.skyroomDimType, playerID, player.getName() + "'s " + InstanceTypes.skyroomDimType.name());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
