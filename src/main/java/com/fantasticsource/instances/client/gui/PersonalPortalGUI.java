@@ -1,8 +1,8 @@
-package com.fantasticsource.instances.client;
+package com.fantasticsource.instances.client.gui;
 
-import com.fantasticsource.instances.client.gui.GUIScreen;
 import com.fantasticsource.instances.client.gui.guielements.VerticalScrollbar;
 import com.fantasticsource.instances.client.gui.guielements.rect.*;
+import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.tools.datastructures.Color;
 
 import java.util.ArrayList;
@@ -34,13 +34,11 @@ public class PersonalPortalGUI extends GUIScreen
 
             //Left
             ArrayList<GUIRectElement> subElements = new ArrayList<>();
-            //TODO enable this and see how it goes beyond the boundary of its container...need to clip that somehow
-//            subElements.add(new GradientRect(0, 0, 0.5, 1.5, new Color(0xFFFFFFFF), new Color(0xFF), new Color(0xFFFFFFFF), new Color(0xFF)));
-//            subElements.add(new GradientRect(0.1, 0, 0.3, 1.5, new Color(0xFFFFFFFF), new Color(0xFF), new Color(0xFFFFFFFF), new Color(0xFF)));
-            int i = 0;
+
+            System.out.println(InstanceHandler.visitablePlayersData.size());
             for (double y = 0.01; y < 1.5; y += 0.1)
             {
-                subElements.add(new GUITextRect(1d / 60, y, 17d / 60, "Test " + i++, WHITE_3, TEAL, WHITE_4));
+                subElements.add(new GUITextRect(1d / 60, y, 17d / 60, "Test", WHITE_3, TEAL, WHITE_4));
             }
 
             GUIRectElement element = new GradientBorder(0, 0, 19d / 60, 1, 1d / 15, WHITE, BLANK);

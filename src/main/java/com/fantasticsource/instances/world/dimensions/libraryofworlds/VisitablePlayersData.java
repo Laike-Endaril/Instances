@@ -6,11 +6,11 @@ import com.fantasticsource.tools.datastructures.SortableTable;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class LibraryOfWorldsChunkData
+public class VisitablePlayersData
 {
     public SortableTable visitablePlayers = new SortableTable(Character.class, ArrayList.class);
 
-    public LibraryOfWorldsChunkData()
+    public VisitablePlayersData()
     {
         visitablePlayers.startSorting(0);
     }

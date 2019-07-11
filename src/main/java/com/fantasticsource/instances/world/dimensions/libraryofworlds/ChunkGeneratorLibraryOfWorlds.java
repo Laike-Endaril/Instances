@@ -92,7 +92,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 
         EntityPlayer player = world.playerEntities.get(0);
         UUID id = player.getPersistentID();
-        LibraryOfWorldsChunkData chunkData = InstanceHandler.libraryOfWorldsData.getOrDefault(id, new LibraryOfWorldsChunkData());
+        VisitablePlayersData chunkData = InstanceHandler.visitablePlayersData.getOrDefault(id, new VisitablePlayersData());
         Object[] indexLetters = chunkData.visitablePlayers.getColumn(0);
 
         boolean haveVisitables = indexLetters.length > 0;
