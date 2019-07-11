@@ -3,8 +3,12 @@ package com.fantasticsource.instances.client.gui;
 import com.fantasticsource.instances.client.gui.guielements.GUIElement;
 import com.fantasticsource.instances.client.gui.guielements.VerticalScrollbar;
 import com.fantasticsource.instances.client.gui.guielements.rect.*;
+import com.fantasticsource.instances.network.Network;
+import com.fantasticsource.instances.world.InstanceHandler;
+import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.tools.datastructures.Color;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -15,7 +19,8 @@ public class PersonalPortalGUI extends GUIScreen
     private static final double
             SEPARATION_POINT = 58d / 60,
             H_PADDING = 1d / 60,
-            V_PADDING = 0.01;
+            V_PADDING = 0.01,
+            V_PADDING_2 = 0.05;
 
     private static final Color
             BLANK = new Color(0),
@@ -29,6 +34,7 @@ public class PersonalPortalGUI extends GUIScreen
 
     public static PersonalPortalGUI personalPortalGUI = new PersonalPortalGUI();
     public static String[] names;
+    public static boolean isInInstance;
 
     static
     {
@@ -44,14 +50,7 @@ public class PersonalPortalGUI extends GUIScreen
             if (element instanceof GUITextRect)
             {
                 Minecraft.getMinecraft().player.closeScreen();
-                switch (element.toString())
-                {
-                    case "Go Home":
-                        System.out.println("Home");
-                        break;
-                    default:
-                        System.out.println("Visit");
-                }
+                Network.WRAPPER.sendToServer(new Network.PersonalPortalPacket(element.toString().replace("Visit ", "")));
             }
         }
     }
@@ -67,11 +66,22 @@ public class PersonalPortalGUI extends GUIScreen
         //Single scrollview for now
         ArrayList<GUIRectElement> subElements = new ArrayList<>();
 
-        double y = V_PADDING;
-        subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Go Home", TEAL, TEAL_2, WHITE_3));
+        double y = V_PADDING - V_PADDING_2;
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        InstanceWorldInfo info = InstanceHandler.instanceInfo.get(player.dimension);
+        if (info != null)
+        {
+            y += V_PADDING_2;
+            subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Leave Instance", TEAL, TEAL_2, WHITE_3));
+        }
+        if (info == null || !player.getPersistentID().equals(info.getOwner()))
+        {
+            y += V_PADDING_2;
+            subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Go Home", TEAL, TEAL_2, WHITE_3));
+        }
         for (String name : names)
         {
-            y += 0.05;
+            y += V_PADDING_2;
             subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Visit " + name, TEAL, TEAL_2, WHITE_3));
         }
         subElements.add(new GradientRect(this, 0, 0, SEPARATION_POINT, y + V_PADDING, BLANK, BLANK, BLANK, BLANK));
