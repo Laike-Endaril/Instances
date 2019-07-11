@@ -5,6 +5,7 @@ import com.fantasticsource.instances.blocksanditems.tileentities.TEVisitorPortal
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.tools.Tools;
+import com.fantasticsource.tools.datastructures.SortableTable;
 import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
@@ -87,7 +88,6 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     {
         int xx = chunkX << 4, zz = chunkZ << 4;
         Chunk chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
-        int dimension = world.provider.getDimension();
 
 
         EntityPlayer player = world.playerEntities.get(0);
@@ -146,7 +146,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 
             //Visitable portals
 
-            ArrayList<String> isleNames;
+            SortableTable isleNames;
             String name;
             int index;
             BlockPos portalPos;
@@ -156,7 +156,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    isleNames = (ArrayList<String>) chunkData.visitablePlayers.get(1, Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length));
+                    isleNames = (SortableTable) chunkData.visitablePlayers.get(1, Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length));
 
                     for (int z = 15; z >= 0; z -= 2)
                     {
@@ -164,7 +164,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         portalPos = new BlockPos(xx + (i << 2), 3, zz + z);
                         chunk.setBlockState(portalPos, VISITOR_PORTAL);
                         index = Tools.posMod(15 - z, isleNames.size());
-                        name = isleNames.get(index);
+                        name = (String) isleNames.get(0, index);
                         te = world.getTileEntity(portalPos);
                         if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
                         createSign(chunk, portalPos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
@@ -173,7 +173,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         portalPos = portalPos.east(3);
                         chunk.setBlockState(portalPos, VISITOR_PORTAL);
                         index = Tools.posMod(++index, isleNames.size());
-                        name = isleNames.get(index);
+                        name = (String) isleNames.get(0, index);
                         te = world.getTileEntity(portalPos);
                         if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
                         createSign(chunk, portalPos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
@@ -184,7 +184,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    isleNames = (ArrayList<String>) chunkData.visitablePlayers.get(1, Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length));
+                    isleNames = (SortableTable) chunkData.visitablePlayers.get(1, Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length));
 
                     for (int z = 0; z < 16; z += 2)
                     {
@@ -192,7 +192,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         portalPos = new BlockPos(xx + (i << 2) + 3, 3, zz + z);
                         chunk.setBlockState(portalPos, VISITOR_PORTAL);
                         index = Tools.posMod(z, isleNames.size());
-                        name = isleNames.get(index);
+                        name = (String) isleNames.get(0, index);
                         te = world.getTileEntity(portalPos);
                         if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
                         createSign(chunk, portalPos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
@@ -201,7 +201,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                         portalPos = portalPos.west(3);
                         chunk.setBlockState(portalPos, VISITOR_PORTAL);
                         index = Tools.posMod(++index, isleNames.size());
-                        name = isleNames.get(index);
+                        name = (String) isleNames.get(0, index);
                         te = world.getTileEntity(portalPos);
                         if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
                         createSign(chunk, portalPos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);

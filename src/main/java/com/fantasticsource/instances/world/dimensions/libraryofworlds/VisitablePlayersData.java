@@ -3,12 +3,11 @@ package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.datastructures.SortableTable;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class VisitablePlayersData
 {
-    public SortableTable visitablePlayers = new SortableTable(Character.class, ArrayList.class);
+    public SortableTable visitablePlayers = new SortableTable(Character.class, SortableTable.class);
 
     public VisitablePlayersData()
     {
@@ -20,13 +19,14 @@ public class VisitablePlayersData
         String name = PlayerData.getName(id);
         char c = name.charAt(0);
 
-        ArrayList<String> list = (ArrayList<String>) visitablePlayers.get(0, c, 1);
-        if (list == null)
+        SortableTable table = (SortableTable) visitablePlayers.get(0, c, 1);
+        if (table == null)
         {
-            list = new ArrayList<>();
-            visitablePlayers.add(c, list);
+            table = new SortableTable(String.class);
+            table.startSorting(0);
+            visitablePlayers.add(c, table);
         }
-        list.add(name);
+        table.add(name);
     }
 
     public void remove(UUID id)
@@ -34,10 +34,10 @@ public class VisitablePlayersData
         String name = PlayerData.getName(id);
         char c = name.charAt(0);
 
-        ArrayList<String> list = (ArrayList<String>) visitablePlayers.get(0, c, 1);
-        if (list == null) return;
+        SortableTable table = (SortableTable) visitablePlayers.get(0, c, 1);
+        if (table == null) return;
 
-        list.remove(name);
-        if (list.size() == 0) visitablePlayers.delete(c, 0);
+        table.delete(name, 0);
+        if (table.size() == 0) visitablePlayers.delete(c, 0);
     }
 }

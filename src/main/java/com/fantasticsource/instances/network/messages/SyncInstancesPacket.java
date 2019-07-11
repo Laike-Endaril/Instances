@@ -9,11 +9,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MessageDimensionSync implements IMessage
+public class SyncInstancesPacket implements IMessage
 {
     private HashMap<Integer, DimensionType> instances;
 
-    public MessageDimensionSync()
+    public SyncInstancesPacket()
     {
         instances = new HashMap<>();
     }

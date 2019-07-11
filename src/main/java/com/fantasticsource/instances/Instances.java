@@ -4,7 +4,7 @@ import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.client.ClientHandler;
 import com.fantasticsource.instances.client.LightFixer;
 import com.fantasticsource.instances.commands.*;
-import com.fantasticsource.instances.network.PacketHandler;
+import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
@@ -123,7 +123,7 @@ public class Instances
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        PacketHandler.init();
+        Network.init();
     }
 
     @EventHandler
@@ -148,7 +148,7 @@ public class Instances
     @SubscribeEvent
     public void clientConnect(FMLNetworkEvent.ServerConnectionFromClientEvent event)
     {
-        event.getManager().sendPacket(PacketHandler.INSTANCE.getPacketFrom(InstanceHandler.constructSyncMessage()));
+        event.getManager().sendPacket(Network.WRAPPER.getPacketFrom(InstanceHandler.constructSyncMessage()));
     }
 
     @SubscribeEvent

@@ -2,7 +2,7 @@ package com.fantasticsource.instances.world;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.commands.TeleporterSimple;
-import com.fantasticsource.instances.network.messages.MessageDimensionSync;
+import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
@@ -249,7 +249,7 @@ public class InstanceHandler extends WorldSavedData
 
     public static IMessage constructSyncMessage()
     {
-        MessageDimensionSync message = new MessageDimensionSync();
+        SyncInstancesPacket message = new SyncInstancesPacket();
 
         for (Map.Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
         {

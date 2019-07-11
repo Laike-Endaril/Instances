@@ -1,8 +1,8 @@
 package com.fantasticsource.instances.client.oldgui;
 
 import com.fantasticsource.instances.Instances;
-import com.fantasticsource.instances.network.PacketHandler;
-import com.fantasticsource.instances.network.messages.MessageCreateDimension;
+import com.fantasticsource.instances.network.Network;
+import com.fantasticsource.instances.network.messages.CreateInstancePacket;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -236,9 +236,9 @@ public class GuiCreateDimension extends GuiScreen
                 if (allowCheats) worldsettings.enableCommands();
 
                 InstanceWorldInfo worldInfo = new InstanceWorldInfo(worldsettings, dimensionNameTextField.getText().trim(), DimensionType.values()[selectedInstanceTypeIndex]);
-                MessageCreateDimension createMessage = new MessageCreateDimension(worldInfo);
+                CreateInstancePacket createMessage = new CreateInstancePacket(worldInfo);
 
-                PacketHandler.INSTANCE.sendToServer(createMessage);
+                Network.WRAPPER.sendToServer(createMessage);
             }
             else if (button.id == 3)
             {

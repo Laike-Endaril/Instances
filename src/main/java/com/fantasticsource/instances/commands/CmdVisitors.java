@@ -114,11 +114,11 @@ public class CmdVisitors extends CommandBase
                 info.visitorWhitelist.remove(data.id);
                 player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));
 
-                VisitablePlayersData chunkData = InstanceHandler.visitablePlayersData.get(data.id);
-                if (chunkData != null)
+                VisitablePlayersData visitData = InstanceHandler.visitablePlayersData.get(data.id);
+                if (visitData != null)
                 {
-                    chunkData.remove(data.id);
-                    if (chunkData.visitablePlayers.size() == 0) InstanceHandler.visitablePlayersData.remove(data.id);
+                    visitData.remove(data.id);
+                    if (visitData.visitablePlayers.size() == 0) InstanceHandler.visitablePlayersData.remove(data.id);
                 }
             }
             else player.sendMessage(new TextComponentString(getUsage(player)));

@@ -41,6 +41,13 @@ public abstract class GUIScreen extends GuiScreen
     }
 
     @Override
+    public void initGui()
+    {
+        guiElements.clear();
+        mouseButtons.clear();
+    }
+
+    @Override
     public void onResize(Minecraft mcIn, int w, int h)
     {
         super.onResize(mcIn, w, h);

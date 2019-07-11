@@ -1,7 +1,7 @@
 package com.fantasticsource.instances.commands;
 
-import com.fantasticsource.instances.network.PacketHandler;
-import com.fantasticsource.instances.network.messages.MessageOpenGui;
+import com.fantasticsource.instances.network.Network;
+import com.fantasticsource.instances.network.messages.OpenCreationGUIPacket;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
@@ -104,7 +104,7 @@ public class Commands extends CommandBase
                     {
                         EntityPlayerMP player = (EntityPlayerMP) sender;
 
-                        PacketHandler.INSTANCE.sendTo(new MessageOpenGui(), player);
+                        Network.WRAPPER.sendTo(new OpenCreationGUIPacket(), player);
                     }
                 }
                 else if (args.length == 2)

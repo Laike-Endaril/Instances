@@ -5,16 +5,16 @@ import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
-public class MessageCreateDimension implements IMessage
+public class CreateInstancePacket implements IMessage
 {
     InstanceWorldInfo worldInfo;
 
-    public MessageCreateDimension()
+    public CreateInstancePacket()
     {
         //Required IIRC (Laike_Endaril)
     }
 
-    public MessageCreateDimension(InstanceWorldInfo worldInfo)
+    public CreateInstancePacket(InstanceWorldInfo worldInfo)
     {
         this.worldInfo = worldInfo;
     }
