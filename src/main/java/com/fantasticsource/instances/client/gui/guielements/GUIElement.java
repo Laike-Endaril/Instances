@@ -1,18 +1,23 @@
 package com.fantasticsource.instances.client.gui.guielements;
 
+import com.fantasticsource.instances.client.gui.GUILeftClickEvent;
 import com.fantasticsource.instances.client.gui.GUIScreen;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.ArrayList;
 
 public abstract class GUIElement
 {
-    protected boolean active = false;
+    public double x, y;
     public GUIElement parent = null;
     public ArrayList<GUIElement> children = new ArrayList<>();
-    public double x, y;
+    protected GUIScreen screen;
+    protected boolean active = false;
 
-    public GUIElement(double x, double y)
+
+    public GUIElement(GUIScreen screen, double x, double y)
     {
+        this.screen = screen;
         this.x = x;
         this.y = y;
     }
@@ -42,7 +47,7 @@ public abstract class GUIElement
     {
         if (button == 0)
         {
-            if (active && isMouseWithin()) System.out.println("Clicked " + toString());
+            if (active && isMouseWithin()) MinecraftForge.EVENT_BUS.post(new GUILeftClickEvent(screen, this));
             active = false;
         }
 

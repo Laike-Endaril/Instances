@@ -1,14 +1,15 @@
 package com.fantasticsource.instances.client.gui.guielements.rect;
 
+import com.fantasticsource.instances.client.gui.GUIScreen;
 import com.fantasticsource.instances.client.gui.guielements.GUIElement;
 
 public abstract class GUIRectElement extends GUIElement
 {
     public double width, height;
 
-    public GUIRectElement(double x, double y, double width, double height)
+    public GUIRectElement(GUIScreen screen, double x, double y, double width, double height)
     {
-        super(x, y);
+        super(screen, x, y);
         this.width = width;
         this.height = height;
     }

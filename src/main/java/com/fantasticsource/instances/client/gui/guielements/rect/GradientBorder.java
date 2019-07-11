@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.client.gui.guielements.rect;
 
+import com.fantasticsource.instances.client.gui.GUIScreen;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Color;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -14,9 +15,9 @@ public class GradientBorder extends GUIRectElement
     private double thickness;
     private Color border, center;
 
-    public GradientBorder(double left, double top, double right, double bottom, double borderThickness, Color border, Color center)
+    public GradientBorder(GUIScreen screen, double left, double top, double right, double bottom, double borderThickness, Color border, Color center)
     {
-        super(left, top, right - left, bottom - top);
+        super(screen, left, top, right - left, bottom - top);
         this.thickness = borderThickness;
         this.border = border;
         this.center = center;

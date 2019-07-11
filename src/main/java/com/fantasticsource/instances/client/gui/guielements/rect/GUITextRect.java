@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.client.gui.guielements.rect;
 
+import com.fantasticsource.instances.client.gui.GUIScreen;
 import com.fantasticsource.tools.datastructures.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -12,9 +13,9 @@ public class GUITextRect extends GUIRectElement
     private String text;
     private Color color, hoverColor, pressedColor;
 
-    public GUITextRect(double x, double y, double width, String text, Color color, Color hoverColor, Color pressedColor)
+    public GUITextRect(GUIScreen screen, double x, double y, double width, String text, Color color, Color hoverColor, Color pressedColor)
     {
-        super(x, y, width, 0);
+        super(screen, x, y, width, 0);
         this.text = text;
         this.color = color;
         this.hoverColor = hoverColor;

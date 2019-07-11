@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.client.gui.guielements;
 
+import com.fantasticsource.instances.client.gui.GUIScreen;
 import com.fantasticsource.instances.client.gui.guielements.rect.GUIRectElement;
 import com.fantasticsource.instances.client.gui.guielements.rect.GUIRectScrollView;
 import com.fantasticsource.instances.client.gui.guielements.rect.GradientBorder;
@@ -12,17 +13,17 @@ public class VerticalScrollbar extends GUIRectElement
     private GradientBorder background, slider;
     private GUIRectScrollView scrollView;
 
-    public VerticalScrollbar(double left, double top, double right, double bottom, Color backgroundBorder, Color backgroundCenter, Color sliderBorder, Color sliderCenter, GUIRectScrollView scrollView)
+    public VerticalScrollbar(GUIScreen screen, double left, double top, double right, double bottom, Color backgroundBorder, Color backgroundCenter, Color sliderBorder, Color sliderCenter, GUIRectScrollView scrollView)
     {
-        super(left, top, right - left, bottom - top);
+        super(screen, left, top, right - left, bottom - top);
         this.scrollView = scrollView;
 
         double thickness = (right - left) / 3;
-        background = new GradientBorder(left, top, right, bottom, thickness, backgroundBorder, backgroundCenter);
+        background = new GradientBorder(screen, left, top, right, bottom, thickness, backgroundBorder, backgroundCenter);
         height = background.height;
         sliderHeight = height / 10;
 
-        slider = new GradientBorder(left, 0, right, sliderHeight, thickness, sliderBorder, sliderCenter);
+        slider = new GradientBorder(screen, left, 0, right, sliderHeight, thickness, sliderBorder, sliderCenter);
     }
 
     @Override

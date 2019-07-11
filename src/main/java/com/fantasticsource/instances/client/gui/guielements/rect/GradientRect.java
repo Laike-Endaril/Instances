@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.client.gui.guielements.rect;
 
+import com.fantasticsource.instances.client.gui.GUIScreen;
 import com.fantasticsource.tools.datastructures.Color;
 import net.minecraft.client.renderer.GlStateManager;
 
@@ -9,9 +10,9 @@ public class GradientRect extends GUIRectElement
 {
     private Color topRight, topLeft, bottomLeft, bottomRight;
 
-    public GradientRect(double left, double top, double right, double bottom, Color topRight, Color topLeft, Color bottomLeft, Color bottomRight)
+    public GradientRect(GUIScreen screen, double left, double top, double right, double bottom, Color topRight, Color topLeft, Color bottomLeft, Color bottomRight)
     {
-        super(left, top, right - left, bottom - top);
+        super(screen, left, top, right - left, bottom - top);
         this.topRight = topRight;
         this.topLeft = topLeft;
         this.bottomLeft = bottomLeft;

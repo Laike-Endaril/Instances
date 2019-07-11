@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.client.gui.guielements.rect;
 
+import com.fantasticsource.instances.client.gui.GUIScreen;
 import com.fantasticsource.instances.client.gui.guielements.GUIElement;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.client.renderer.GlStateManager;
@@ -10,9 +11,9 @@ public class GUIRectScrollView extends GUIRectElement
     private GUIRectElement background;
     private double lastScreenWidth, lastScreenHeight, top, bottom;
 
-    public GUIRectScrollView(GUIRectElement background, double screenWidth, double screenHeight, GUIRectElement... subElements)
+    public GUIRectScrollView(GUIScreen screen, GUIRectElement background, double screenWidth, double screenHeight, GUIRectElement... subElements)
     {
-        super(background.x, background.y, background.width, background.height);
+        super(screen, background.x, background.y, background.width, background.height);
 
         this.background = background;
         for (GUIRectElement element : subElements)
