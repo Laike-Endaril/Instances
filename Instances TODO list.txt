@@ -6,13 +6,6 @@
 
 
 
-Combine personal portal and visitor portal; all personal instances available from one portal
-Make GUI or some other form of control to select a destination
-Remove visitor portals
-Reskin personal portal to make it more library-themed
-
-
-
 Sync dimension deletion to clients!
 Make sure dimension creation is synced to clients as well, any time one is created
 
