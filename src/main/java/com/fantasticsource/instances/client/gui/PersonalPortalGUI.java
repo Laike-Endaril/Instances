@@ -45,6 +45,11 @@ public class PersonalPortalGUI extends GUIScreen
             y += 0.05;
             subElements.add(new GUITextRect(H_PADDING, y, SEPARATION_POINT - H_PADDING, "Visit " + name, TEAL, TEAL_2, WHITE_3));
         }
+        for (int i = 0; i < 20; i++)
+        {
+            y += 0.05;
+            subElements.add(new GUITextRect(H_PADDING, y, SEPARATION_POINT - H_PADDING, "Test " + i, TEAL, TEAL_2, WHITE_3));
+        }
         subElements.add(new GradientRect(0, 0, SEPARATION_POINT, y + V_PADDING, BLANK, BLANK, BLANK, BLANK));
 
         GUIRectElement element = new GradientBorder(0, 0, SEPARATION_POINT, 1, 1d / 15, WHITE, BLANK);

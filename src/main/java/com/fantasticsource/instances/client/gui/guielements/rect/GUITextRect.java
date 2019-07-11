@@ -11,7 +11,6 @@ public class GUITextRect extends GUIRectElement
 
     private String text;
     private Color color, hoverColor, pressedColor;
-    private boolean active = false;
 
     public GUITextRect(double x, double y, double width, String text, Color color, Color hoverColor, Color pressedColor)
     {
@@ -25,26 +24,6 @@ public class GUITextRect extends GUIRectElement
     public void recalcHeight(double width, double screenHeight)
     {
         height = (double) fontRenderer.getWordWrappedHeight(text, (int) width) / screenHeight;
-    }
-
-    @Override
-    public void mousePressed(double x, double y, int button)
-    {
-        if (button != 0 || !isMouseWithin()) return;
-
-        active = true;
-    }
-
-    @Override
-    public void mouseReleased(double x, double y, int button)
-    {
-        if (button != 0 || !active) return;
-        active = false;
-
-        if (!isMouseWithin()) return;
-
-        //TODO Do stuff here!
-        System.out.println(text + " pressed!");
     }
 
     @Override
@@ -68,5 +47,11 @@ public class GUITextRect extends GUIRectElement
         fontRenderer.drawString(text, 0, 0, (c.color() >> 8) | c.a() << 24, false);
 
         GlStateManager.popMatrix();
+    }
+
+    @Override
+    public String toString()
+    {
+        return text;
     }
 }

@@ -11,7 +11,6 @@ public class VerticalScrollbar extends GUIRectElement
     private double height, sliderHeight;
     private GradientBorder background, slider;
     private GUIRectScrollView scrollView;
-    private boolean active;
 
     public VerticalScrollbar(double left, double top, double right, double bottom, Color backgroundBorder, Color backgroundCenter, Color sliderBorder, Color sliderCenter, GUIRectScrollView scrollView)
     {
@@ -63,19 +62,16 @@ public class VerticalScrollbar extends GUIRectElement
     }
 
     @Override
-    public void mousePressed(double x, double y, int button)
+    public boolean mousePressed(double x, double y, int button)
     {
-        if (scrollView.progress != -1 && button == 0 && isMouseWithin())
+        active = super.mousePressed(x, y, button);
+
+        if (active && scrollView.progress != -1)
         {
-            active = true;
             scrollView.progress = Tools.min(Tools.max((y - this.y - slider.height * 0.5) / (height - slider.height), 0), 1);
         }
-    }
 
-    @Override
-    public void mouseReleased(double x, double y, int button)
-    {
-        if (button == 0) active = false;
+        return active;
     }
 
     @Override

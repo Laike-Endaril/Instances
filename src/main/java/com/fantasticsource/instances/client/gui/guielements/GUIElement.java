@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public abstract class GUIElement
 {
+    protected boolean active = false;
     public GUIElement parent = null;
     public ArrayList<GUIElement> children = new ArrayList<>();
     public double x, y;
@@ -28,13 +29,23 @@ public abstract class GUIElement
         for (GUIElement child : children) child.mouseWheel(x - this.x, y - this.y, delta);
     }
 
-    public void mousePressed(double x, double y, int button)
+    public boolean mousePressed(double x, double y, int button)
     {
+        if (button == 0 && isMouseWithin()) active = true;
+
         for (GUIElement child : children) child.mousePressed(x - this.x, y - this.y, button);
+
+        return active;
     }
 
     public void mouseReleased(double x, double y, int button)
     {
+        if (button == 0)
+        {
+            if (active && isMouseWithin()) System.out.println("Clicked " + toString());
+            active = false;
+        }
+
         for (GUIElement child : children) child.mouseReleased(x - this.x, y - this.y, button);
     }
 
@@ -80,5 +91,11 @@ public abstract class GUIElement
     public boolean isMouseWithin()
     {
         return isWithin(mouseX(), mouseY());
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName();
     }
 }

@@ -1,16 +1,13 @@
 package com.fantasticsource.instances.client.gui.guielements.rect;
 
+import com.fantasticsource.instances.client.gui.guielements.GUIElement;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.client.renderer.GlStateManager;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GUIRectScrollView extends GUIRectElement
 {
     public double internalHeight, progress = -1;
     private GUIRectElement background;
-    private ArrayList<GUIRectElement> subElements = new ArrayList<>();
     private double lastScreenWidth, lastScreenHeight, top, bottom;
 
     public GUIRectScrollView(GUIRectElement background, double screenWidth, double screenHeight, GUIRectElement... subElements)
@@ -18,7 +15,11 @@ public class GUIRectScrollView extends GUIRectElement
         super(background.x, background.y, background.width, background.height);
 
         this.background = background;
-        this.subElements.addAll(Arrays.asList(subElements));
+        for (GUIRectElement element : subElements)
+        {
+            children.add(element);
+            element.parent = this;
+        }
 
         recalc(screenWidth, screenHeight);
     }
@@ -32,11 +33,13 @@ public class GUIRectScrollView extends GUIRectElement
 
         double pxWidth = screenWidth * width;
         internalHeight = 0;
-        for (GUIRectElement element : subElements)
+        for (GUIElement element : children)
         {
-            element.parent = this;
-            if (element instanceof GUITextRect) ((GUITextRect) element).recalcHeight(pxWidth, screenHeight);
-            internalHeight = Tools.max(internalHeight, element.y + element.height);
+            if (element instanceof GUIRectElement)
+            {
+                if (element instanceof GUITextRect) ((GUITextRect) element).recalcHeight(pxWidth, screenHeight);
+                internalHeight = Tools.max(internalHeight, element.y + ((GUIRectElement) element).height);
+            }
         }
 
         recalc2();
@@ -65,7 +68,7 @@ public class GUIRectScrollView extends GUIRectElement
         GlStateManager.pushMatrix();
         GlStateManager.translate(0, -top, 0);
 
-        for (GUIRectElement element : subElements)
+        for (GUIElement element : children)
         {
             if (element.y + height < top || element.y >= bottom) continue;
             element.draw(screenWidth, screenHeight);
@@ -78,14 +81,12 @@ public class GUIRectScrollView extends GUIRectElement
     }
 
     @Override
-    public void mousePressed(double x, double y, int button)
+    public boolean mousePressed(double x, double y, int button)
     {
         recalc2();
         y -= top;
-        for (GUIRectElement element : subElements)
-        {
-            element.mousePressed(x, y, button);
-        }
+
+        return super.mousePressed(x, y, button);
     }
 
     @Override
@@ -93,10 +94,8 @@ public class GUIRectScrollView extends GUIRectElement
     {
         recalc2();
         y -= top;
-        for (GUIRectElement element : subElements)
-        {
-            element.mouseReleased(x, y, button);
-        }
+
+        super.mouseReleased(x, y, button);
     }
 
     @Override
@@ -104,10 +103,8 @@ public class GUIRectScrollView extends GUIRectElement
     {
         recalc2();
         y -= top;
-        for (GUIRectElement element : subElements)
-        {
-            element.mouseDrag(x, y, button);
-        }
+
+        super.mouseDrag(x, y, button);
     }
 
     @Override
@@ -115,10 +112,8 @@ public class GUIRectScrollView extends GUIRectElement
     {
         recalc2();
         y -= top;
-        for (GUIRectElement element : subElements)
-        {
-            element.mouseWheel(x, y, delta);
-        }
+
+        super.mouseWheel(x, y, delta);
     }
 
     @Override
