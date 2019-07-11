@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.client.gui;
+package com.fantasticsource.instances.client.oldgui;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.network.PacketHandler;

@@ -2,18 +2,18 @@ package com.fantasticsource.instances.blocksanditems.blocks;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
-import com.fantasticsource.instances.server.Teleport;
-import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import static com.fantasticsource.instances.client.PersonalPortalGUI.personalPortalGUI;
 
 public class BlockPersonalPortal extends Block
 {
@@ -37,9 +37,7 @@ public class BlockPersonalPortal extends Block
     {
         if (worldIn.isRemote) return false;
 
-        if (player.isSneaking()) return false;
-
-        if (worldIn.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType) return Teleport.joinPossiblyCreating((EntityPlayerMP) player);
-        return Teleport.gotoHub((EntityPlayerMP) player);
+        Minecraft.getMinecraft().displayGuiScreen(personalPortalGUI);
+        return true;
     }
 }

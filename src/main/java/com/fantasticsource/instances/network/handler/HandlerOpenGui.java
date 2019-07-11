@@ -1,6 +1,6 @@
 package com.fantasticsource.instances.network.handler;
 
-import com.fantasticsource.instances.client.gui.GuiCreateDimension;
+import com.fantasticsource.instances.client.oldgui.GuiCreateDimension;
 import com.fantasticsource.instances.network.messages.MessageOpenGui;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.client.gui;
+package com.fantasticsource.instances.client.oldgui;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;

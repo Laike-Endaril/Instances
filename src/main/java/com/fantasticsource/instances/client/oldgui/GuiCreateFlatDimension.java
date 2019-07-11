@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.client.gui;
+package com.fantasticsource.instances.client.oldgui;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

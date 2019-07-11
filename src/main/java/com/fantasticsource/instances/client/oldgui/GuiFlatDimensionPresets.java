@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.client.gui;
+package com.fantasticsource.instances.client.oldgui;
 
 import com.google.common.collect.Maps;
 import net.minecraft.block.BlockTallGrass;
