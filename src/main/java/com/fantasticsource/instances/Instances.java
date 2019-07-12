@@ -37,12 +37,12 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.UUID;
 
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,)")
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,)", acceptableSaveVersions = "[1.12.2.000h,1.12.2.000i]")
 public class Instances
 {
     public static final String MODID = "instances";
     public static final String NAME = "Instances";
-    public static final String VERSION = "1.12.2.000h";
+    public static final String VERSION = "1.12.2.000i";
 
     public static Integer nextFreeDimID()
     {
