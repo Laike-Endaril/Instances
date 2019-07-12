@@ -19,8 +19,7 @@ import java.util.List;
 public class ChunkGeneratorSkyroom implements IChunkGenerator
 {
     private static final IBlockState
-            PERSONAL_PORTAL = BlocksAndItems.blockPersonalPortal.getDefaultState(),
-            RETURN_PORTAL = BlocksAndItems.blockReturnPortal.getDefaultState(),
+            PORTAL = BlocksAndItems.blockPersonalPortal.getDefaultState(),
             BARRIER = Blocks.BARRIER.getDefaultState(),
             BEDROCK = Blocks.BEDROCK.getDefaultState(),
             FLOOR = Blocks.GRASS.getDefaultState();
@@ -111,15 +110,15 @@ public class ChunkGeneratorSkyroom implements IChunkGenerator
             {
                 if (chunkX == -1)
                 {
-                    chunk.setBlockState(new BlockPos(15, bottom + 2, 1), PERSONAL_PORTAL);
-                    chunk.setBlockState(new BlockPos(15, bottom + 3, 1), PERSONAL_PORTAL);
-                    chunk.setBlockState(new BlockPos(15, bottom + 4, 1), PERSONAL_PORTAL);
+                    chunk.setBlockState(new BlockPos(15, bottom + 2, 1), PORTAL);
+                    chunk.setBlockState(new BlockPos(15, bottom + 3, 1), PORTAL);
+                    chunk.setBlockState(new BlockPos(15, bottom + 4, 1), PORTAL);
                 }
                 else
                 {
-                    chunk.setBlockState(new BlockPos(0, bottom + 2, 1), RETURN_PORTAL);
-                    chunk.setBlockState(new BlockPos(0, bottom + 3, 1), RETURN_PORTAL);
-                    chunk.setBlockState(new BlockPos(0, bottom + 4, 1), RETURN_PORTAL);
+                    chunk.setBlockState(new BlockPos(0, bottom + 2, 1), PORTAL);
+                    chunk.setBlockState(new BlockPos(0, bottom + 3, 1), PORTAL);
+                    chunk.setBlockState(new BlockPos(0, bottom + 4, 1), PORTAL);
                 }
             }
         }

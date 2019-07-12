@@ -1,8 +1,12 @@
-** If necessary, more efficient Library of Worlds terrain gen...or rather...terrain copying?
-** Check LightFixer performance; it runs near each player, no matter the dimension.  Impact factor is probably roughly <player count> * <light count> (lights near the given player)
-** Check if inventory sync on teleport is fixed or not
-
 ** Check interaction protection!!!
+
+
+
+Odd/Even plot types
+
+
+
+Plot upgrade items
 
 
 
