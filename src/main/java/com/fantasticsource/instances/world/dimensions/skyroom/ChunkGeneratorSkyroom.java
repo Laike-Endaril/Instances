@@ -18,7 +18,7 @@ import java.util.List;
 
 public class ChunkGeneratorSkyroom implements IChunkGenerator
 {
-    private static final IBlockState
+    public static final IBlockState
             PORTAL = BlocksAndItems.blockPersonalPortal.getDefaultState(),
             BARRIER = Blocks.BARRIER.getDefaultState(),
             BEDROCK = Blocks.BEDROCK.getDefaultState(),

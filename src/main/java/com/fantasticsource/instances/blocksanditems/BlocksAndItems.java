@@ -5,10 +5,7 @@ import com.fantasticsource.instances.blocksanditems.blocks.BlockInstancePortal;
 import com.fantasticsource.instances.blocksanditems.blocks.BlockPersonalPortal;
 import com.fantasticsource.instances.blocksanditems.blocks.BlockReturnPortal;
 import com.fantasticsource.instances.blocksanditems.blocks.BlockVisitorPortal;
-import com.fantasticsource.instances.blocksanditems.items.ItemInstancePortal;
-import com.fantasticsource.instances.blocksanditems.items.ItemPersonalPortal;
-import com.fantasticsource.instances.blocksanditems.items.ItemReturnPortal;
-import com.fantasticsource.instances.blocksanditems.items.ItemVisitorPortal;
+import com.fantasticsource.instances.blocksanditems.items.*;
 import com.fantasticsource.instances.blocksanditems.tileentities.TEInstancePortal;
 import com.fantasticsource.instances.blocksanditems.tileentities.TEVisitorPortal;
 import net.minecraft.block.Block;
@@ -17,6 +14,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
@@ -84,6 +82,9 @@ public class BlocksAndItems
         registry.register(new ItemPersonalPortal());
         registry.register(new ItemReturnPortal());
         registry.register(new ItemVisitorPortal());
+
+        registry.register(new ItemPlotUpgrade(new BlockPos(30, 38, 46), new BlockPos(30, 30, 30)));
+        registry.register(new ItemPlotUpgrade(new BlockPos(46, 46, 46), new BlockPos(30, 38, 46)));
     }
 
     @SubscribeEvent

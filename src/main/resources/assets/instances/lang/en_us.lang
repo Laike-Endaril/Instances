@@ -1,5 +1,7 @@
 itemGroup.instances=Instances
 
+item.instances:plotupgrade.name=Plot Upgrade (%sx%sx%s)
+
 tile.instances:personalportal.name=Personal Portal
 tile.instances:returnportal.name=Return Portal
 tile.instances:visitorportal.name=Visitor Portal
