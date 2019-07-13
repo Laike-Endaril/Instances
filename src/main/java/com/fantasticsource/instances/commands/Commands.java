@@ -127,7 +127,7 @@ public class Commands extends CommandBase
                     try
                     {
                         dimensionID = Integer.parseInt(args[1]);
-                        InstanceHandler.deleteDimension(sender, dimensionID);
+                        InstanceHandler.deleteInstance(sender, dimensionID);
                     }
                     catch (NumberFormatException e)
                     {
@@ -135,7 +135,7 @@ public class Commands extends CommandBase
                         {
                             if (entry.getValue().getWorldName().equals(args[1]))
                             {
-                                InstanceHandler.deleteDimension(sender, entry.getKey());
+                                InstanceHandler.deleteInstance(sender, entry.getKey());
                                 return;
                             }
                         }

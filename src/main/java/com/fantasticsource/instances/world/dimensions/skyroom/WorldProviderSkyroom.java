@@ -8,6 +8,7 @@ import net.minecraft.world.WorldProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 
 import javax.annotation.Nullable;
+import java.io.File;
 
 public class WorldProviderSkyroom extends WorldProvider
 {
@@ -33,6 +34,6 @@ public class WorldProviderSkyroom extends WorldProvider
         InstanceWorldInfo info = InstanceHandler.get(dim);
         if (info != null) name = info.getWorldName();
 
-        return "./personal/" + name + "_" + dim;
+        return "personal" + File.separator + name + "_" + dim;
     }
 }

@@ -2,7 +2,7 @@
 
 
 
-Odd/Even plot types
+Odd/Even plot type switching item
 
 
 
@@ -12,6 +12,10 @@ Plot upgrade items
 
 Sync dimension deletion to clients!
 Make sure dimension creation is synced to clients as well, any time one is created
+
+
+
+Are players not properly being added to an instance world's player entity list upon teleport?
 
 
 

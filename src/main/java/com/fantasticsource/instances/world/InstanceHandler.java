@@ -1,19 +1,16 @@
 package com.fantasticsource.instances.world;
 
 import com.fantasticsource.instances.Instances;
-import com.fantasticsource.instances.commands.TeleporterSimple;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
+import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.PlayerList;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -103,6 +100,7 @@ public class InstanceHandler extends WorldSavedData
         instanceInfo.put(dimensionID, worldInfo);
 
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
+        loadDimension(dimensionID, worldInfo);
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
     }
@@ -118,7 +116,9 @@ public class InstanceHandler extends WorldSavedData
         worldInfo.setOwner(owner);
 
         instanceInfo.put(dimensionID, worldInfo);
+
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
+        loadDimension(dimensionID, worldInfo);
 
         if (sender != null) sender.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
 
@@ -156,94 +156,36 @@ public class InstanceHandler extends WorldSavedData
         mcServer.setDifficultyForAllWorlds(difficulty);
     }
 
-    public static void unloadDimension(ICommandSender sender, int instanceID)
+    public static void deleteInstance(ICommandSender sender, int dimensionID)
     {
-        if (!instanceInfo.containsKey(instanceID))
+        World world = DimensionManager.getWorld(dimensionID);
+        if (world == null)
         {
-            if (sender != null) sender.sendMessage(new TextComponentString("Instance ID (" + instanceID + ") not found"));
-            return;
+            loadDimension(dimensionID, InstanceHandler.get(dimensionID));
+            world = DimensionManager.getWorld(dimensionID);
         }
 
-        WorldServer w = DimensionManager.getWorld(instanceID);
-
-        if (w == null)
-        {
-            if (DimensionManager.isDimensionRegistered(instanceID))
-            {
-                loadDimension(instanceID, instanceInfo.get(instanceID));
-                w = DimensionManager.getWorld(instanceID);
-                if (w == null)
-                {
-                    if (sender != null) sender.sendMessage(new TextComponentString("Failed to load dimension").setStyle(new Style().setColor(TextFormatting.RED)));
-                    return;
-                }
-            }
-        }
-
-        if (!w.playerEntities.isEmpty())
-        {
-            WorldServer overworld = DimensionManager.getWorld(0);
-            MinecraftServer mcserver = overworld.getMinecraftServer();
-            PlayerList plist = mcserver.getPlayerList();
-            BlockPos defaultspawnpoint = overworld.getSpawnPoint();
-            ArrayList<EntityPlayer> currentPlayers = new ArrayList<>(w.playerEntities);
-            for (EntityPlayer player : currentPlayers)
-            {
-                BlockPos spawnpoint = new BlockPos(defaultspawnpoint.getX(), overworld.getHeight(defaultspawnpoint.getX(), defaultspawnpoint.getZ()), defaultspawnpoint.getZ());
-                BlockPos bedlocation = player.getBedLocation();
-
-                if (bedlocation != null)
-                {
-                    BlockPos bedspawnlocation = EntityPlayer.getBedSpawnLocation(overworld, bedlocation, false);
-                    if (bedspawnlocation != null)
-                    {
-                        spawnpoint = bedspawnlocation;
-                    }
-                }
-
-                EnumSet enumset = EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class);
-
-                player.dismountRidingEntity();
-                ((EntityPlayerMP) player).connection.setPlayerLocation(spawnpoint.getX(), spawnpoint.getY(), spawnpoint.getZ(), 0, 0, enumset);
-
-                plist.transferPlayerToDimension((EntityPlayerMP) player, 0, new TeleporterSimple(overworld));
-
-                if (sender != player)
-                {
-                    player.sendMessage(new TextComponentString("The dimension you were in was unloaded").setStyle(new Style().setColor(TextFormatting.RED)));
-                }
-            }
-        }
-
-        MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(w));
-        w.flush();
-        DimensionManager.setWorld(instanceID, null, w.getMinecraftServer());
-        w.flush();
-    }
-
-    public static void deleteDimension(ICommandSender sender, int dimensionID)
-    {
-        unloadDimension(sender, dimensionID);
+        File file = new File(world.getSaveHandler().getWorldDirectory().getAbsolutePath() + File.separator + world.provider.getSaveFolder());
 
 
+        for (Entity entity : world.loadedEntityList.toArray(new Entity[0])) Teleport.escape(entity);
+
+        ((WorldServer) world).flush();
+        DimensionManager.setWorld(dimensionID, null, FMLCommonHandler.instance().getMinecraftServerInstance());
         DimensionManager.unregisterDimension(dimensionID);
+
         instanceInfo.remove(dimensionID);
 
 
-        File dimensionFolder = new File(DimensionManager.getCurrentSaveRootDirectory(), "DIM" + dimensionID);
-
         try
         {
-            FileUtils.deleteDirectory(dimensionFolder);
+            FileUtils.deleteDirectory(file);
+            if (sender != null) sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
         }
         catch (IOException e)
         {
             e.printStackTrace();
             if (sender != null) sender.sendMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
-        }
-        finally
-        {
-            if (sender != null) sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
         }
     }
 
