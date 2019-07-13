@@ -76,12 +76,16 @@ public class Network
             InstanceWorldInfo info = InstanceHandler.get(player.dimension);
             String ownername = info == null ? null : PlayerData.getName(info.getOwner());
             namesIn = new ArrayList<>();
-            Object[] nameTables = InstanceHandler.visitablePlayersData.get(player.getPersistentID()).visitablePlayers.getColumn(1);
-            for (Object nameTable : nameTables)
+            VisitablePlayersData data = InstanceHandler.visitablePlayersData.get(player.getPersistentID());
+            if (data != null)
             {
-                for (Object name : ((SortableTable) nameTable).getColumn(0))
+                Object[] nameTables = data.visitablePlayers.getColumn(1);
+                for (Object nameTable : nameTables)
                 {
-                    if (!name.equals(ownername)) namesIn.add((String) name);
+                    for (Object name : ((SortableTable) nameTable).getColumn(0))
+                    {
+                        if (!name.equals(ownername)) namesIn.add((String) name);
+                    }
                 }
             }
 

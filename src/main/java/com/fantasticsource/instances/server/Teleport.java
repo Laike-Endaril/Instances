@@ -109,13 +109,13 @@ public class Teleport
         {
             if (id.equals(entry.getValue().getOwner()))
             {
-                return Teleport.teleport(entity, entry.getKey(), 0, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
+                return Teleport.teleport(entity, entry.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
             }
         }
 
         //Not found
         Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createDimension(null, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.name());
-        return Teleport.teleport(entity, pair.getKey(), 0, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
+        return Teleport.teleport(entity, pair.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
     }
 
     public static boolean teleport(Entity entity, TEInstancePortal.Destination destination)
