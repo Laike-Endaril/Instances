@@ -22,27 +22,31 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import java.util.ArrayList;
+
 public class BlocksAndItems
 {
     @GameRegistry.ObjectHolder("instances:instanceportal")
     public static BlockInstancePortal blockInstancePortal;
     @GameRegistry.ObjectHolder("instances:instanceportal")
-    public static Item itemInstancePortal;
+    public static ItemInstancePortal itemInstancePortal;
 
     @GameRegistry.ObjectHolder("instances:personalportal")
     public static BlockPersonalPortal blockPersonalPortal;
     @GameRegistry.ObjectHolder("instances:personalportal")
-    public static Item itemPersonalPortal;
+    public static ItemPersonalPortal itemPersonalPortal;
 
     @GameRegistry.ObjectHolder("instances:returnportal")
     public static BlockReturnPortal blockReturnPortal;
     @GameRegistry.ObjectHolder("instances:returnportal")
-    public static Item itemReturnPortal;
+    public static ItemReturnPortal itemReturnPortal;
 
     @GameRegistry.ObjectHolder("instances:visitorportal")
     public static BlockVisitorPortal blockVisitorPortal;
     @GameRegistry.ObjectHolder("instances:visitorportal")
-    public static Item itemVisitorPortal;
+    public static ItemVisitorPortal itemVisitorPortal;
+
+    public static ArrayList<ItemPlotUpgrade> plotUpgrades = new ArrayList<>();
 
 
     public static CreativeTabs creativeTab = new CreativeTabs(Instances.MODID)
@@ -83,8 +87,9 @@ public class BlocksAndItems
         registry.register(new ItemReturnPortal());
         registry.register(new ItemVisitorPortal());
 
-        registry.register(new ItemPlotUpgrade(new BlockPos(30, 38, 46), new BlockPos(30, 30, 30)));
-        registry.register(new ItemPlotUpgrade(new BlockPos(46, 46, 46), new BlockPos(30, 38, 46)));
+        plotUpgrades.add(new ItemPlotUpgrade(new BlockPos(30, 38, 46), new BlockPos(30, 30, 30)));
+        plotUpgrades.add(new ItemPlotUpgrade(new BlockPos(46, 46, 46), new BlockPos(30, 38, 46)));
+        for (ItemPlotUpgrade item : plotUpgrades) registry.register(item);
     }
 
     @SubscribeEvent
@@ -94,5 +99,10 @@ public class BlocksAndItems
         ModelLoader.setCustomModelResourceLocation(itemPersonalPortal, 0, new ModelResourceLocation("instances:personalportal", "inventory"));
         ModelLoader.setCustomModelResourceLocation(itemReturnPortal, 0, new ModelResourceLocation("instances:returnportal", "inventory"));
         ModelLoader.setCustomModelResourceLocation(itemVisitorPortal, 0, new ModelResourceLocation("instances:visitorportal", "inventory"));
+
+        for (ItemPlotUpgrade item : plotUpgrades)
+        {
+            ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation("instances:plotupgrade", "inventory"));
+        }
     }
 }
