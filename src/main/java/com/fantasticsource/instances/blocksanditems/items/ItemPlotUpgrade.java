@@ -32,7 +32,10 @@ public class ItemPlotUpgrade extends Item
 
         for (BlockPos pos : allowedExistingSizes)
         {
-            if (size.getX() < pos.getX() || size.getY() < pos.getY() || size.getZ() < pos.getZ()) throw new IllegalArgumentException("New plot size must be larger than any allowed existing size: " + sizeString(size));
+            if (pos.getX() % 2 != 0) pos = pos.east();
+            if (pos.getZ() % 2 != 0) pos = pos.south();
+
+            if (size.equals(pos) || size.getX() < pos.getX() || size.getY() < pos.getY() || size.getZ() < pos.getZ()) throw new IllegalArgumentException("New plot size must be larger than any allowed existing size: " + sizeString(size) + " -> " + sizeString(pos));
         }
 
 
@@ -69,17 +72,18 @@ public class ItemPlotUpgrade extends Item
         {
             if (!world.isRemote)
             {
-                if (creative) player.sendMessage(new TextComponentString("Plot upgrades can only be used in personal instances!"));
-                else player.sendMessage(new TextComponentString("Plot upgrades can only be used in your own personal instances!"));
+                if (creative) player.sendMessage(new TextComponentString("Plot changing items can only be used in personal instances!"));
+                else player.sendMessage(new TextComponentString("Plot changing items can only be used in your own personal instances!"));
             }
             return new ActionResult<>(EnumActionResult.FAIL, itemstack);
         }
 
         if (!creative && !player.getPersistentID().equals(info.getOwner()))
         {
-            if (!world.isRemote) player.sendMessage(new TextComponentString("Plot upgrades can only be used in your own personal instances!"));
+            if (!world.isRemote) player.sendMessage(new TextComponentString("Plot changing items can only be used in your own personal instances!"));
             return new ActionResult<>(EnumActionResult.FAIL, itemstack);
         }
+
 
         BlockPos start = new BlockPos(0, 75, 0);
         while (world.getBlockState(start).getBlock() == Blocks.BEDROCK) start = start.add(-1, 0, -1);
@@ -87,7 +91,6 @@ public class ItemPlotUpgrade extends Item
         start = start.east();
         while (world.getBlockState(start).getBlock() == Blocks.BARRIER) start = start.north();
         start = start.add(1, 1, 2);
-        System.out.println(start);
 
         BlockPos end = new BlockPos(0, 75, 0);
         while (world.getBlockState(end).getBlock() == Blocks.BEDROCK) end = end.add(1, 0, 1);
@@ -97,7 +100,7 @@ public class ItemPlotUpgrade extends Item
         end = end.north();
         while (world.getBlockState(end).getBlock() == Blocks.BARRIER) end = end.up();
         end = end.add(-1, -2, -1);
-        System.out.println(end);
+
 
         BlockPos existingSize = end.subtract(start).add(1, 1, 1);
 
@@ -107,7 +110,7 @@ public class ItemPlotUpgrade extends Item
         {
             for (BlockPos pos : allowedExistingSizes)
             {
-                if (pos.equals(existingSize))
+                if (pos.equals(existingSize) || pos.equals(existingSize.add(-1, -1, -1)))
                 {
                     allow = true;
                     break;
@@ -206,7 +209,6 @@ public class ItemPlotUpgrade extends Item
         {
             case WEST:
                 x = start.getX() - 1;
-                System.out.println(x);
                 for (z = start.getZ() - 1; z <= end.getZ() + 1; z++)
                 {
                     for (y = start.getY() - 1; y <= end.getY() + 1; y++)
@@ -218,7 +220,6 @@ public class ItemPlotUpgrade extends Item
 
             case EAST:
                 x = end.getX() + 1;
-                System.out.println(x);
                 for (z = start.getZ() - 1; z <= end.getZ() + 1; z++)
                 {
                     for (y = start.getY() - 1; y <= end.getY() + 1; y++)

@@ -45,10 +45,6 @@ public class BlocksAndItems
     public static BlockVisitorPortal blockVisitorPortal;
     @GameRegistry.ObjectHolder("instances:visitorportal")
     public static ItemVisitorPortal itemVisitorPortal;
-
-    public static ArrayList<ItemPlotUpgrade> plotUpgrades = new ArrayList<>();
-
-
     public static CreativeTabs creativeTab = new CreativeTabs(Instances.MODID)
     {
         @Override
@@ -63,6 +59,9 @@ public class BlocksAndItems
             super.displayAllRelevantItems(itemStacks);
         }
     };
+    private static ArrayList<ItemPlotUpgrade> plotUpgrades = new ArrayList<>();
+    @GameRegistry.ObjectHolder("instances:plotoddeven")
+    private static ItemPlotOddEvenSwitcher oddEvenSwitcher;
 
     @SubscribeEvent
     public static void blockRegistry(RegistryEvent.Register<Block> event)
@@ -90,6 +89,8 @@ public class BlocksAndItems
         plotUpgrades.add(new ItemPlotUpgrade(new BlockPos(30, 38, 46), new BlockPos(30, 30, 30)));
         plotUpgrades.add(new ItemPlotUpgrade(new BlockPos(46, 46, 46), new BlockPos(30, 38, 46)));
         for (ItemPlotUpgrade item : plotUpgrades) registry.register(item);
+
+        registry.register(new ItemPlotOddEvenSwitcher());
     }
 
     @SubscribeEvent
@@ -102,7 +103,9 @@ public class BlocksAndItems
 
         for (ItemPlotUpgrade item : plotUpgrades)
         {
-            ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation("instances:plotupgrade", "inventory"));
+            ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation("instances:scroll", "inventory"));
         }
+
+        ModelLoader.setCustomModelResourceLocation(oddEvenSwitcher, 0, new ModelResourceLocation("instances:scroll", "inventory"));
     }
 }

@@ -2,10 +2,6 @@
 
 
 
-Odd/Even plot type switching item
-
-
-
 Sync dimension deletion to clients!
 Make sure dimension creation is synced to clients as well, any time one is created
 
