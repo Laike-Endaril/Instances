@@ -142,10 +142,10 @@ public class ItemPlotUpgrade extends Item
         if (!world.isRemote)
         {
             int xDif = size.getX() - existingSize.getX();
-            if (xDif % 2 != 0) xDif++;
+            if (xDif % 2 != 0) xDif--;
 
             int zDif = size.getZ() - existingSize.getZ();
-            if (zDif % 2 != 0) zDif++;
+            if (zDif % 2 != 0) zDif--;
 
             int yDif = size.getY() - existingSize.getY();
 
