@@ -54,7 +54,7 @@ public class Network
         EntityPlayerMP player;
         ArrayList<String> namesIn;
         String[] namesOut;
-        boolean isInInstance;
+        boolean isInInstance, isInOwnedInstance;
 
         public PersonalPortalGUIPacket()
         {
@@ -71,9 +71,11 @@ public class Network
         @Override
         public void toBytes(ByteBuf buf)
         {
-            buf.writeBoolean(InstanceHandler.instanceInfo.keySet().contains(player.dimension));
-
             InstanceWorldInfo info = InstanceHandler.get(player.dimension);
+
+            buf.writeBoolean(info != null);
+            buf.writeBoolean(info != null && player.getPersistentID().equals(info.getOwner()));
+
             String ownername = info == null ? null : PlayerData.getName(info.getOwner());
             namesIn = new ArrayList<>();
             VisitablePlayersData data = InstanceHandler.visitablePlayersData.get(player.getPersistentID());
@@ -97,6 +99,7 @@ public class Network
         public void fromBytes(ByteBuf buf)
         {
             isInInstance = buf.readBoolean();
+            isInOwnedInstance = buf.readBoolean();
 
             int size = buf.readInt();
             namesOut = new String[size];
@@ -118,6 +121,7 @@ public class Network
             {
                 PersonalPortalGUI.names = message.namesOut;
                 PersonalPortalGUI.isInInstance = message.isInInstance;
+                PersonalPortalGUI.isInOwnedInstance = message.isInOwnedInstance;
                 PersonalPortalGUI.personalPortalGUI.initGui();
                 mc.displayGuiScreen(PersonalPortalGUI.personalPortalGUI);
             });

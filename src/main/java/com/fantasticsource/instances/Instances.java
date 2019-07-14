@@ -5,6 +5,7 @@ import com.fantasticsource.instances.client.ClientHandler;
 import com.fantasticsource.instances.client.LightFixer;
 import com.fantasticsource.instances.commands.*;
 import com.fantasticsource.instances.network.Network;
+import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
@@ -148,7 +149,7 @@ public class Instances
     @SubscribeEvent
     public void clientConnect(FMLNetworkEvent.ServerConnectionFromClientEvent event)
     {
-        event.getManager().sendPacket(Network.WRAPPER.getPacketFrom(InstanceHandler.constructSyncMessage()));
+        event.getManager().sendPacket(Network.WRAPPER.getPacketFrom(new SyncInstancesPacket()));
     }
 
     @SubscribeEvent
@@ -174,7 +175,10 @@ public class Instances
             }
         }
 
-        if (!found) InstanceHandler.createDimension(null, InstanceTypes.skyroomDimType, playerID, player.getName() + "'s " + InstanceTypes.skyroomDimType.name());
+        if (!found)
+        {
+            InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, playerID, player.getName() + "'s " + InstanceTypes.skyroomDimType.name());
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)

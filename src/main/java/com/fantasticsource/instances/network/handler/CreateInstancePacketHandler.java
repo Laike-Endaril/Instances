@@ -19,7 +19,7 @@ public class CreateInstancePacketHandler implements IMessageHandler<CreateInstan
 
             if (netHandler.player.canUseCommand(3, "instances"))
             {
-                InstanceHandler.createDimension(((NetHandlerPlayServer) ctx.netHandler).player, message.getWorldInfo());
+                InstanceHandler.createInstance(((NetHandlerPlayServer) ctx.netHandler).player, message.getWorldInfo());
             }
         });
 

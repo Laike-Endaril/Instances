@@ -1,6 +1,7 @@
 package com.fantasticsource.instances.world;
 
 import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
@@ -22,7 +23,6 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -94,7 +94,7 @@ public class InstanceHandler extends WorldSavedData
         instanceInfo.clear();
     }
 
-    public static void createDimension(EntityPlayerMP playerEntity, InstanceWorldInfo worldInfo)
+    public static void createInstance(EntityPlayerMP playerEntity, InstanceWorldInfo worldInfo)
     {
         int dimensionID = Instances.nextFreeDimID();
         instanceInfo.put(dimensionID, worldInfo);
@@ -103,9 +103,11 @@ public class InstanceHandler extends WorldSavedData
         loadDimension(dimensionID, worldInfo);
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
+
+        Network.WRAPPER.sendToAll(new SyncInstancesPacket());
     }
 
-    public static Pair<Integer, InstanceWorldInfo> createDimension(ICommandSender sender, DimensionType type, UUID owner, String name)
+    public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType type, UUID owner, String name)
     {
         name = name.replaceAll(" ", "_");
 
@@ -121,6 +123,8 @@ public class InstanceHandler extends WorldSavedData
         loadDimension(dimensionID, worldInfo);
 
         if (sender != null) sender.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
+
+        Network.WRAPPER.sendToAll(new SyncInstancesPacket());
 
         return new Pair<>(dimensionID, worldInfo);
     }
@@ -187,18 +191,8 @@ public class InstanceHandler extends WorldSavedData
             e.printStackTrace();
             if (sender != null) sender.sendMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
         }
-    }
 
-    public static IMessage constructSyncMessage()
-    {
-        SyncInstancesPacket message = new SyncInstancesPacket();
-
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
-        {
-            message.addDimension(entry.getKey(), entry.getValue().getDimensionType());
-        }
-
-        return message;
+        Network.WRAPPER.sendToAll(new SyncInstancesPacket());
     }
 
     public static ArrayList<String> list()

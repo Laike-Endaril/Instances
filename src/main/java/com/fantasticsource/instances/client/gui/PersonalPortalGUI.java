@@ -4,8 +4,6 @@ import com.fantasticsource.instances.client.gui.guielements.GUIElement;
 import com.fantasticsource.instances.client.gui.guielements.VerticalScrollbar;
 import com.fantasticsource.instances.client.gui.guielements.rect.*;
 import com.fantasticsource.instances.network.Network;
-import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.tools.datastructures.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,7 +32,7 @@ public class PersonalPortalGUI extends GUIScreen
 
     public static PersonalPortalGUI personalPortalGUI = new PersonalPortalGUI();
     public static String[] names;
-    public static boolean isInInstance;
+    public static boolean isInInstance, isInOwnedInstance;
 
     static
     {
@@ -68,13 +66,12 @@ public class PersonalPortalGUI extends GUIScreen
 
         double y = V_PADDING - V_PADDING_2;
         EntityPlayer player = Minecraft.getMinecraft().player;
-        InstanceWorldInfo info = InstanceHandler.instanceInfo.get(player.dimension);
-        if (info != null)
+        if (isInInstance)
         {
             y += V_PADDING_2;
             subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Leave Instance", TEAL, TEAL_2, WHITE_3));
         }
-        if (info == null || !player.getPersistentID().equals(info.getOwner()))
+        if (!isInOwnedInstance)
         {
             y += V_PADDING_2;
             subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Go Home", TEAL, TEAL_2, WHITE_3));

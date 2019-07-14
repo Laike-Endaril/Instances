@@ -110,12 +110,12 @@ public class Commands extends CommandBase
                 else if (args.length == 2)
                 {
                     //No GUI, no owner
-                    InstanceHandler.createDimension(sender, DimensionType.byName(args[1]), null, args[1] + " Instance");
+                    InstanceHandler.createInstance(sender, DimensionType.byName(args[1]), null, args[1] + " Instance");
                 }
                 else if (args.length == 3)
                 {
                     //No GUI, has owner
-                    InstanceHandler.createDimension(sender, DimensionType.byName(args[1]), PlayerData.getID(args[2]), args[2] + "'s " + args[1]);
+                    InstanceHandler.createInstance(sender, DimensionType.byName(args[1]), PlayerData.getID(args[2]), args[2] + "'s " + args[1]);
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;

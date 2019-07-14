@@ -89,7 +89,7 @@ public class CmdVisitors extends CommandBase
             {
                 if (info == null)
                 {
-                    info = InstanceHandler.createDimension(null, InstanceTypes.skyroomDimType, player.getPersistentID(), player.getName() + "'s " + InstanceTypes.skyroomDimType.name()).getValue();
+                    info = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, player.getPersistentID(), player.getName() + "'s " + InstanceTypes.skyroomDimType.name()).getValue();
                 }
 
                 if (info.visitorWhitelist.contains(data.id))

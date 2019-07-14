@@ -12,7 +12,7 @@ public class SyncInstancesPacketHandler implements IMessageHandler<SyncInstances
     @Override
     public IMessage onMessage(SyncInstancesPacket message, MessageContext ctx)
     {
-        Minecraft.getMinecraft().addScheduledTask(() -> ClientHandler.sync(message.getDimensions()));
+        Minecraft.getMinecraft().addScheduledTask(() -> ClientHandler.sync(message.instances));
         return null;
     }
 }

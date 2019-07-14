@@ -1,9 +1,6 @@
+* Instances are not fully synced to clients; only dimensiontypes are synced
+
 ** Check interaction protection!!!
-
-
-
-Sync dimension deletion to clients!
-Make sure dimension creation is synced to clients as well, any time one is created
 
 
 
@@ -12,7 +9,6 @@ Are players not properly being added to an instance world's player entity list u
 
 
 Make sure deleting an instance with offline players in it works correctly
-Fix crash when deleting an unloaded personal instance from the dedicated console with no players online...only happens sometimes?
 
 
 
