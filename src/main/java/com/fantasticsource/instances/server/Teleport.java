@@ -87,7 +87,7 @@ public class Teleport
             if (s.contains("instances.lastgoodpos"))
             {
                 String[] tokens = s.replace("instances.lastgoodpos", "").split(",");
-                return Teleport.teleport(entity, Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), entity.rotationYaw, entity.rotationPitch);
+                return Teleport.teleport(entity, Integer.parseInt(tokens[0]), 0.5d + Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), 0.5d + Integer.parseInt(tokens[3]), entity.rotationYaw, entity.rotationPitch);
             }
         }
 
