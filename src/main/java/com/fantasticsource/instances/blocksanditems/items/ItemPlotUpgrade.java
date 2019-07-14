@@ -110,7 +110,7 @@ public class ItemPlotUpgrade extends Item
         {
             for (BlockPos pos : allowedExistingSizes)
             {
-                if (pos.equals(existingSize) || pos.equals(existingSize.add(-1, -1, -1)))
+                if (pos.equals(existingSize) || pos.equals(existingSize.add(-1, 0, -1)))
                 {
                     allow = true;
                     break;
@@ -126,6 +126,7 @@ public class ItemPlotUpgrade extends Item
                 for (BlockPos pos : allowedExistingSizes)
                 {
                     player.sendMessage(new TextComponentString(sizeString(pos)));
+                    player.sendMessage(new TextComponentString(sizeString(pos.add(-1, 0, -1))));
                 }
                 player.sendMessage(new TextComponentString(""));
                 player.sendMessage(new TextComponentString("The existing size of this plot is " + sizeString(existingSize)));
@@ -266,6 +267,7 @@ public class ItemPlotUpgrade extends Item
         for (BlockPos pos : allowedExistingSizes)
         {
             tooltip.add(sizeString(pos));
+            tooltip.add(sizeString(pos.add(-1, 0, -1)));
         }
     }
 }
