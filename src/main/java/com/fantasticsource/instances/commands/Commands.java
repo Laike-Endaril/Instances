@@ -72,10 +72,7 @@ public class Commands extends CommandBase
                 {
                     if (args.length == 1)
                     {
-                        if (!Teleport.joinPossiblyCreating((EntityPlayerMP) sender))
-                        {
-                            sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
-                        }
+                        Teleport.joinPossiblyCreating((EntityPlayerMP) sender);
                     }
                     else if (args.length == 2)
                     {
