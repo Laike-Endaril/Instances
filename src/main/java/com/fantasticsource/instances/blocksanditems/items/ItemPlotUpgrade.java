@@ -110,7 +110,7 @@ public class ItemPlotUpgrade extends Item
         {
             for (BlockPos pos : allowedExistingSizes)
             {
-                if (pos.equals(existingSize) || pos.equals(existingSize.add(-1, 0, -1)))
+                if (existingSize.equals(pos) || existingSize.equals(pos.add(-1, 0, -1)))
                 {
                     allow = true;
                     break;
