@@ -131,7 +131,7 @@ public class Instances
     public void serverStarting(FMLServerStartingEvent event)
     {
         event.registerServerCommand(new Commands());
-        event.registerServerCommand(new CMDWeatherD());
+        event.registerServerCommand(new CmdDimWeather());
         event.registerServerCommand(new CmdDimTime());
         event.registerServerCommand(new CmdDimTP());
         event.registerServerCommand(new CmdEscape());

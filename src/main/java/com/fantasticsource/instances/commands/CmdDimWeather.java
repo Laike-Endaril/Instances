@@ -14,7 +14,7 @@ import net.minecraftforge.common.DimensionManager;
 import java.util.List;
 import java.util.Random;
 
-public class CMDWeatherD extends CommandBase
+public class CmdDimWeather extends CommandBase
 {
     /**
      * Get the name of the command
@@ -22,7 +22,7 @@ public class CMDWeatherD extends CommandBase
     @Override
     public String getName()
     {
-        return "weatherd";
+        return "dimweather";
     }
 
     /**
@@ -37,7 +37,7 @@ public class CMDWeatherD extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return Instances.MODID + ".commands.weatherd.usage";
+        return Instances.MODID + ".commands.dimweather.usage";
     }
 
     /**
@@ -85,7 +85,7 @@ public class CMDWeatherD extends CommandBase
                 {
                     if (!"thunder".equalsIgnoreCase(args[1]))
                     {
-                        throw new WrongUsageException(Instances.MODID + ".commands.weatherd.usage");
+                        throw new WrongUsageException(Instances.MODID + ".commands.dimweather.usage");
                     }
 
                     worldinfo.setCleanWeatherTime(0);
@@ -103,7 +103,7 @@ public class CMDWeatherD extends CommandBase
         }
         else
         {
-            throw new WrongUsageException(Instances.MODID + ".commands.weatherd.usage");
+            throw new WrongUsageException(Instances.MODID + ".commands.dimweather.usage");
         }
     }
 

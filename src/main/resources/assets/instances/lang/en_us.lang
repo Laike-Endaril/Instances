@@ -16,7 +16,7 @@ instances.noInstances=There currently are no Instances
 instances.customizeTitle=Customize Instance Settings
 instances.instanceType=Dimension Type:
 
-instances.commands.weatherd.usage=/weatherd <dimension> <clear|rain|thunder> [duration in seconds]
+instances.commands.dimweather.usage=/dimweather <dimension> <clear|rain|thunder> [duration in seconds]
 instances.commands.dimtime.usage=/dimtime <dimension> <set|add|query> <value>
 instances.commands.dimtp.usage=/dimtp [target player] <destination player> OR /dimtp [dimensionID] [target player] <x> <y> <z> [<y-rot> <x-rot>]
 
