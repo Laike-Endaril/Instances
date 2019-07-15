@@ -2,7 +2,7 @@ package com.fantasticsource.instances.server;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.tileentities.TEInstancePortal;
-import com.fantasticsource.instances.commands.CmdTPD;
+import com.fantasticsource.instances.commands.CmdDimTP;
 import com.fantasticsource.instances.commands.TeleporterSimple;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
@@ -131,7 +131,7 @@ public class Teleport
         return teleport(null, server, server, entity, new String[]{"" + dimension, "" + x, "" + y, "" + z, "" + yaw, "" + pitch});
     }
 
-    public static boolean teleport(CmdTPD command, MinecraftServer server, ICommandSender sender, Entity entity, String[] args)
+    public static boolean teleport(CmdDimTP command, MinecraftServer server, ICommandSender sender, Entity entity, String[] args)
     {
         if (entity == null)
         {
@@ -165,7 +165,7 @@ public class Teleport
 
         if (args.length < 1)
         {
-            sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.tpd.usage"));
+            sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.dimtp.usage"));
             return false;
         }
 
@@ -258,7 +258,7 @@ public class Teleport
         {
             if (args.length < b0 + 3 || !dimensionThere)
             {
-                sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.tpd.usage"));
+                sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.dimtp.usage"));
                 return false;
             }
 
@@ -274,7 +274,7 @@ public class Teleport
             }
             catch (NumberInvalidException e)
             {
-                sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.tpd.usage"));
+                sender.sendMessage(new TextComponentString(Instances.MODID + ".commands.dimtp.usage"));
                 return false;
             }
 

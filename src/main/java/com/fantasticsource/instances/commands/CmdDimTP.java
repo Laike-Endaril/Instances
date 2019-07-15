@@ -13,11 +13,11 @@ import net.minecraftforge.common.DimensionManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CmdTPD extends CommandBase
+public class CmdDimTP extends CommandBase
 {
     public String getName()
     {
-        return "tpd";
+        return "dimtp";
     }
 
     public int getRequiredPermissionLevel()
@@ -27,7 +27,7 @@ public class CmdTPD extends CommandBase
 
     public String getUsage(ICommandSender sender)
     {
-        return Instances.MODID + ".commands.tpd.usage";
+        return Instances.MODID + ".commands.dimtp.usage";
     }
 
     public void execute(MinecraftServer server, ICommandSender sender, String[] args)

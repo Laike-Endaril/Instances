@@ -133,7 +133,7 @@ public class Instances
         event.registerServerCommand(new Commands());
         event.registerServerCommand(new CMDWeatherD());
         event.registerServerCommand(new CmdDimTime());
-        event.registerServerCommand(new CmdTPD());
+        event.registerServerCommand(new CmdDimTP());
         event.registerServerCommand(new CmdEscape());
         event.registerServerCommand(new CmdVisitors());
 
