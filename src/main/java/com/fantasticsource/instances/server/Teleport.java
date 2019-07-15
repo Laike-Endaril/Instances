@@ -3,7 +3,6 @@ package com.fantasticsource.instances.server;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.tileentities.TEInstancePortal;
 import com.fantasticsource.instances.commands.CmdDimTP;
-import com.fantasticsource.instances.commands.TeleporterSimple;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
