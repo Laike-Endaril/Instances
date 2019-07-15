@@ -2,7 +2,7 @@
 {
   "modid": "instances",
   "name": "Instances",
-  "description": "Allows the creation and handling of area instances.  Originally based on/forked from lumien's Simple Dimensions mod",
+  "description": "Allows the creation and handling of dimension instances and portals",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
