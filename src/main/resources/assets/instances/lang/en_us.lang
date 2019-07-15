@@ -17,7 +17,7 @@ instances.customizeTitle=Customize Instance Settings
 instances.instanceType=Dimension Type:
 
 instances.commands.weatherd.usage=/weatherd <dimension> <clear|rain|thunder> [duration in seconds]
-instances.commands.timed.usage=/timed <dimension> <set|add|query> <value>
+instances.commands.dimtime.usage=/dimtime <dimension> <set|add|query> <value>
 instances.commands.tpd.usage=/tpd [target player] <destination player> OR /tpd [dimensionID] [target player] <x> <y> <z> [<y-rot> <x-rot>]
 
 instances.worldType.void=Void Instance

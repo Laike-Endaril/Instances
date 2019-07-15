@@ -9,13 +9,13 @@ import net.minecraftforge.common.DimensionManager;
 
 import java.util.List;
 
-public class CmdTimeD extends CommandBase
+public class CmdDimTime extends CommandBase
 {
 
     @Override
     public String getName()
     {
-        return "timed";
+        return "dimtime";
     }
 
     @Override
@@ -27,7 +27,7 @@ public class CmdTimeD extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return Instances.MODID + ".commands.timed.usage";
+        return Instances.MODID + ".commands.dimtime.usage";
     }
 
     @Override
@@ -96,7 +96,7 @@ public class CmdTimeD extends CommandBase
             }
         }
 
-        throw new WrongUsageException(Instances.MODID + ".commands.timed.usage");
+        throw new WrongUsageException(Instances.MODID + ".commands.dimtime.usage");
     }
 
     @Override
