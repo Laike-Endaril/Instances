@@ -26,10 +26,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -125,6 +122,12 @@ public class Instances
     public void init(FMLInitializationEvent event)
     {
         Network.init();
+    }
+
+    @EventHandler
+    public void serverStartingPre(FMLServerAboutToStartEvent event)
+    {
+        if (!event.getServer().getAllowNether()) throw new IllegalStateException("The Instances mod cannot run with allow-nether set to false in server.properties! (MC bug: https://bugs.mojang.com/browse/MC-85267)");
     }
 
     @EventHandler

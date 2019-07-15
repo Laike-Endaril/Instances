@@ -4,18 +4,13 @@
 
 Are players not properly being added to an instance world's player entity list upon teleport?
 
-
-
-Make sure deleting an instance with offline players in it works correctly
+Make sure deleting an instance with offline players in it works correctly or is disallowed
 
 
 
 Non-Faerun
 
 Disallow duplicate instance names?
-
-Fix vanilla's BS allow-nether server setting in server.properties...setting it to false disables ALL dimension types besides the overworld!
-https://bugs.mojang.com/browse/MC-85267
 
 
 
