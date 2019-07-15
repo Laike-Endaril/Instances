@@ -1,7 +1,5 @@
 * Instances are not fully synced to clients; only dimensiontypes are synced
 
-** Check interaction protection!!!
-
 
 
 Are players not properly being added to an instance world's player entity list upon teleport?
@@ -24,7 +22,5 @@ https://bugs.mojang.com/browse/MC-85267
 
 
 Low priority
-
-Fix spinny camera bug when changing yaw/pitch during a teleport (currently avoiding by not changing yaw/pitch)
 
 Get the client F3 to show the biome correctly
