@@ -98,6 +98,18 @@ public class Teleport
         return joinPossiblyCreating(player, player.getName());
     }
 
+    public static boolean joinPossiblyCreating(Entity entity, int dimension)
+    {
+        InstanceWorldInfo info = InstanceHandler.get(dimension);
+        if (info == null)
+        {
+            entity.sendMessage(new TextComponentString("Instance not found: " + dimension));
+            return false;
+        }
+
+        return Teleport.teleport(entity, dimension, 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
+    }
+
     public static boolean joinPossiblyCreating(Entity entity, String ownername)
     {
         UUID id = PlayerData.getID(ownername);
