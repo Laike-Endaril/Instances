@@ -45,6 +45,8 @@ public class BlocksAndItems
     public static BlockVisitorPortal blockVisitorPortal;
     @GameRegistry.ObjectHolder("instances:visitorportal")
     public static ItemVisitorPortal itemVisitorPortal;
+
+
     public static CreativeTabs creativeTab = new CreativeTabs(Instances.MODID)
     {
         @Override
@@ -59,7 +61,9 @@ public class BlocksAndItems
             super.displayAllRelevantItems(itemStacks);
         }
     };
+
     private static ArrayList<ItemPlotUpgrade> plotUpgrades = new ArrayList<>();
+
     @GameRegistry.ObjectHolder("instances:plotoddeven")
     private static ItemPlotOddEvenSwitcher oddEvenSwitcher;
 

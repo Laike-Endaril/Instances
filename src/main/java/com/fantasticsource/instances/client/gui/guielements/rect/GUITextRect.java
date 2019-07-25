@@ -22,9 +22,9 @@ public class GUITextRect extends GUIRectElement
         this.pressedColor = pressedColor;
     }
 
-    public void recalcHeight(double width, double screenHeight)
+    public void recalcHeight(double pxWidth, double pxHeight)
     {
-        height = (double) fontRenderer.getWordWrappedHeight(text, (int) width) / screenHeight;
+        height = (double) fontRenderer.getWordWrappedHeight(text, (int) pxWidth) / pxHeight;
     }
 
     @Override
