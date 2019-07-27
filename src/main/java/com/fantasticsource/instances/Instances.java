@@ -35,12 +35,12 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.UUID;
 
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,)", acceptableRemoteVersions = "[1.12.2.000n,1.12.2.000o]")
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,)")
 public class Instances
 {
     public static final String MODID = "instances";
     public static final String NAME = "Instances";
-    public static final String VERSION = "1.12.2.000o";
+    public static final String VERSION = "1.12.2.000p";
 
     public static Integer nextFreeDimID()
     {
@@ -242,5 +242,11 @@ public class Instances
                 else Teleport.joinPossiblyCreating(entity, entity.dimension);
             }
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void playerLoggedOff(PlayerEvent.PlayerLoggedOutEvent event)
+    {
+        Teleport.escape(event.player);
     }
 }
