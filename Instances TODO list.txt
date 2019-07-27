@@ -10,7 +10,7 @@ Make sure deleting an instance with offline players in it works correctly or is 
 
 Non-Faerun
 
-Disallow duplicate instance names?
+Disallow duplicate instance names
 
 
 

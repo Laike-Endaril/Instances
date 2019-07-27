@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 
@@ -259,6 +260,11 @@ public class ItemPlotUpgrade extends Item
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
     {
+        if (this != BlocksAndItems.plotUpgrades.get(0))
+        {
+            tooltip.add(TextFormatting.RED + "REQUIRES THE PREVIOUS UPGRADE!");
+            tooltip.add("");
+        }
         tooltip.add("Upgrades a personal instance to " + sizeString(size));
         tooltip.add("");
         tooltip.add("Or in odd layout, to " + sizeString(size.add(-1, 0, -1)));

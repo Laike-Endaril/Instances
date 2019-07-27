@@ -62,7 +62,7 @@ public class BlocksAndItems
         }
     };
 
-    private static ArrayList<ItemPlotUpgrade> plotUpgrades = new ArrayList<>();
+    public static ArrayList<ItemPlotUpgrade> plotUpgrades = new ArrayList<>();
 
     @GameRegistry.ObjectHolder("instances:plotoddeven")
     private static ItemPlotOddEvenSwitcher oddEvenSwitcher;
