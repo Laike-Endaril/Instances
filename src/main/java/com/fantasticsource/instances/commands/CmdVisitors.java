@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.commands;
 
+import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
@@ -65,8 +66,8 @@ public class CmdVisitors extends CommandBase
             return;
         }
 
-        PlayerData data = PlayerData.get(args[0]);
-        if (data == null)
+        PlayerData playerData = PlayerData.get(args[0]);
+        if (playerData == null)
         {
             player.sendMessage(new TextComponentString("Player not found: " + args[0]));
             return;
@@ -80,7 +81,7 @@ public class CmdVisitors extends CommandBase
 
         if (args.length == 1)
         {
-            if (info == null || !info.visitorWhitelist.contains(data.id)) player.sendMessage(new TextComponentString(args[0] + " is currently NOT allowed to visit you"));
+            if (info == null || !info.visitorWhitelist.contains(playerData.id)) player.sendMessage(new TextComponentString(args[0] + " is currently NOT allowed to visit you"));
             else player.sendMessage(new TextComponentString(args[0] + " is currently allowed to visit you"));
         }
         else if (args.length == 2)
@@ -92,34 +93,42 @@ public class CmdVisitors extends CommandBase
                     info = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, player.getPersistentID(), player.getName() + "'s " + InstanceTypes.skyroomDimType.name()).getValue();
                 }
 
-                if (info.visitorWhitelist.contains(data.id))
+                if (info.visitorWhitelist.contains(playerData.id))
                 {
                     player.sendMessage(new TextComponentString(args[0] + " can visit you"));
                     return;
                 }
 
-                info.visitorWhitelist.add(data.id);
+                info.visitorWhitelist.add(playerData.id);
                 player.sendMessage(new TextComponentString(args[0] + " can now visit you"));
 
-                InstanceHandler.visitablePlayersData.computeIfAbsent(data.id, o -> new VisitablePlayersData()).add(player.getPersistentID());
+                InstanceHandler.visitablePlayersData.computeIfAbsent(playerData.id, o -> new VisitablePlayersData()).add(player.getPersistentID());
             }
             else if (args[1].toLowerCase().equals("deny"))
             {
-                if (info == null || !info.visitorWhitelist.contains(data.id))
+                if (info == null || !info.visitorWhitelist.contains(playerData.id))
                 {
                     player.sendMessage(new TextComponentString(args[0] + " cannot visit you"));
                     return;
                 }
 
-                info.visitorWhitelist.remove(data.id);
-                player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));
+                info.visitorWhitelist.remove(playerData.id);
 
-                VisitablePlayersData visitData = InstanceHandler.visitablePlayersData.get(data.id);
+                EntityPlayerMP otherPlayer = (EntityPlayerMP) playerData.player;
+                if (otherPlayer != null)
+                {
+                    InstanceWorldInfo info1 = InstanceHandler.get(otherPlayer.dimension);
+                    if (info1 != null && player.getPersistentID().equals(info1.getOwner())) Teleport.escape(otherPlayer);
+                }
+
+                VisitablePlayersData visitData = InstanceHandler.visitablePlayersData.get(playerData.id);
                 if (visitData != null)
                 {
-                    visitData.remove(data.id);
-                    if (visitData.visitablePlayers.size() == 0) InstanceHandler.visitablePlayersData.remove(data.id);
+                    visitData.remove(player.getPersistentID());
+                    if (visitData.visitablePlayers.size() == 0) InstanceHandler.visitablePlayersData.remove(playerData.id);
                 }
+
+                player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));
             }
             else player.sendMessage(new TextComponentString(getUsage(player)));
         }

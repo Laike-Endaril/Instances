@@ -206,9 +206,9 @@ public class InstanceHandler extends WorldSavedData
         return result;
     }
 
-    public static InstanceWorldInfo get(int id)
+    public static InstanceWorldInfo get(int instDimID)
     {
-        return instanceInfo.get(id);
+        return instanceInfo.get(instDimID);
     }
 
     @Override
