@@ -144,7 +144,16 @@ public class Instances
     }
 
     @EventHandler
-    public void serverStop(FMLServerStoppedEvent event)
+    public void serverStopping(FMLServerStoppingEvent event)
+    {
+        for (EntityPlayerMP player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers())
+        {
+            Teleport.escape(player);
+        }
+    }
+
+    @EventHandler
+    public void serverStopped(FMLServerStoppedEvent event)
     {
         InstanceHandler.unloadHandler();
     }
