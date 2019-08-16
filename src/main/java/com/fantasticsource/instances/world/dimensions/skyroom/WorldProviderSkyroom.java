@@ -9,6 +9,7 @@ import net.minecraft.world.gen.IChunkGenerator;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.UUID;
 
 public class WorldProviderSkyroom extends WorldProvider
 {
@@ -31,12 +32,11 @@ public class WorldProviderSkyroom extends WorldProvider
     public String getSaveFolder()
     {
         int dim = getDimension();
-
-        String name = "Unknown_" + TYPE_NAME;
-
         InstanceWorldInfo info = InstanceHandler.get(dim);
-        if (info != null) name = info.getWorldName();
+        if (info == null) throw new IllegalStateException();
 
-        return "instances" + File.separator + TYPE_NAME + File.separator + name;
+        UUID owner = info.getOwner();
+
+        return "instances" + File.separator + TYPE_NAME + File.separator + (owner != null ? owner : "Unowned_" + info.getWorldName());
     }
 }

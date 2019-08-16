@@ -7,6 +7,7 @@ import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
@@ -47,22 +48,10 @@ public class InstanceHandler
     {
         System.out.println("Attempting to save...");
 
-        File f = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()));
+        File f = new File(info.SAVE_FOLDER_NAME);
         if (!f.exists())
         {
-            if (!f.mkdir()) throw new IllegalStateException("Failed to create " + f);
-        }
-
-        f = new File(f.getAbsolutePath() + File.separator + info.getDimensionType().getName().replaceAll(" ", "_"));
-        if (!f.exists())
-        {
-            if (!f.mkdir()) throw new IllegalStateException("Failed to create " + f);
-        }
-
-        f = new File(f.getAbsolutePath() + File.separator + info.getWorldName());
-        if (!f.exists())
-        {
-            if (!f.mkdir()) throw new IllegalStateException("Failed to create " + f);
+            if (!f.mkdirs()) throw new IllegalStateException("Failed to create " + f);
         }
 
         f = new File(f.getAbsolutePath() + File.separator + "instanceData.txt");
@@ -133,7 +122,15 @@ public class InstanceHandler
                                 }
                             }
 
-                            createInstance(null, instanceType, owner, instanceFolder.getName(), false);
+                            if (instanceType == InstanceTypes.skyroomDimType)
+                            {
+                                String playername = PlayerData.getName(owner);
+                                createInstance(null, instanceType, owner, playername != null ? playername + "'s " + InstanceTypes.skyroomDimType.getName() : instanceFolder.getName(), false);
+                            }
+                            else
+                            {
+                                throw new IllegalStateException("Found unknown file: " + instanceFile);
+                            }
 
                             s = reader.readLine();
                             while (s != null)
@@ -186,8 +183,7 @@ public class InstanceHandler
 
         WorldType worldType = DimensionManager.getWorld(0).getWorldInfo().getTerrainType();
         WorldSettings settings = new WorldSettings(new Random().nextLong(), GameType.CREATIVE, true, false, worldType);
-        InstanceWorldInfo worldInfo = new InstanceWorldInfo(dimensionID, settings, name, dimType);
-        worldInfo.setOwner(owner);
+        InstanceWorldInfo worldInfo = new InstanceWorldInfo(dimensionID, settings, owner, name, dimType);
         if (save)
         {
             try

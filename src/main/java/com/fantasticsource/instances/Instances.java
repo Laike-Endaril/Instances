@@ -98,8 +98,10 @@ public class Instances
     }
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event)
+    public void preInit(FMLPreInitializationEvent event) throws IOException
     {
+        Converter.convert();
+
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
 
