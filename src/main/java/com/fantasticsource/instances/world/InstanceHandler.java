@@ -10,14 +10,12 @@ import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.*;
 import net.minecraft.world.storage.ISaveHandler;
-import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
@@ -36,14 +34,13 @@ public class InstanceHandler
     public static LinkedHashMap<UUID, VisitablePlayersData> visitablePlayersData = new LinkedHashMap<>();
 
 
-    public static void unload(World world) throws IOException
+    public static void unload(InstanceWorldInfo info) throws IOException
     {
-        WorldInfo worldInfo = world.getWorldInfo();
-        if (!(worldInfo instanceof InstanceWorldInfo)) return;
-
-        InstanceWorldInfo info = (InstanceWorldInfo) worldInfo;
-        save(info);
-        info.world = null;
+        if (info.world != null)
+        {
+            save(info);
+            info.world = null;
+        }
     }
 
     public static void save(InstanceWorldInfo info) throws IOException
@@ -169,28 +166,16 @@ public class InstanceHandler
         }
     }
 
-    private static void clear()
+    public static void clear() throws IOException
     {
         for (Map.Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
         {
-            int id = entry.getKey();
-            DimensionManager.unregisterDimension(id);
+            unload(entry.getValue());
+            DimensionManager.unregisterDimension(entry.getKey());
         }
 
         instanceInfo.clear();
         visitablePlayersData.clear();
-    }
-
-    public static void createInstance(EntityPlayerMP playerEntity, InstanceWorldInfo worldInfo)
-    {
-        int dimensionID = Instances.nextFreeDimID();
-        instanceInfo.put(dimensionID, worldInfo);
-
-        DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
-
-        playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
-
-        Network.WRAPPER.sendToAll(new SyncInstancesPacket());
     }
 
     public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType dimType, UUID owner, String name, boolean save)
@@ -248,7 +233,7 @@ public class InstanceHandler
         }
     }
 
-    public static void deleteInstance(ICommandSender sender, InstanceWorldInfo info)
+    public static void delete(ICommandSender sender, InstanceWorldInfo info)
     {
         int dimensionID = info.dimensionID;
         File file = new File(info.SAVE_FOLDER_NAME);

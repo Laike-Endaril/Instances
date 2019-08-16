@@ -110,7 +110,7 @@ public class Commands extends CommandBase
                         }
                     }
 
-                    if (info != null) InstanceHandler.deleteInstance(sender, info);
+                    if (info != null) InstanceHandler.delete(sender, info);
                     else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));

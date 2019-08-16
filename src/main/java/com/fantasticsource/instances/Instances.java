@@ -19,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -142,12 +143,14 @@ public class Instances
     }
 
     @EventHandler
-    public void serverStopping(FMLServerStoppingEvent event)
+    public void serverStopping(FMLServerStoppingEvent event) throws IOException
     {
         for (EntityPlayerMP player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers())
         {
             Teleport.escape(player);
         }
+
+        InstanceHandler.clear();
     }
 
     @SubscribeEvent
@@ -239,6 +242,11 @@ public class Instances
     public void worldUnload(WorldEvent.Unload event) throws IOException
     {
         World world = event.getWorld();
-        if (!world.isRemote) InstanceHandler.unload(world);
+        if (world.isRemote) return;
+
+        WorldInfo info = world.getWorldInfo();
+        if (!(info instanceof InstanceWorldInfo)) return;
+
+        InstanceHandler.unload((InstanceWorldInfo) info);
     }
 }

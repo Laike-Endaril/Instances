@@ -444,7 +444,7 @@ public class Teleport
             InstanceWorldInfo oldInfo = InstanceHandler.get(oldDim);
             if (oldInfo != null && oldInfo.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
             {
-                InstanceHandler.deleteInstance(server, oldInfo);
+                InstanceHandler.delete(server, oldInfo);
             }
 
             //Fix exp desync
