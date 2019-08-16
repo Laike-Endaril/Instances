@@ -37,6 +37,6 @@ public class WorldProviderSkyroom extends WorldProvider
 
         UUID owner = info.getOwner();
 
-        return "instances" + File.separator + TYPE_NAME + File.separator + (owner != null ? owner : "Unowned_" + info.getWorldName());
+        return "instances" + File.separator + TYPE_NAME + File.separator + (owner != null ? owner : info.getWorldName());
     }
 }

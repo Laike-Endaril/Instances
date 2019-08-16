@@ -47,7 +47,7 @@ public class InstanceWorldInfo extends WorldInfo
         this.dimensionID = dimensionID;
         this.owner = owner;
 
-        SAVE_FOLDER_NAME = InstanceTypes.getInstanceTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), dimensionType) + (owner != null ? owner : "Unowned_" + getWorldName()) + File.separator;
+        SAVE_FOLDER_NAME = InstanceTypes.getInstanceTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), dimensionType) + (owner != null ? owner : getWorldName()) + File.separator;
     }
 
     @Override
@@ -75,6 +75,11 @@ public class InstanceWorldInfo extends WorldInfo
         return owner;
     }
 
+    public void setOwner(EntityPlayerMP player)
+    {
+        setOwner(player.getPersistentID());
+    }
+
     public void setOwner(UUID id)
     {
         owner = id;
@@ -92,10 +97,5 @@ public class InstanceWorldInfo extends WorldInfo
                 }
             }
         }
-    }
-
-    public void setOwner(EntityPlayerMP player)
-    {
-        setOwner(player.getPersistentID());
     }
 }
