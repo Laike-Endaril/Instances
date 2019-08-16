@@ -23,6 +23,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -32,6 +33,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
+
+import java.io.IOException;
 
 @Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021,)", acceptableRemoteVersions = "[1.12.2.000p,1.12.2.000q]")
 public class Instances
@@ -44,10 +47,7 @@ public class Instances
     {
         for (int i = Integer.MIN_VALUE; i < Integer.MAX_VALUE; i++)
         {
-            if (!DimensionManager.isDimensionRegistered(i))
-            {
-                return i;
-            }
+            if (!DimensionManager.isDimensionRegistered(i)) return i;
         }
         return null;
     }
@@ -129,7 +129,7 @@ public class Instances
     }
 
     @EventHandler
-    public void serverStarting(FMLServerStartingEvent event)
+    public void serverStarting(FMLServerStartingEvent event) throws IOException
     {
         event.registerServerCommand(new Commands());
         event.registerServerCommand(new CmdDimWeather());
@@ -138,7 +138,7 @@ public class Instances
         event.registerServerCommand(new CmdEscape());
         event.registerServerCommand(new CmdVisitors());
 
-        InstanceHandler.init();
+        InstanceHandler.load(event);
     }
 
     @EventHandler
@@ -148,12 +148,6 @@ public class Instances
         {
             Teleport.escape(player);
         }
-    }
-
-    @EventHandler
-    public void serverStopped(FMLServerStoppedEvent event)
-    {
-        InstanceHandler.unloadHandler();
     }
 
     @SubscribeEvent
@@ -239,5 +233,12 @@ public class Instances
     public void playerLoggedOff(PlayerEvent.PlayerLoggedOutEvent event)
     {
         Teleport.escape(event.player);
+    }
+
+    @SubscribeEvent
+    public void worldUnload(WorldEvent.Unload event) throws IOException
+    {
+        World world = event.getWorld();
+        if (!world.isRemote) InstanceHandler.save(world);
     }
 }

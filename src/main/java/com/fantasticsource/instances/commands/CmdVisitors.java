@@ -5,6 +5,7 @@ import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -14,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -90,7 +92,7 @@ public class CmdVisitors extends CommandBase
             {
                 if (info == null)
                 {
-                    info = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, player.getPersistentID(), player.getName() + "'s " + InstanceTypes.skyroomDimType.name()).getValue();
+                    info = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, player.getPersistentID(), player.getName() + "'s " + InstanceTypes.skyroomDimType.getName(), false).getValue();
                 }
 
                 if (info.visitorWhitelist.contains(playerData.id))
@@ -99,10 +101,21 @@ public class CmdVisitors extends CommandBase
                     return;
                 }
 
-                info.visitorWhitelist.add(playerData.id);
-                player.sendMessage(new TextComponentString(args[0] + " can now visit you"));
-
                 InstanceHandler.visitablePlayersData.computeIfAbsent(playerData.id, o -> new VisitablePlayersData()).add(player.getPersistentID());
+
+
+                info.visitorWhitelist.add(playerData.id);
+                try
+                {
+                    InstanceHandler.save(info);
+                }
+                catch (IOException e)
+                {
+                    MCTools.crash(e, 2000, false);
+                }
+
+
+                player.sendMessage(new TextComponentString(args[0] + " can now visit you"));
             }
             else if (args[1].toLowerCase().equals("deny"))
             {
@@ -111,8 +124,6 @@ public class CmdVisitors extends CommandBase
                     player.sendMessage(new TextComponentString(args[0] + " cannot visit you"));
                     return;
                 }
-
-                info.visitorWhitelist.remove(playerData.id);
 
                 EntityPlayerMP otherPlayer = (EntityPlayerMP) playerData.player;
                 if (otherPlayer != null)
@@ -127,6 +138,18 @@ public class CmdVisitors extends CommandBase
                     visitData.remove(player.getPersistentID());
                     if (visitData.visitablePlayers.size() == 0) InstanceHandler.visitablePlayersData.remove(playerData.id);
                 }
+
+
+                info.visitorWhitelist.remove(playerData.id);
+                try
+                {
+                    InstanceHandler.save(info);
+                }
+                catch (IOException e)
+                {
+                    MCTools.crash(e, 2000, false);
+                }
+
 
                 player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));
             }

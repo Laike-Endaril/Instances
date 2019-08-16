@@ -22,7 +22,7 @@ import java.util.UUID;
 public class InstanceWorldInfo extends WorldInfo
 {
     public ArrayList<UUID> visitorWhitelist = new ArrayList<>();
-    private DimensionType dimensionType = DimensionType.OVERWORLD;
+    private DimensionType dimensionType = null;
     private UUID owner = null;
 
     public InstanceWorldInfo(NBTTagCompound nbt)
@@ -80,6 +80,21 @@ public class InstanceWorldInfo extends WorldInfo
         return dimensionType;
     }
 
+    public void setDimensionType(DimensionType dimensionType)
+    {
+        this.dimensionType = dimensionType;
+    }
+
+    public void setOwner(EntityPlayerMP player)
+    {
+        setOwner(player.getPersistentID());
+    }
+
+    public UUID getOwner()
+    {
+        return owner;
+    }
+
     public void setOwner(UUID id)
     {
         owner = id;
@@ -97,15 +112,5 @@ public class InstanceWorldInfo extends WorldInfo
                 }
             }
         }
-    }
-
-    public UUID getOwner()
-    {
-        return owner;
-    }
-
-    public void setOwner(EntityPlayerMP player)
-    {
-        setOwner(player.getPersistentID());
     }
 }

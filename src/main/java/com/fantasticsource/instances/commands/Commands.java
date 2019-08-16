@@ -5,6 +5,7 @@ import com.fantasticsource.instances.network.messages.OpenCreationGUIPacket;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -15,6 +16,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.util.FakePlayer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -107,12 +109,12 @@ public class Commands extends CommandBase
                 else if (args.length == 2)
                 {
                     //No GUI, no owner
-                    InstanceHandler.createInstance(sender, DimensionType.byName(args[1]), null, args[1] + " Instance");
+                    InstanceHandler.createInstance(sender, DimensionType.byName(args[1]), null, args[1] + " Instance", true);
                 }
                 else if (args.length == 3)
                 {
                     //No GUI, has owner
-                    InstanceHandler.createInstance(sender, DimensionType.byName(args[1]), PlayerData.getID(args[2]), args[2] + "'s " + args[1]);
+                    InstanceHandler.createInstance(sender, DimensionType.byName(args[1]), PlayerData.getID(args[2]), args[2] + "'s " + args[1], true);
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
@@ -177,7 +179,16 @@ public class Commands extends CommandBase
                     }
 
                     info.setOwner(id);
-                    sender.sendMessage(new TextComponentString("Set owner of " + info.getWorldName() + " to " + PlayerData.getName(id) + " (ID = " + args[1] + ", type = " + info.getDimensionType().name() + ")"));
+                    try
+                    {
+                        InstanceHandler.save(info);
+                    }
+                    catch (IOException e)
+                    {
+                        MCTools.crash(e, 2000, false);
+                    }
+
+                    sender.sendMessage(new TextComponentString("Set owner of " + info.getWorldName() + " to " + PlayerData.getName(id) + " (ID = " + args[1] + ", type = " + info.getDimensionType().getName() + ")"));
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;

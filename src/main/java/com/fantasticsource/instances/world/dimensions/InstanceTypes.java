@@ -10,7 +10,14 @@ public class InstanceTypes
 {
     public static DimensionType voidDimType = DimensionType.register("Void", "_void", Instances.nextFreeDimTypeID(), WorldProviderVoid.class, false);
     public static DimensionType skyroomDimType = DimensionType.register("Skyroom", "_skyroom", Instances.nextFreeDimTypeID(), WorldProviderSkyroom.class, false);
-    public static DimensionType libraryOfWorldsDimType = DimensionType.register("Library of Worlds", "_libraryofworlds", Instances.nextFreeDimTypeID(), WorldProviderLibraryOfWorlds.class, false);
+    public static DimensionType libraryOfWorldsDimType = DimensionType.register("Library of Worlds", "_library_of_worlds", Instances.nextFreeDimTypeID(), WorldProviderLibraryOfWorlds.class, false);
+
+    public static DimensionType[] dimensionTypes = new DimensionType[]
+            {
+                    voidDimType,
+                    skyroomDimType,
+                    libraryOfWorldsDimType
+            };
 
     public static void init()
     {
