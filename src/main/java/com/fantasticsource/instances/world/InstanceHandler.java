@@ -39,6 +39,7 @@ public class InstanceHandler
     public static void save(World world) throws IOException
     {
         WorldInfo worldInfo = world.getWorldInfo();
+
         if (!(worldInfo instanceof InstanceWorldInfo)) return;
         save((InstanceWorldInfo) worldInfo);
     }
@@ -131,7 +132,7 @@ public class InstanceHandler
                                 }
                             }
 
-                            createInstance(null, instanceType, owner, instanceFile.getName(), false);
+                            createInstance(null, instanceType, owner, instanceFolder.getName(), false);
 
                             s = reader.readLine();
                             while (s != null)
