@@ -122,7 +122,7 @@ public class InstanceHandler
                                 {
                                     try
                                     {
-                                        owner = UUID.fromString(reader.readLine());
+                                        owner = UUID.fromString(s);
                                     }
                                     catch (IllegalArgumentException e)
                                     {
