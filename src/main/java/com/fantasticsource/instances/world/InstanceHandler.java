@@ -7,6 +7,7 @@ import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
@@ -21,7 +22,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.*;
@@ -65,7 +65,7 @@ public class InstanceHandler
             if (!f.mkdir()) throw new IllegalStateException("Failed to create " + f);
         }
 
-        f = new File(f.getAbsolutePath() + File.separator + "data.txt");
+        f = new File(f.getAbsolutePath() + File.separator + "instanceData.txt");
 
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(f));
@@ -105,7 +105,7 @@ public class InstanceHandler
             {
                 if (!instanceFolder.isDirectory()) continue;
 
-                File instanceFile = new File(instanceFolder.getAbsolutePath() + File.separator + "data.txt");
+                File instanceFile = new File(instanceFolder.getAbsolutePath() + File.separator + "instanceData.txt");
                 if (!instanceFile.exists() || instanceFile.isDirectory()) continue;
 
 
@@ -222,7 +222,7 @@ public class InstanceHandler
 
         ISaveHandler savehandler = overworld.getSaveHandler();
 
-        WorldServer world = (WorldServer) (new WorldCustom(info, server, savehandler, info.dimensionID, overworld, server.profiler).init());
+        WorldInstance world = new WorldInstance(info, server, savehandler, info.dimensionID, overworld, server.profiler).init();
         info.world = world;
         world.addEventListener(new ServerWorldEventHandler(server, world));
         MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
@@ -236,9 +236,6 @@ public class InstanceHandler
     public static void delete(ICommandSender sender, InstanceWorldInfo info)
     {
         int dimensionID = info.dimensionID;
-        File file = new File(info.SAVE_FOLDER_NAME);
-
-
         WorldServer world = info.world;
         if (world != null)
         {
@@ -252,15 +249,15 @@ public class InstanceHandler
         instanceInfo.remove(dimensionID);
 
 
-        try
+        File file = new File(info.SAVE_FOLDER_NAME);
+        if (Tools.delete(file))
         {
-            FileUtils.deleteDirectory(file);
             if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Completely deleted dimension " + dimensionID));
         }
-        catch (IOException e)
+        else
         {
-            e.printStackTrace();
-            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually."));
+            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting file: " + file));
+            else System.out.println(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.");
         }
 
         Network.WRAPPER.sendToAll(new SyncInstancesPacket());
@@ -272,7 +269,7 @@ public class InstanceHandler
         for (Map.Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
         {
             InstanceWorldInfo info = entry.getValue();
-            result.add(entry.getKey() + " (" + info.getWorldName() + ") Type = " + info.getDimensionType());
+            result.add(entry.getKey() + " (" + info.getWorldName() + ")");
         }
         return result;
     }

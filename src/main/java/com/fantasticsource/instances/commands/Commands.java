@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -91,21 +92,33 @@ public class Commands extends CommandBase
                 break;
 
             case "delete":
-                if (args.length == 2)
+                if (args.length <= 2)
                 {
                     InstanceWorldInfo info = null;
-                    try
+                    if (args.length == 1)
                     {
-                        info = InstanceHandler.get(Integer.parseInt(args[1]));
-                    }
-                    catch (NumberFormatException e)
-                    {
-                        for (InstanceWorldInfo info1 : InstanceHandler.instanceInfo.values())
+                        if (sender instanceof EntityPlayerMP)
                         {
-                            if (info1.getWorldName().equals(args[1]))
+                            info = InstanceHandler.get(((EntityPlayerMP) sender).dimension);
+                            if (info == null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleting the 'current instance' only works while inside an instance"));
+                        }
+                        else System.out.println("Deleting the 'current instance' is only usable when logged in as a player (and inside an instance)");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            info = InstanceHandler.get(Integer.parseInt(args[1]));
+                        }
+                        catch (NumberFormatException e)
+                        {
+                            for (InstanceWorldInfo info1 : InstanceHandler.instanceInfo.values())
                             {
-                                info = info1;
-                                break;
+                                if (info1.getWorldName().equals(args[1]))
+                                {
+                                    info = info1;
+                                    break;
+                                }
                             }
                         }
                     }

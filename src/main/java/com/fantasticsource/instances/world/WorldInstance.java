@@ -4,19 +4,18 @@ import net.minecraft.profiler.Profiler;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.village.VillageCollection;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.border.IBorderListener;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 
-public class WorldCustom extends WorldServer
+public class WorldInstance extends WorldServer
 {
     private WorldServer delegate;
     private IBorderListener borderListener;
 
-    public WorldCustom(WorldInfo worldInfo, MinecraftServer server, ISaveHandler saveHandlerIn, int dimensionId, WorldServer delegate, Profiler profilerIn)
+    public WorldInstance(WorldInfo worldInfo, MinecraftServer server, ISaveHandler saveHandlerIn, int dimensionId, WorldServer delegate, Profiler profilerIn)
     {
         super(server, saveHandlerIn, worldInfo, dimensionId, profilerIn);
         this.delegate = delegate;
@@ -65,7 +64,7 @@ public class WorldCustom extends WorldServer
         perWorldStorage.saveAllData();
     }
 
-    public World init()
+    public WorldInstance init()
     {
         super.init();
         mapStorage = delegate.getMapStorage();

@@ -10,7 +10,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
@@ -29,7 +28,7 @@ public class InstanceWorldInfo extends WorldInfo
     public final int dimensionID;
 
     public ArrayList<UUID> visitorWhitelist = new ArrayList<>();
-    public WorldServer world = null;
+    public WorldInstance world = null;
 
     private DimensionType dimensionType = null;
     private UUID owner = null;
