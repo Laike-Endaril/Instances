@@ -12,7 +12,7 @@ import java.io.File;
 
 public class WorldProviderSkyroom extends WorldProvider
 {
-    private static final String name = InstanceTypes.skyroomDimType.getName().replaceAll(" ", "_");
+    private static final String TYPE_NAME = InstanceTypes.skyroomDimType.getName().replaceAll(" ", "_");
 
     @Override
     public DimensionType getDimensionType()
@@ -32,11 +32,11 @@ public class WorldProviderSkyroom extends WorldProvider
     {
         int dim = getDimension();
 
-        String name = "Unknown_" + InstanceTypes.skyroomDimType.getName();
+        String name = "Unknown_" + TYPE_NAME;
 
         InstanceWorldInfo info = InstanceHandler.get(dim);
         if (info != null) name = info.getWorldName();
 
-        return "instances" + File.separator + name + File.separator + name;
+        return "instances" + File.separator + TYPE_NAME + File.separator + name;
     }
 }
