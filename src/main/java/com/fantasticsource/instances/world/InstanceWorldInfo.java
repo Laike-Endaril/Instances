@@ -24,11 +24,9 @@ public class InstanceWorldInfo extends WorldInfo
 {
     public final String SAVE_FOLDER_NAME;
     public final int dimensionID;
-
+    private final DimensionType dimensionType;
     public ArrayList<UUID> visitorWhitelist = new ArrayList<>();
     public WorldInstance world = null;
-
-    private final DimensionType dimensionType;
     private UUID owner;
 
     public InstanceWorldInfo(WorldInfo info)
@@ -77,11 +75,6 @@ public class InstanceWorldInfo extends WorldInfo
         return owner;
     }
 
-    public void setOwner(EntityPlayerMP player)
-    {
-        setOwner(player.getPersistentID());
-    }
-
     public void setOwner(UUID id)
     {
         owner = id;
@@ -99,5 +92,10 @@ public class InstanceWorldInfo extends WorldInfo
                 }
             }
         }
+    }
+
+    public void setOwner(EntityPlayerMP player)
+    {
+        setOwner(player.getPersistentID());
     }
 }
