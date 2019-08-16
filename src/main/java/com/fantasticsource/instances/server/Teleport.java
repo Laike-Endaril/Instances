@@ -71,7 +71,8 @@ public class Teleport
         }
 
         //Not found
-        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.libraryOfWorldsDimType, null, player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.getName(), false);
+        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.libraryOfWorldsDimType, null, player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.getName(), true);
+        InstanceHandler.load(pair.getValue());
         return Teleport.teleport(player, pair.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
     }
 
@@ -126,13 +127,12 @@ public class Teleport
 
         //Not found
         Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.getName(), true);
+        InstanceHandler.load(pair.getValue());
         return Teleport.teleport(entity, pair.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
     }
 
     public static boolean teleport(Entity entity, TEInstancePortal.Destination destination)
     {
-        //TODO change yaw and pitch to destination.yaw and destination.pitch and figure out the spinny camera bug it causes in dedicated mode (angle desync?)
-
         return teleport(entity, destination.dimension, destination.x, destination.y, destination.z, entity.rotationYaw, entity.rotationPitch);
     }
 
@@ -444,7 +444,7 @@ public class Teleport
             InstanceWorldInfo oldInfo = InstanceHandler.get(oldDim);
             if (oldInfo != null && oldInfo.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
             {
-                InstanceHandler.deleteInstance(server, oldDim);
+                InstanceHandler.deleteInstance(server, oldInfo);
             }
 
             //Fix exp desync

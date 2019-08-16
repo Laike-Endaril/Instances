@@ -2,11 +2,7 @@ package com.fantasticsource.instances.network;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.client.gui.PersonalPortalGUI;
-import com.fantasticsource.instances.network.handler.CreateInstancePacketHandler;
-import com.fantasticsource.instances.network.handler.OpenCreationGUIPacketHandler;
 import com.fantasticsource.instances.network.handler.SyncInstancesPacketHandler;
-import com.fantasticsource.instances.network.messages.CreateInstancePacket;
-import com.fantasticsource.instances.network.messages.OpenCreationGUIPacket;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
@@ -40,8 +36,6 @@ public class Network
 
     public static void init()
     {
-        WRAPPER.registerMessage(CreateInstancePacketHandler.class, CreateInstancePacket.class, discriminator++, Side.SERVER);
-        WRAPPER.registerMessage(OpenCreationGUIPacketHandler.class, OpenCreationGUIPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(SyncInstancesPacketHandler.class, SyncInstancesPacket.class, discriminator++, Side.CLIENT);
 
         WRAPPER.registerMessage(PersonalPortalGUIPacketHandler.class, PersonalPortalGUIPacket.class, discriminator++, Side.CLIENT);

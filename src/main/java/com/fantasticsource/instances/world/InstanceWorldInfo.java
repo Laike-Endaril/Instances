@@ -1,6 +1,7 @@
 package com.fantasticsource.instances.world;
 
 import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
@@ -9,23 +10,41 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
 public class InstanceWorldInfo extends WorldInfo
 {
+    public final String SAVE_FOLDER_NAME;
+    public final int dimensionID;
+
     public ArrayList<UUID> visitorWhitelist = new ArrayList<>();
+    public WorldServer world = null;
+
     private DimensionType dimensionType = null;
     private UUID owner = null;
 
+    public InstanceWorldInfo(WorldInfo info)
+    {
+        throw new IllegalStateException("Not implemented!");
+    }
+
     public InstanceWorldInfo(NBTTagCompound nbt)
+    {
+        throw new IllegalStateException("Not implemented!");
+    }
+
+    public InstanceWorldInfo(int dimensionID, NBTTagCompound nbt)
     {
         super(nbt);
 
@@ -52,12 +71,18 @@ public class InstanceWorldInfo extends WorldInfo
         {
             visitorWhitelist.add(UUID.fromString(((NBTTagString) tag).getString()));
         }
+
+        this.dimensionID = dimensionID;
+        SAVE_FOLDER_NAME = InstanceTypes.getInstanceTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), dimensionType) + getWorldName() + File.separator;
     }
 
-    public InstanceWorldInfo(WorldSettings settings, String name, DimensionType dimType)
+    public InstanceWorldInfo(int dimensionID, WorldSettings settings, String name, DimensionType dimType)
     {
         super(settings, name);
         dimensionType = dimType != null ? dimType : DimensionType.OVERWORLD;
+
+        this.dimensionID = dimensionID;
+        SAVE_FOLDER_NAME = InstanceTypes.getInstanceTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), dimensionType) + getWorldName() + File.separator;
     }
 
     @Override

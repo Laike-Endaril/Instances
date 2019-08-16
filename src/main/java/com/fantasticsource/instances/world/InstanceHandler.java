@@ -36,17 +36,21 @@ public class InstanceHandler
     public static LinkedHashMap<UUID, VisitablePlayersData> visitablePlayersData = new LinkedHashMap<>();
 
 
-    public static void save(World world) throws IOException
+    public static void unload(World world) throws IOException
     {
         WorldInfo worldInfo = world.getWorldInfo();
-
         if (!(worldInfo instanceof InstanceWorldInfo)) return;
-        save((InstanceWorldInfo) worldInfo);
+
+        InstanceWorldInfo info = (InstanceWorldInfo) worldInfo;
+        save(info);
+        info.world = null;
     }
 
     public static void save(InstanceWorldInfo info) throws IOException
     {
-        File f = new File(MCTools.getDataDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + ".." + File.separator + "instances" + File.separator);
+        System.out.println("Attempting to save...");
+
+        File f = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()));
         if (!f.exists())
         {
             if (!f.mkdir()) throw new IllegalStateException("Failed to create " + f);
@@ -84,12 +88,12 @@ public class InstanceHandler
         System.out.println("Saved " + info.getWorldName());
     }
 
-    public static void load(FMLServerStartingEvent event) throws IOException
+    public static void init(FMLServerStartingEvent event) throws IOException
     {
         clear();
 
 
-        File instancesFolder = new File(MCTools.getDataDir(event.getServer()) + ".." + File.separator + "instances" + File.separator);
+        File instancesFolder = new File(getInstancesDir(event.getServer()));
         if (!instancesFolder.isDirectory()) return;
 
         for (DimensionType instanceType : InstanceTypes.dimensionTypes)
@@ -183,7 +187,6 @@ public class InstanceHandler
         instanceInfo.put(dimensionID, worldInfo);
 
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
-        loadDimension(dimensionID, worldInfo);
 
         playerEntity.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
 
@@ -198,7 +201,7 @@ public class InstanceHandler
 
         WorldType worldType = DimensionManager.getWorld(0).getWorldInfo().getTerrainType();
         WorldSettings settings = new WorldSettings(new Random().nextLong(), GameType.CREATIVE, true, false, worldType);
-        InstanceWorldInfo worldInfo = new InstanceWorldInfo(settings, name, dimType);
+        InstanceWorldInfo worldInfo = new InstanceWorldInfo(dimensionID, settings, name, dimType);
         worldInfo.setOwner(owner);
         if (save)
         {
@@ -215,7 +218,6 @@ public class InstanceHandler
         instanceInfo.put(dimensionID, worldInfo);
 
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
-        loadDimension(dimensionID, worldInfo);
 
         if (sender != null) sender.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
 
@@ -224,7 +226,7 @@ public class InstanceHandler
         return new Pair<>(dimensionID, worldInfo);
     }
 
-    private static void loadDimension(int dimensionID, WorldInfo worldInfo)
+    public static void load(InstanceWorldInfo info)
     {
         MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
         if (server == null) throw new RuntimeException("Cannot Hotload Dim: Server is not running!");
@@ -233,21 +235,10 @@ public class InstanceHandler
         if (overworld == null) throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
 
 
-        try
-        {
-            DimensionManager.getProviderType(dimensionID);
-        }
-        catch (Exception e)
-        {
-            System.err.println("Cannot Hotload Dim: " + e.getMessage());
-            return;
-        }
-
-
         ISaveHandler savehandler = overworld.getSaveHandler();
-        EnumDifficulty difficulty = overworld.getDifficulty();
 
-        WorldServer world = (WorldServer) (new WorldCustom(worldInfo, server, savehandler, dimensionID, overworld, server.profiler).init());
+        WorldServer world = (WorldServer) (new WorldCustom(info, server, savehandler, info.dimensionID, overworld, server.profiler).init());
+        info.world = world;
         world.addEventListener(new ServerWorldEventHandler(server, world));
         MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
 
@@ -255,26 +246,22 @@ public class InstanceHandler
         {
             world.getWorldInfo().setGameType(server.getGameType());
         }
-
-        server.setDifficultyForAllWorlds(difficulty);
     }
 
-    public static void deleteInstance(ICommandSender sender, int dimensionID)
+    public static void deleteInstance(ICommandSender sender, InstanceWorldInfo info)
     {
-        WorldServer world = DimensionManager.getWorld(dimensionID);
-        if (world == null)
+        int dimensionID = info.dimensionID;
+        File file = new File(info.SAVE_FOLDER_NAME);
+
+
+        WorldServer world = info.world;
+        if (world != null)
         {
-            loadDimension(dimensionID, InstanceHandler.get(dimensionID));
-            world = DimensionManager.getWorld(dimensionID);
+            for (Entity entity : world.loadedEntityList.toArray(new Entity[0])) Teleport.escape(entity);
+
+            world.flush();
+            DimensionManager.setWorld(dimensionID, null, FMLCommonHandler.instance().getMinecraftServerInstance());
         }
-
-        File file = new File(world.getSaveHandler().getWorldDirectory().getAbsolutePath() + File.separator + world.provider.getSaveFolder());
-
-
-        for (Entity entity : world.loadedEntityList.toArray(new Entity[0])) Teleport.escape(entity);
-
-        world.flush();
-        DimensionManager.setWorld(dimensionID, null, FMLCommonHandler.instance().getMinecraftServerInstance());
         DimensionManager.unregisterDimension(dimensionID);
 
         instanceInfo.remove(dimensionID);
@@ -283,12 +270,12 @@ public class InstanceHandler
         try
         {
             FileUtils.deleteDirectory(file);
-            if (sender != null) sender.sendMessage(new TextComponentString("Completely deleted dimension " + dimensionID).setStyle(new Style().setColor(TextFormatting.GREEN)));
+            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Completely deleted dimension " + dimensionID));
         }
         catch (IOException e)
         {
             e.printStackTrace();
-            if (sender != null) sender.sendMessage(new TextComponentString("Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.").setStyle(new Style().setColor(TextFormatting.RED)));
+            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually."));
         }
 
         Network.WRAPPER.sendToAll(new SyncInstancesPacket());
@@ -308,5 +295,10 @@ public class InstanceHandler
     public static InstanceWorldInfo get(int instDimID)
     {
         return instanceInfo.get(instDimID);
+    }
+
+    public static String getInstancesDir(MinecraftServer server)
+    {
+        return MCTools.getDataDir(server) + ".." + File.separator + "instances" + File.separator;
     }
 }

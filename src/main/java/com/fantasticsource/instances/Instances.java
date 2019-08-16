@@ -138,7 +138,7 @@ public class Instances
         event.registerServerCommand(new CmdEscape());
         event.registerServerCommand(new CmdVisitors());
 
-        InstanceHandler.load(event);
+        InstanceHandler.init(event);
     }
 
     @EventHandler
@@ -239,6 +239,6 @@ public class Instances
     public void worldUnload(WorldEvent.Unload event) throws IOException
     {
         World world = event.getWorld();
-        if (!world.isRemote) InstanceHandler.save(world);
+        if (!world.isRemote) InstanceHandler.unload(world);
     }
 }
