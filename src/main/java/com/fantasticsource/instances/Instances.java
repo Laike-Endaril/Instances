@@ -171,6 +171,7 @@ public class Instances
     public void playerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
+        Teleport.escape(player);
         setPlayerMode(player, InstanceHandler.get(player.world.provider.getDimension()));
     }
 

@@ -42,7 +42,17 @@ public class CmdDimTP extends CommandBase
             ArrayList<String> strings = new ArrayList<>();
 
             for (InstanceWorldInfo info : InstanceHandler.instanceInfo.values()) strings.add(info.getWorldName());
-            for (int id : DimensionManager.getIDs()) strings.add("" + id);
+
+            ArrayList<Integer> ids = new ArrayList<>(InstanceHandler.instanceInfo.keySet());
+            for (int id : ids) strings.add("" + id);
+
+            for (int id : DimensionManager.getIDs())
+            {
+                String name = DimensionManager.getWorld(id).getWorldInfo().getWorldName();
+                if (!strings.contains(name)) strings.add(name);
+                if (!ids.contains(id)) strings.add("" + id);
+            }
+
 
             return getListOfStringsMatchingLastWord(args, strings);
         }
