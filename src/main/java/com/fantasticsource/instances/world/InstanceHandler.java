@@ -82,7 +82,7 @@ public class InstanceHandler
         File instancesFolder = new File(getInstancesDir(event.getServer()));
         if (!instancesFolder.isDirectory()) return;
 
-        for (DimensionType instanceType : InstanceTypes.dimensionTypes)
+        for (DimensionType instanceType : InstanceTypes.instanceTypes)
         {
             File typeFolder = new File(instancesFolder.getAbsolutePath() + File.separator + instanceType.getName().replaceAll(" ", "_"));
             if (!typeFolder.isDirectory()) continue;

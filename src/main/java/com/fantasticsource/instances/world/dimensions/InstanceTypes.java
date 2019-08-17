@@ -16,7 +16,7 @@ public class InstanceTypes
     public static DimensionType skyroomDimType = DimensionType.register("Skyroom", "_skyroom", Instances.nextFreeDimTypeID(), WorldProviderSkyroom.class, false);
     public static DimensionType libraryOfWorldsDimType = DimensionType.register("Library of Worlds", "_library_of_worlds", Instances.nextFreeDimTypeID(), WorldProviderLibraryOfWorlds.class, false);
 
-    public static DimensionType[] dimensionTypes = new DimensionType[]
+    public static DimensionType[] instanceTypes = new DimensionType[]
             {
                     voidDimType,
                     skyroomDimType,
@@ -30,7 +30,7 @@ public class InstanceTypes
 
     public static String getInstanceTypeDir(MinecraftServer server, DimensionType instanceType)
     {
-        for (DimensionType type : dimensionTypes)
+        for (DimensionType type : instanceTypes)
         {
             if (type == instanceType) return InstanceHandler.getInstancesDir(server) + instanceType.getName().replaceAll(" ", "_") + File.separator;
         }

@@ -33,7 +33,7 @@ public class WorldProviderSkyroom extends WorldProvider
     {
         int dim = getDimension();
         InstanceWorldInfo info = InstanceHandler.get(dim);
-        if (info == null) throw new IllegalStateException();
+        if (info == null) return null;
 
         UUID owner = info.getOwner();
 
