@@ -65,7 +65,6 @@ public class PersonalPortalGUI extends GUIScreen
         ArrayList<GUIRectElement> subElements = new ArrayList<>();
 
         double y = V_PADDING - V_PADDING_2;
-        EntityPlayer player = Minecraft.getMinecraft().player;
         if (isInInstance)
         {
             y += V_PADDING_2;
