@@ -6,7 +6,6 @@ import com.fantasticsource.instances.client.gui.guielements.rect.*;
 import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.tools.datastructures.Color;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -17,17 +16,16 @@ public class PersonalPortalGUI extends GUIScreen
     private static final double
             SEPARATION_POINT = 58d / 60,
             H_PADDING = 1d / 60,
-            V_PADDING = 0.01,
-            V_PADDING_2 = 0.05;
+            V_PADDING = 0.06;
 
     private static final Color
             BLANK = new Color(0),
-            BLACK = new Color(0xCC),
-            AQUA = new Color(0x3366CC),
+            BLACK = new Color(0xEE),
+            BLUE = new Color(0x0055DD),
             WHITE = new Color(0xFFFFFF33),
             WHITE_2 = new Color(0xFFFFFF77),
             WHITE_3 = new Color(0xFFFFFFFF),
-            TEAL = new Color(0x227F7FFF),
+            TEAL = new Color(0x338F8FFF),
             TEAL_2 = new Color(0x44FFFFFF);
 
     public static PersonalPortalGUI personalPortalGUI = new PersonalPortalGUI();
@@ -59,30 +57,30 @@ public class PersonalPortalGUI extends GUIScreen
         super.initGui();
 
         //Background
-        guiElements.add(new GradientRect(this, 0, 0, 1, 1, BLACK, BLACK, AQUA, AQUA));
+        guiElements.add(new GradientRect(this, 0, 0, 1, 1, BLACK, BLACK, BLUE, BLUE));
 
         //Single scrollview for now
         ArrayList<GUIRectElement> subElements = new ArrayList<>();
 
-        double y = V_PADDING - V_PADDING_2;
+        double y = -V_PADDING / 2;
         if (isInInstance)
         {
-            y += V_PADDING_2;
+            y += V_PADDING;
             subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Leave Instance", TEAL, TEAL_2, WHITE_3));
         }
         if (!isInOwnedInstance)
         {
-            y += V_PADDING_2;
+            y += V_PADDING;
             subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Go Home", TEAL, TEAL_2, WHITE_3));
         }
         for (String name : names)
         {
-            y += V_PADDING_2;
+            y += V_PADDING;
             subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Visit " + name, TEAL, TEAL_2, WHITE_3));
         }
         subElements.add(new GradientRect(this, 0, 0, SEPARATION_POINT, y + V_PADDING, BLANK, BLANK, BLANK, BLANK));
 
-        GUIRectElement element = new GradientBorder(this, 0, 0, SEPARATION_POINT, 1, 1d / 15, WHITE, BLANK);
+        GUIRectElement element = new GradientBorder(this, 0, 0, SEPARATION_POINT, 1, 1d / 32, WHITE, BLANK);
         GUIRectScrollView scrollView = new GUIRectScrollView(this, element, width, height, subElements.toArray(new GUIRectElement[0]));
         guiElements.add(scrollView);
         guiElements.add(new VerticalScrollbar(this, SEPARATION_POINT, 0, 1, 1, WHITE_2, BLANK, WHITE_2, BLANK, scrollView));
