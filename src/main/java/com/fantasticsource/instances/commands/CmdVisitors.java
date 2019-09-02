@@ -36,6 +36,12 @@ public class CmdVisitors extends CommandBase
     }
 
     @Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender)
+    {
+        return true;
+    }
+
+    @Override
     public String getUsage(ICommandSender sender)
     {
         return "visitors <playername> [allow:deny]";
