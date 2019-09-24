@@ -1,15 +1,18 @@
 package com.fantasticsource.instances.client.gui;
 
-import com.fantasticsource.instances.client.gui.guielements.GUIElement;
-import com.fantasticsource.instances.client.gui.guielements.VerticalScrollbar;
-import com.fantasticsource.instances.client.gui.guielements.rect.*;
 import com.fantasticsource.instances.network.Network;
+import com.fantasticsource.mctools.gui.GUILeftClickEvent;
+import com.fantasticsource.mctools.gui.GUIScreen;
+import com.fantasticsource.mctools.gui.element.GUIElement;
+import com.fantasticsource.mctools.gui.element.other.GUIGradient;
+import com.fantasticsource.mctools.gui.element.other.GUIGradientBorder;
+import com.fantasticsource.mctools.gui.element.other.GUIVerticalScrollbar;
+import com.fantasticsource.mctools.gui.element.text.GUIText;
+import com.fantasticsource.mctools.gui.element.view.GUIScrollView;
 import com.fantasticsource.tools.datastructures.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import java.util.ArrayList;
 
 public class PersonalPortalGUI extends GUIScreen
 {
@@ -43,7 +46,7 @@ public class PersonalPortalGUI extends GUIScreen
         if (event.getScreen() == personalPortalGUI)
         {
             GUIElement element = event.getElement();
-            if (element instanceof GUITextRect)
+            if (element instanceof GUIText)
             {
                 Minecraft.getMinecraft().player.closeScreen();
                 Network.WRAPPER.sendToServer(new Network.PersonalPortalPacket(element.toString().replace("Visit ", "")));
@@ -52,37 +55,36 @@ public class PersonalPortalGUI extends GUIScreen
     }
 
     @Override
-    public void initGui()
+    protected void init()
     {
-        super.initGui();
-
         //Background
-        guiElements.add(new GradientRect(this, 0, 0, 1, 1, BLACK, BLACK, BLUE, BLUE));
+        guiElements.add(new GUIGradient(this, 0, 0, 1, 1, BLACK, BLACK, BLUE, BLUE));
 
-        //Single scrollview for now
-        ArrayList<GUIRectElement> subElements = new ArrayList<>();
+        guiElements.add(new GUIGradientBorder(this, 0, 0, SEPARATION_POINT, 1, 1d / 32, WHITE, BLANK));
+
+        GUIScrollView scrollView = new GUIScrollView(this, 0, 0, SEPARATION_POINT, 1);
+        guiElements.add(scrollView);
+        guiElements.add(new GUIVerticalScrollbar(this, SEPARATION_POINT, 0, 1 - SEPARATION_POINT, 1, WHITE_2, BLANK, WHITE_2, BLANK, scrollView));
 
         double y = -V_PADDING / 2;
         if (isInInstance)
         {
             y += V_PADDING;
-            subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Leave Instance", TEAL, TEAL_2, WHITE_3));
+            guiElements.add(new GUIText(this, H_PADDING, y, "Leave Instance", TEAL, TEAL_2, WHITE_3));
         }
+
         if (!isInOwnedInstance)
         {
             y += V_PADDING;
-            subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Go Home", TEAL, TEAL_2, WHITE_3));
+            guiElements.add(new GUIText(this, H_PADDING, y, "Go Home", TEAL, TEAL_2, WHITE_3));
         }
+
         for (String name : names)
         {
             y += V_PADDING;
-            subElements.add(new GUITextRect(this, H_PADDING, y, SEPARATION_POINT - H_PADDING, "Visit " + name, TEAL, TEAL_2, WHITE_3));
+            guiElements.add(new GUIText(this, H_PADDING, y, "Visit " + name, TEAL, TEAL_2, WHITE_3));
         }
-        subElements.add(new GradientRect(this, 0, 0, SEPARATION_POINT, y + V_PADDING, BLANK, BLANK, BLANK, BLANK));
 
-        GUIRectElement element = new GradientBorder(this, 0, 0, SEPARATION_POINT, 1, 1d / 32, WHITE, BLANK);
-        GUIRectScrollView scrollView = new GUIRectScrollView(this, element, width, height, subElements.toArray(new GUIRectElement[0]));
-        guiElements.add(scrollView);
-        guiElements.add(new VerticalScrollbar(this, SEPARATION_POINT, 0, 1, 1, WHITE_2, BLANK, WHITE_2, BLANK, scrollView));
+        guiElements.add(new GUIGradient(this, 0, 0, SEPARATION_POINT, y + V_PADDING, BLANK, BLANK, BLANK, BLANK));
     }
 }
