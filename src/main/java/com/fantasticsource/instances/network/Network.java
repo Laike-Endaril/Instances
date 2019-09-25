@@ -47,8 +47,8 @@ public class Network
     {
         EntityPlayerMP player;
         ArrayList<String> namesIn;
-        String[] namesOut;
-        boolean isInInstance, isInOwnedInstance;
+        public String[] namesOut;
+        public boolean isInInstance, isInOwnedInstance;
 
         public PersonalPortalGUIPacket()
         {
@@ -108,17 +108,9 @@ public class Network
     {
         @Override
         @SideOnly(Side.CLIENT)
-        public IMessage onMessage(PersonalPortalGUIPacket message, MessageContext ctx)
+        public IMessage onMessage(PersonalPortalGUIPacket packet, MessageContext ctx)
         {
-            Minecraft mc = Minecraft.getMinecraft();
-            mc.addScheduledTask(() ->
-            {
-                PersonalPortalGUI.names = message.namesOut;
-                PersonalPortalGUI.isInInstance = message.isInInstance;
-                PersonalPortalGUI.isInOwnedInstance = message.isInOwnedInstance;
-                PersonalPortalGUI.personalPortalGUI.initGui();
-                mc.displayGuiScreen(PersonalPortalGUI.personalPortalGUI);
-            });
+            Minecraft.getMinecraft().addScheduledTask(() -> PersonalPortalGUI.show(packet));
             return null;
         }
     }
