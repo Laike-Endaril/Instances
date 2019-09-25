@@ -37,12 +37,12 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021i,)", acceptableRemoteVersions = "[1.12.2.000u,1.12.2.000v]")
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.022,)", acceptableRemoteVersions = "[1.12.2.000u,1.12.2.000v]")
 public class Instances
 {
     public static final String MODID = "instances";
     public static final String NAME = "Instances";
-    public static final String VERSION = "1.12.2.000v";
+    public static final String VERSION = "1.12.2.001";
 
     public static Integer nextFreeDimID()
     {
