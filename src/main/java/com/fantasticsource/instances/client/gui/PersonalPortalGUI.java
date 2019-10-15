@@ -68,13 +68,13 @@ public class PersonalPortalGUI extends GUIScreen
     protected void init()
     {
         //Background
-        guiElements.add(new GUIGradient(this, 0, 0, 1, 1, BLACK, BLACK, BLUE, BLUE));
+        root.add(new GUIGradient(this, 0, 0, 1, 1, BLACK, BLACK, BLUE, BLUE));
 
-        guiElements.add(new GUIGradientBorder(this, 0, 0, 0.98, 1, 1d / 32, WHITE, BLANK));
+        root.add(new GUIGradientBorder(this, 0, 0, 0.98, 1, 1d / 32, WHITE, BLANK));
 
         scrollView = new GUIScrollView(this, 0, 0, 0.98, 1);
-        guiElements.add(scrollView);
-        guiElements.add(new GUIVerticalScrollbar(this, 0.98, 0, 0.02, 1, WHITE_2, BLANK, WHITE_2, BLANK, scrollView));
+        root.add(scrollView);
+        root.add(new GUIVerticalScrollbar(this, 0.98, 0, 0.02, 1, WHITE_2, BLANK, WHITE_2, BLANK, scrollView));
     }
 
     @SubscribeEvent
