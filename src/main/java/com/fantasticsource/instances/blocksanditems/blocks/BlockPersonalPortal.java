@@ -34,7 +34,7 @@ public class BlockPersonalPortal extends Block
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-        if (worldIn.isRemote) return false;
+        if (worldIn.isRemote) return true;
 
         Network.WRAPPER.sendTo(new Network.PersonalPortalGUIPacket((EntityPlayerMP) player), (EntityPlayerMP) player);
         return true;

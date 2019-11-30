@@ -37,9 +37,7 @@ public class BlockVisitorPortal extends Block
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-        if (worldIn.isRemote) return false;
-
-        if (player.isSneaking()) return false;
+        if (worldIn.isRemote) return true;
 
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof TEVisitorPortal)) return false;

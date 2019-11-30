@@ -33,9 +33,7 @@ public class BlockReturnPortal extends Block
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-        if (worldIn.isRemote) return false;
-
-        if (player.isSneaking()) return false;
+        if (worldIn.isRemote) return true;
 
         return Teleport.escape(player);
     }
