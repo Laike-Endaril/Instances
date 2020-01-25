@@ -246,7 +246,7 @@ public class InstanceHandler
 
 
         File file = new File(info.SAVE_FOLDER_NAME);
-        if (Tools.delete(file))
+        if (Tools.deleteFilesRecursively(file))
         {
             if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Completely deleted dimension " + dimensionID));
         }

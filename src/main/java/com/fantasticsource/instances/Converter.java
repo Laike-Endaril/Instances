@@ -45,7 +45,7 @@ public class Converter
                 if (original && id != null) writer.write(id + "\r\n");
                 writer.close();
             }
-            else Tools.delete(folder);
+            else Tools.deleteFilesRecursively(folder);
         }
     }
 }

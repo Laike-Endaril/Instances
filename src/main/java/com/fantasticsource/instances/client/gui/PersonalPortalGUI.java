@@ -65,6 +65,12 @@ public class PersonalPortalGUI extends GUIScreen
     }
 
     @Override
+    public String title()
+    {
+        return "Teleport to...";
+    }
+
+    @Override
     protected void init()
     {
         //Background
