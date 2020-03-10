@@ -12,6 +12,7 @@ import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.tools.Tools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,9 +34,11 @@ import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
@@ -284,5 +287,14 @@ public class Instances
         if (!(info instanceof InstanceWorldInfo)) return;
 
         InstanceHandler.unload((InstanceWorldInfo) info);
+    }
+
+    @SubscribeEvent
+    public static void worldTick(TickEvent.WorldTickEvent event)
+    {
+        if (event.side == Side.CLIENT || event.phase != TickEvent.Phase.END || event.world.provider.getDimension() != 0) return;
+
+        File file = new File(InstanceTypes.getInstanceTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), InstanceTypes.libraryOfWorldsDimType));
+        Tools.deleteFilesRecursively(file);
     }
 }

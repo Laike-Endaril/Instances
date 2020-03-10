@@ -64,6 +64,24 @@ public class PersonalPortalGUI extends GUIScreen
         scrollView.add(new GUIText(GUI, "\n"));
     }
 
+    @SubscribeEvent
+    public static void mouseClick(GUILeftClickEvent event)
+    {
+        if (event.getScreen() == GUI)
+        {
+            GUIElement element = event.getElement();
+            if (element instanceof GUIText)
+            {
+                String name = element.toString().trim().replace("Visit ", "");
+                if (!name.equals(""))
+                {
+                    GUI.close();
+                    Network.WRAPPER.sendToServer(new Network.PersonalPortalPacket(name));
+                }
+            }
+        }
+    }
+
     @Override
     public String title()
     {
@@ -81,23 +99,5 @@ public class PersonalPortalGUI extends GUIScreen
         scrollView = new GUIScrollView(this, 0, 0, 0.98, 1);
         root.add(scrollView);
         root.add(new GUIVerticalScrollbar(this, 0.98, 0, 0.02, 1, WHITE_2, BLANK, WHITE_2, BLANK, scrollView));
-    }
-
-    @SubscribeEvent
-    public static void mouseClick(GUILeftClickEvent event)
-    {
-        if (event.getScreen() == GUI)
-        {
-            GUIElement element = event.getElement();
-            if (element instanceof GUIText)
-            {
-                String name = element.toString().trim().replace("Visit ", "");
-                if (!name.equals(""))
-                {
-                    GUI.close();
-                    Network.WRAPPER.sendToServer(new Network.PersonalPortalPacket(name));
-                }
-            }
-        }
     }
 }

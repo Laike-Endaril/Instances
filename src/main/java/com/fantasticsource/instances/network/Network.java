@@ -46,10 +46,10 @@ public class Network
 
     public static class PersonalPortalGUIPacket implements IMessage
     {
-        EntityPlayerMP player;
-        ArrayList<String> namesIn;
         public String[] namesOut;
         public boolean isInInstance, isInOwnedSkyroom;
+        EntityPlayerMP player;
+        ArrayList<String> namesIn;
 
         public PersonalPortalGUIPacket()
         {
