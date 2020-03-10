@@ -1,8 +1,3 @@
-Add explanation to odd/even switcher tooltip about having to clear the South and East sides when going from even to odd
-Add same explanation to error message when failing to use the item
-
-
-
 * Instances are not fully synced to clients; only dimensiontypes are synced
 
 

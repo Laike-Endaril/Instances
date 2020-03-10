@@ -17,6 +17,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -93,7 +94,7 @@ public class ItemPlotOddEvenSwitcher extends Item
                         if (!world.isRemote)
                         {
                             player.sendMessage(new TextComponentString("Block detected at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + " (" + world.getBlockState(pos).getBlock().getLocalizedName() + ")"));
-                            player.sendMessage(new TextComponentString("The area to be removed must be clear of blocks! (The East and South sides)"));
+                            player.sendMessage(new TextComponentString("The area to be removed must be clear of blocks! (One layer from each of the South and East sides)"));
                         }
                         return new ActionResult<>(EnumActionResult.FAIL, itemstack);
                     }
@@ -109,7 +110,7 @@ public class ItemPlotOddEvenSwitcher extends Item
                         if (!world.isRemote)
                         {
                             player.sendMessage(new TextComponentString("Block detected at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + " (" + world.getBlockState(pos).getBlock().getLocalizedName() + ")"));
-                            player.sendMessage(new TextComponentString("The area to be removed must be clear of blocks! (The East and South sides)"));
+                            player.sendMessage(new TextComponentString("The area to be removed must be clear of blocks! (One layer from each of the South and East sides)"));
                         }
                         return new ActionResult<>(EnumActionResult.FAIL, itemstack);
                     }
@@ -236,5 +237,7 @@ public class ItemPlotOddEvenSwitcher extends Item
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
     {
         tooltip.add("Switches your plot from odd to even, or vice-versa");
+        tooltip.add("");
+        tooltip.add(TextFormatting.RED + "When changing from even to odd, one layer is removed from the South and East sides.  These layers must be clear for the item to work.  The item will not be consumed if it doesn't work");
     }
 }
