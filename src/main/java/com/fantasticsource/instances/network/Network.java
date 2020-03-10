@@ -165,7 +165,7 @@ public class Network
                         return;
 
                     case "Go Home":
-                        Teleport.joinPossiblyCreating(player);
+                        Teleport.joinSkyroomPossiblyCreating(player);
                         return;
 
                     default:
@@ -175,7 +175,7 @@ public class Network
                         SortableTable nameTable = (SortableTable) data.visitablePlayers.get(0, s.charAt(0), 1);
                         if (nameTable == null || !nameTable.contains(s, 0)) return;
 
-                        Teleport.joinPossiblyCreating(player, s);
+                        Teleport.joinSkyroomPossiblyCreating(player, s);
                 }
             });
             return null;

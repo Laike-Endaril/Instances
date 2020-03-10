@@ -58,7 +58,7 @@ public class Teleport
         //If we're already in the hub, just teleport locally
         if (player.world.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
         {
-            return Teleport.teleport(player, player.world.provider.getDimension(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
+            return teleport(player, player.world.provider.getDimension(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
         }
 
         //Try finding an existing hub for said player
@@ -67,14 +67,14 @@ public class Teleport
             InstanceWorldInfo info = entry.getValue();
             if (info.getDimensionType() == InstanceTypes.libraryOfWorldsDimType && info.getWorldName().equals((player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.getName()).replace(" ", "_")))
             {
-                return Teleport.teleport(player, entry.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
+                return teleport(player, entry.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
             }
         }
 
         //Not found
         Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.libraryOfWorldsDimType, player.getPersistentID(), false);
         InstanceHandler.load(pair.getValue());
-        return Teleport.teleport(player, pair.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
+        return teleport(player, pair.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
     }
 
     public static boolean escape(Entity entity)
@@ -88,19 +88,19 @@ public class Teleport
             if (s.contains("instances.lastgoodpos"))
             {
                 String[] tokens = s.replace("instances.lastgoodpos", "").split(",");
-                return Teleport.teleport(entity, Integer.parseInt(tokens[0]), 0.5d + Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), 0.5d + Integer.parseInt(tokens[3]), entity.rotationYaw, entity.rotationPitch);
+                return teleport(entity, Integer.parseInt(tokens[0]), 0.5d + Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), 0.5d + Integer.parseInt(tokens[3]), entity.rotationYaw, entity.rotationPitch);
             }
         }
 
         return false;
     }
 
-    public static boolean joinPossiblyCreating(EntityPlayerMP player)
+    public static boolean joinSkyroomPossiblyCreating(EntityPlayerMP player)
     {
-        return joinPossiblyCreating(player, player.getName());
+        return joinSkyroomPossiblyCreating(player, player.getName());
     }
 
-    public static boolean joinPossiblyCreating(Entity entity, int dimension)
+    public static boolean joinSkyroomPossiblyCreating(Entity entity, int dimension)
     {
         InstanceWorldInfo info = InstanceHandler.get(dimension);
         if (info == null)
@@ -109,10 +109,10 @@ public class Teleport
             return false;
         }
 
-        return Teleport.teleport(entity, dimension, 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
+        return teleport(entity, dimension, 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
     }
 
-    public static boolean joinPossiblyCreating(Entity entity, String ownername)
+    public static boolean joinSkyroomPossiblyCreating(Entity entity, String ownername)
     {
         UUID id = PlayerData.getID(ownername);
         if (id == null) return false;
@@ -122,14 +122,14 @@ public class Teleport
         {
             if (entry.getValue().getDimensionType() == InstanceTypes.skyroomDimType && id.equals(entry.getValue().getOwner()))
             {
-                return Teleport.teleport(entity, entry.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
+                return teleport(entity, entry.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
             }
         }
 
         //Not found
         Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, id, true);
         InstanceHandler.load(pair.getValue());
-        return Teleport.teleport(entity, pair.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
+        return teleport(entity, pair.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
     }
 
     public static boolean teleport(Entity entity, TEInstancePortal.Destination destination)

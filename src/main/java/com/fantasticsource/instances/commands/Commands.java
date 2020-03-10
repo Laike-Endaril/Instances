@@ -39,7 +39,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <delete:list:setowner:personal:hub>";
+        return "Usage: /instances <hub:personal:template:list:delete:setowner>";
     }
 
     @Override
@@ -68,11 +68,30 @@ public class Commands extends CommandBase
                 {
                     if (args.length == 1)
                     {
-                        Teleport.joinPossiblyCreating((EntityPlayerMP) sender);
+                        Teleport.joinSkyroomPossiblyCreating((EntityPlayerMP) sender);
                     }
                     else if (args.length == 2)
                     {
-                        if (!Teleport.joinPossiblyCreating((EntityPlayerMP) sender, args[1]))
+                        if (!Teleport.joinSkyroomPossiblyCreating((EntityPlayerMP) sender, args[1]))
+                        {
+                            sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
+                        }
+                    }
+                    else sender.sendMessage(new TextComponentString(getUsage(sender)));
+                }
+                else sender.sendMessage(new TextComponentString(getUsage(sender)));
+                break;
+
+            case "template":
+                if (sender instanceof EntityPlayerMP)
+                {
+                    if (args.length == 1)
+                    {
+                        Teleport.joinSkyroomPossiblyCreating((EntityPlayerMP) sender);
+                    }
+                    else if (args.length == 2)
+                    {
+                        if (!Teleport.joinSkyroomPossiblyCreating((EntityPlayerMP) sender, args[1]))
                         {
                             sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
                         }

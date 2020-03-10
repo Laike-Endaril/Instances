@@ -246,7 +246,7 @@ public class Instances
             if (entity.posY < 0 && entity instanceof EntityPlayer)
             {
                 if (dimType == InstanceTypes.libraryOfWorldsDimType) Teleport.gotoHub((EntityPlayerMP) entity);
-                else Teleport.joinPossiblyCreating(entity, entity.dimension);
+                else Teleport.joinSkyroomPossiblyCreating(entity, entity.dimension);
             }
         }
     }
@@ -266,7 +266,7 @@ public class Instances
             if (entity.posY < 0 && entity instanceof EntityPlayer)
             {
                 if (dimType == InstanceTypes.libraryOfWorldsDimType) Teleport.gotoHub((EntityPlayerMP) entity);
-                else Teleport.joinPossiblyCreating(entity, entity.dimension);
+                else Teleport.joinSkyroomPossiblyCreating(entity, entity.dimension);
             }
         }
     }

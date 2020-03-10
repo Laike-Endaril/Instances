@@ -42,7 +42,7 @@ public class BlockVisitorPortal extends Block
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof TEVisitorPortal)) return false;
 
-        return Teleport.joinPossiblyCreating(player, ((TEVisitorPortal) te).ownername);
+        return Teleport.joinSkyroomPossiblyCreating(player, ((TEVisitorPortal) te).ownername);
     }
 
     @Override
