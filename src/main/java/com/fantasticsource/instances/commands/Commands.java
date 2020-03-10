@@ -100,7 +100,7 @@ public class Commands extends CommandBase
                             info = InstanceHandler.get(((EntityPlayerMP) sender).dimension);
                             if (info == null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleting the 'current instance' only works while inside an instance"));
                         }
-                        else System.out.println("Deleting the 'current instance' is only usable when logged in as a player (and inside an instance)");
+                        else System.err.println("Deleting the 'current instance' is only usable when logged in as a player (and inside an instance)");
                     }
                     else
                     {

@@ -49,8 +49,6 @@ public class InstanceHandler
         if (!info.save) return;
 
 
-        System.out.println("Attempting to save...");
-
         File f = new File(info.SAVE_FOLDER_NAME);
         if (!f.exists())
         {
@@ -75,8 +73,6 @@ public class InstanceHandler
             }
 
             writer.close();
-
-            System.out.println("Saved " + info.getWorldName());
         }
         catch (IOException e)
         {
@@ -252,7 +248,7 @@ public class InstanceHandler
         else
         {
             if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting file: " + file));
-            else System.out.println(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.");
+            else System.err.println(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.");
         }
 
         Network.WRAPPER.sendToAll(new SyncInstancesPacket());

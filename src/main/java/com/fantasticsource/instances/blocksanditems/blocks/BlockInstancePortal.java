@@ -49,11 +49,11 @@ public class BlockInstancePortal extends Block
 
         if (portal.destinations.size() == 0)
         {
-            System.out.println("Behavior for no destination is not yet implemented (" + pos + ")");
+            System.err.println("Behavior for no destination is not yet implemented (" + pos + ")");
             return false;
         }
 
-        System.out.println("Behavior for more than one destination is not yet implemented (" + pos + ")");
+        System.err.println("Behavior for more than one destination is not yet implemented (" + pos + ")");
         return false;
     }
 
