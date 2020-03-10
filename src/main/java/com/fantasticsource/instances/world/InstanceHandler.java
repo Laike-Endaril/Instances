@@ -35,7 +35,7 @@ public class InstanceHandler
     public static LinkedHashMap<UUID, VisitablePlayersData> visitablePlayersData = new LinkedHashMap<>();
 
 
-    public static void unload(InstanceWorldInfo info) throws IOException
+    public static void unload(InstanceWorldInfo info)
     {
         if (info.world != null)
         {
@@ -44,8 +44,11 @@ public class InstanceHandler
         }
     }
 
-    public static void save(InstanceWorldInfo info) throws IOException
+    public static void save(InstanceWorldInfo info)
     {
+        if (!info.save) return;
+
+
         System.out.println("Attempting to save...");
 
         File f = new File(info.SAVE_FOLDER_NAME);
@@ -57,21 +60,28 @@ public class InstanceHandler
         f = new File(f.getAbsolutePath() + File.separator + "instanceData.txt");
 
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(f));
-
-        writer.write(INSTANCE_SAVE_FORMAT + "\r\n");
-
-        UUID owner = info.getOwner();
-        writer.write((owner == null ? "" : owner) + "\r\n");
-
-        for (UUID id : info.visitorWhitelist)
+        try
         {
-            writer.write(id + "\r\n");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+
+            writer.write(INSTANCE_SAVE_FORMAT + "\r\n");
+
+            UUID owner = info.getOwner();
+            writer.write((owner == null ? "" : owner) + "\r\n");
+
+            for (UUID id : info.visitorWhitelist)
+            {
+                writer.write(id + "\r\n");
+            }
+
+            writer.close();
+
+            System.out.println("Saved " + info.getWorldName());
         }
-
-        writer.close();
-
-        System.out.println("Saved " + info.getWorldName());
+        catch (IOException e)
+        {
+            MCTools.crash(e, 2000, false);
+        }
     }
 
     public static void init(FMLServerStartingEvent event) throws IOException
@@ -163,7 +173,7 @@ public class InstanceHandler
         }
     }
 
-    public static void clear() throws IOException
+    public static void clear()
     {
         for (Map.Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
         {
@@ -183,18 +193,7 @@ public class InstanceHandler
 
         WorldType worldType = DimensionManager.getWorld(0).getWorldInfo().getTerrainType();
         WorldSettings settings = new WorldSettings(new Random().nextLong(), GameType.CREATIVE, true, false, worldType);
-        InstanceWorldInfo worldInfo = new InstanceWorldInfo(dimensionID, settings, owner, name, dimType);
-        if (save)
-        {
-            try
-            {
-                save(worldInfo);
-            }
-            catch (Exception e)
-            {
-                MCTools.crash(e, 2000, false);
-            }
-        }
+        InstanceWorldInfo worldInfo = new InstanceWorldInfo(dimensionID, settings, owner, name, dimType, save);
 
         instanceInfo.put(dimensionID, worldInfo);
 

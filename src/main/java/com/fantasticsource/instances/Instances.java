@@ -98,11 +98,11 @@ public class Instances
     }
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event) throws IOException
+    public static void preInit(FMLPreInitializationEvent event) throws IOException
     {
         Converter.convert();
 
-        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(Instances.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
@@ -120,19 +120,19 @@ public class Instances
     }
 
     @EventHandler
-    public void init(FMLInitializationEvent event)
+    public static void init(FMLInitializationEvent event)
     {
         Network.init();
     }
 
     @EventHandler
-    public void serverStartingPre(FMLServerAboutToStartEvent event)
+    public static void serverStartingPre(FMLServerAboutToStartEvent event)
     {
         if (!event.getServer().getAllowNether()) throw new IllegalStateException("The Instances mod cannot run with allow-nether set to false in server.properties! (MC bug: https://bugs.mojang.com/browse/MC-85267)");
     }
 
     @EventHandler
-    public void serverStarting(FMLServerStartingEvent event) throws IOException
+    public static void serverStarting(FMLServerStartingEvent event) throws IOException
     {
         event.registerServerCommand(new Commands());
         event.registerServerCommand(new CmdDimWeather());
@@ -145,7 +145,7 @@ public class Instances
     }
 
     @EventHandler
-    public void serverStopping(FMLServerStoppingEvent event) throws IOException
+    public static void serverStopping(FMLServerStoppingEvent event)
     {
         for (EntityPlayerMP player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers())
         {
@@ -156,19 +156,19 @@ public class Instances
     }
 
     @SubscribeEvent
-    public void clientConnect(FMLNetworkEvent.ServerConnectionFromClientEvent event)
+    public static void clientConnect(FMLNetworkEvent.ServerConnectionFromClientEvent event)
     {
         event.getManager().sendPacket(Network.WRAPPER.getPacketFrom(new SyncInstancesPacket()));
     }
 
     @SubscribeEvent
-    public void clientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
+    public static void clientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
     {
         if (!event.getManager().isLocalChannel()) ClientHandler.cleanUp();
     }
 
     @SubscribeEvent
-    public void playerLogin(PlayerEvent.PlayerLoggedInEvent event)
+    public static void playerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         Teleport.escape(player);
@@ -176,7 +176,7 @@ public class Instances
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    public void playerInteract(PlayerInteractEvent.RightClickBlock event)
+    public static void playerInteract(PlayerInteractEvent.RightClickBlock event)
     {
         World world = event.getWorld();
 
@@ -196,7 +196,7 @@ public class Instances
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void entityDamagePre(LivingHurtEvent event)
+    public static void entityDamagePre(LivingHurtEvent event)
     {
         Entity entity = event.getEntity();
         DimensionType dimType = event.getEntity().world.provider.getDimensionType();
@@ -216,7 +216,7 @@ public class Instances
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void entityDamagePost(LivingHurtEvent event)
+    public static void entityDamagePost(LivingHurtEvent event)
     {
         Entity entity = event.getEntity();
         DimensionType dimType = event.getEntity().world.provider.getDimensionType();
@@ -236,13 +236,13 @@ public class Instances
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void playerLoggedOff(PlayerEvent.PlayerLoggedOutEvent event)
+    public static void playerLoggedOff(PlayerEvent.PlayerLoggedOutEvent event)
     {
         Teleport.escape(event.player);
     }
 
     @SubscribeEvent
-    public void worldUnload(WorldEvent.Unload event) throws IOException
+    public static void worldUnload(WorldEvent.Unload event)
     {
         World world = event.getWorld();
         if (world.isRemote) return;

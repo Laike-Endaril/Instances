@@ -5,7 +5,6 @@ import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
-import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -15,7 +14,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -111,14 +109,7 @@ public class CmdVisitors extends CommandBase
 
 
                 info.visitorWhitelist.add(playerData.id);
-                try
-                {
-                    InstanceHandler.save(info);
-                }
-                catch (IOException e)
-                {
-                    MCTools.crash(e, 2000, false);
-                }
+                InstanceHandler.save(info);
 
 
                 player.sendMessage(new TextComponentString(args[0] + " can now visit you"));
@@ -147,14 +138,7 @@ public class CmdVisitors extends CommandBase
 
 
                 info.visitorWhitelist.remove(playerData.id);
-                try
-                {
-                    InstanceHandler.save(info);
-                }
-                catch (IOException e)
-                {
-                    MCTools.crash(e, 2000, false);
-                }
+                InstanceHandler.save(info);
 
 
                 player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));

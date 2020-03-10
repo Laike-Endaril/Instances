@@ -28,6 +28,7 @@ public class InstanceWorldInfo extends WorldInfo
     public ArrayList<UUID> visitorWhitelist = new ArrayList<>();
     public WorldInstance world = null;
     private UUID owner;
+    public boolean save;
 
     public InstanceWorldInfo(WorldInfo info)
     {
@@ -39,7 +40,7 @@ public class InstanceWorldInfo extends WorldInfo
         throw new IllegalStateException("Not implemented!");
     }
 
-    public InstanceWorldInfo(int dimensionID, WorldSettings settings, UUID owner, String name, DimensionType dimType)
+    public InstanceWorldInfo(int dimensionID, WorldSettings settings, UUID owner, String name, DimensionType dimType, boolean save)
     {
         super(settings, name);
         dimensionType = dimType != null ? dimType : DimensionType.OVERWORLD;
@@ -48,6 +49,9 @@ public class InstanceWorldInfo extends WorldInfo
         this.owner = owner;
 
         SAVE_FOLDER_NAME = InstanceTypes.getInstanceTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), dimensionType) + (owner != null ? owner : getWorldName()) + File.separator;
+
+        this.save = save;
+        InstanceHandler.save(this);
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.fantasticsource.instances.commands;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
-import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -13,7 +12,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -163,14 +161,7 @@ public class Commands extends CommandBase
                     }
 
                     info.setOwner(id);
-                    try
-                    {
-                        InstanceHandler.save(info);
-                    }
-                    catch (IOException e)
-                    {
-                        MCTools.crash(e, 2000, false);
-                    }
+                    InstanceHandler.save(info);
 
                     sender.sendMessage(new TextComponentString("Set owner of " + info.getWorldName() + " to " + PlayerData.getName(id) + " (ID = " + args[1] + ", type = " + info.getDimensionType().getName() + ")"));
                 }
