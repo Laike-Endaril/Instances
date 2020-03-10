@@ -1,3 +1,10 @@
+If a player was in an instance with ID X when the server force-quits...
+...and then the server loads back up, and opens a *different* instance using ID X...
+...and then the player logs back in...
+...need to prevent them from showing up there
+
+
+
 * Instances are not fully synced to clients; only dimensiontypes are synced
 
 

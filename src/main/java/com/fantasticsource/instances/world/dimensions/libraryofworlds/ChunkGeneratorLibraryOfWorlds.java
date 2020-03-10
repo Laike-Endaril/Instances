@@ -17,6 +17,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -48,6 +49,10 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
     public ChunkGeneratorLibraryOfWorlds(World world)
     {
         this.world = world;
+
+        //Don't save this world type
+        if (world instanceof WorldServer) ((WorldServer) world).disableLevelSaving = true;
+
         chunkPrimer = new ChunkPrimerLibraryOfWorlds();
     }
 

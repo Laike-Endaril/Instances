@@ -258,7 +258,7 @@ public class InstanceHandler
         }
         else
         {
-            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting file: " + file));
+            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually."));
             else System.err.println(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.");
         }
 

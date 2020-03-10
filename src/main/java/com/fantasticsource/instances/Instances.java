@@ -39,7 +39,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import java.io.IOException;
 import java.util.Set;
 
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.032b,)")
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.034a,)")
 public class Instances
 {
     public static final String MODID = "instances";
