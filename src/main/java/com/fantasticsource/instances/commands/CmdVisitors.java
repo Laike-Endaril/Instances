@@ -109,7 +109,7 @@ public class CmdVisitors extends CommandBase
 
 
                 info.visitorWhitelist.add(playerData.id);
-                InstanceHandler.save(info);
+                InstanceHandler.trySave(info);
 
 
                 player.sendMessage(new TextComponentString(args[0] + " can now visit you"));
@@ -138,7 +138,7 @@ public class CmdVisitors extends CommandBase
 
 
                 info.visitorWhitelist.remove(playerData.id);
-                InstanceHandler.save(info);
+                InstanceHandler.trySave(info);
 
 
                 player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));

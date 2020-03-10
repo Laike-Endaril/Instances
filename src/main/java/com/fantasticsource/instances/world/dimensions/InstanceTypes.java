@@ -5,6 +5,7 @@ import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.WorldProviderLibraryOfWorlds;
 import com.fantasticsource.instances.world.dimensions.skyroom.WorldProviderSkyroom;
 import com.fantasticsource.instances.world.dimensions.voided.WorldProviderVoid;
+import com.fantasticsource.tools.Tools;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.DimensionType;
 
@@ -30,11 +31,8 @@ public class InstanceTypes
 
     public static String getInstanceTypeDir(MinecraftServer server, DimensionType instanceType)
     {
-        for (DimensionType type : instanceTypes)
-        {
-            if (type == instanceType) return InstanceHandler.getInstancesDir(server) + instanceType.getName().replaceAll(" ", "_") + File.separator;
-        }
+        if (!Tools.contains(instanceTypes, instanceType)) throw new IllegalArgumentException("Invalid instance type: " + instanceType);
 
-        throw new IllegalArgumentException("Invalid instance type: " + instanceType);
+        return InstanceHandler.getInstancesDir(server) + instanceType.getName().replaceAll(" ", "_") + File.separator;
     }
 }

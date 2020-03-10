@@ -7,7 +7,6 @@ import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
 import com.fantasticsource.mctools.MCTools;
-import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
@@ -39,12 +38,12 @@ public class InstanceHandler
     {
         if (info.world != null)
         {
-            save(info);
+            trySave(info);
             info.world = null;
         }
     }
 
-    public static void save(InstanceWorldInfo info)
+    public static void trySave(InstanceWorldInfo info)
     {
         if (!info.save) return;
 

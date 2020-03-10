@@ -51,7 +51,7 @@ public class InstanceWorldInfo extends WorldInfo
         SAVE_FOLDER_NAME = InstanceTypes.getInstanceTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), dimensionType) + (owner != null ? owner : getWorldName()) + File.separator;
 
         this.save = save;
-        InstanceHandler.save(this);
+        InstanceHandler.trySave(this);
     }
 
     @Override

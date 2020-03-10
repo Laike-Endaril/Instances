@@ -161,7 +161,7 @@ public class Commands extends CommandBase
                     }
 
                     info.setOwner(id);
-                    InstanceHandler.save(info);
+                    InstanceHandler.trySave(info);
 
                     sender.sendMessage(new TextComponentString("Set owner of " + info.getWorldName() + " to " + PlayerData.getName(id) + " (ID = " + args[1] + ", type = " + info.getDimensionType().getName() + ")"));
                 }
