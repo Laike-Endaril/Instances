@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
@@ -36,6 +37,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
+import java.util.Set;
 
 @Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.032b,)")
 public class Instances
@@ -165,6 +167,37 @@ public class Instances
     public static void clientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
     {
         if (!event.getManager().isLocalChannel()) ClientHandler.cleanUp();
+    }
+
+    @SubscribeEvent
+    public static void playerLoading(net.minecraftforge.event.entity.player.PlayerEvent.LoadFromFile event)
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        int dim = player.dimension;
+
+        if (FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(dim) == null)
+        {
+            System.err.println(TextFormatting.RED + "This error was due to a player loading into a no-longer-existent dimension, which may happen if the server shut down forcefully, among other things");
+
+            Set<String> strings = player.getTags();
+            boolean found = false;
+            for (String s : strings.toArray(new String[0]))
+            {
+                if (s.contains("instances.lastgoodpos"))
+                {
+                    String[] tokens = s.replace("instances.lastgoodpos", "").split(",");
+                    player.dimension = Integer.parseInt(tokens[0]);
+                    player.posX = 0.5d + Integer.parseInt(tokens[1]);
+                    player.posY = Integer.parseInt(tokens[2]);
+                    player.posZ = 0.5d + Integer.parseInt(tokens[3]);
+                    found = true;
+                    System.err.println(TextFormatting.RED + "The player (" + player.getName() + ") will end up at their last 'instance escape point': " + player.posX + ", " + player.posY + ", " + player.posZ + " in dimension " + player.dimension);
+                    break;
+                }
+            }
+
+            if (!found) System.err.println(TextFormatting.RED + "The player (" + player.getName() + ") will end up at spawn (no instance escape point was found)");
+        }
     }
 
     @SubscribeEvent

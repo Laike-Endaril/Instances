@@ -4,8 +4,6 @@
 
 Are players not properly being added to an instance world's player entity list upon teleport?
 
-Make sure deleting an instance with offline players in it works correctly or is disallowed
-
 
 
 Non-Faerun
