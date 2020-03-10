@@ -7,6 +7,7 @@ import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
@@ -181,6 +182,15 @@ public class InstanceHandler
         visitablePlayersData.clear();
     }
 
+
+    public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType dimType, UUID owner, boolean save)
+    {
+        PlayerData data = PlayerData.get(owner);
+        Entity ownerEntity = data == null ? null : data.player;
+
+        return createInstance(sender, dimType, owner, ownerEntity == null ? dimType.name() : ownerEntity.getName() + "'s " + InstanceTypes.skyroomDimType.getName(), save);
+    }
+
     public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType dimType, UUID owner, String name, boolean save)
     {
         name = name.replaceAll(" ", "_");
@@ -201,6 +211,7 @@ public class InstanceHandler
 
         return new Pair<>(dimensionID, worldInfo);
     }
+
 
     public static void load(InstanceWorldInfo info)
     {

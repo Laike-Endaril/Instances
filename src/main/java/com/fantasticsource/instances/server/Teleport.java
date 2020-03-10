@@ -71,7 +71,7 @@ public class Teleport
         }
 
         //Not found
-        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.libraryOfWorldsDimType, null, player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.getName(), true);
+        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.libraryOfWorldsDimType, null, true);
         InstanceHandler.load(pair.getValue());
         return Teleport.teleport(player, pair.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
     }
@@ -126,7 +126,7 @@ public class Teleport
         }
 
         //Not found
-        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, id, ownername + "'s " + InstanceTypes.skyroomDimType.getName(), true);
+        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, id, true);
         InstanceHandler.load(pair.getValue());
         return Teleport.teleport(entity, pair.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
     }
