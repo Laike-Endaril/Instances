@@ -128,15 +128,16 @@ public class InstanceHandler
                                 }
                             }
 
-                            if (instanceType == InstanceTypes.skyroomDimType)
-                            {
-                                String playername = PlayerData.getName(owner);
-                                createInstance(null, instanceType, owner, playername != null ? playername + "'s " + InstanceTypes.skyroomDimType.getName() : instanceFolder.getName(), false);
-                            }
-                            else
-                            {
-                                throw new IllegalStateException("Found unknown file: " + instanceFile);
-                            }
+                            //TODO This code doesn't seem to have been necessary, but I'm leaving it commented out here for now just in case
+//                            if (instanceType == InstanceTypes.skyroomDimType)
+//                            {
+//                                String playername = PlayerData.getName(owner);
+//                                createInstance(null, instanceType, owner, playername != null ? playername + "'s " + InstanceTypes.skyroomDimType.getName() : instanceFolder.getName(), false);
+//                            }
+//                            else
+//                            {
+//                                throw new IllegalStateException("Found unknown file: " + instanceFile);
+//                            }
 
                             s = reader.readLine();
                             while (s != null)
