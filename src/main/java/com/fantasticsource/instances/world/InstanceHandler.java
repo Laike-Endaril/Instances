@@ -258,8 +258,10 @@ public class InstanceHandler
         }
         else
         {
+            System.err.println(TextFormatting.RED + "Error deleting file: " + file.getAbsolutePath());
+
+            System.err.println(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.");
             if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually."));
-            else System.err.println(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.");
         }
 
         Network.WRAPPER.sendToAll(new SyncInstancesPacket());
@@ -283,6 +285,6 @@ public class InstanceHandler
 
     public static String getInstancesDir(MinecraftServer server)
     {
-        return MCTools.getDataDir(server) + ".." + File.separator + "instances" + File.separator;
+        return MCTools.getWorldSaveDir(server) + "instances" + File.separator;
     }
 }

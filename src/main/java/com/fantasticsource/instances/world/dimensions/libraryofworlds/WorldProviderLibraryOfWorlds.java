@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.Loader;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.UUID;
 
 public class WorldProviderLibraryOfWorlds extends WorldProvider
 {
@@ -106,6 +107,7 @@ public class WorldProviderLibraryOfWorlds extends WorldProvider
         InstanceWorldInfo info = InstanceHandler.get(dim);
         if (info == null) return null;
 
-        return "instances" + File.separator + TYPE_NAME + File.separator + info.getWorldName();
+        UUID owner = info.getOwner();
+        return "instances" + File.separator + TYPE_NAME + File.separator + (owner != null ? owner : info.getWorldName());
     }
 }
