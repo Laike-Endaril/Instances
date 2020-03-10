@@ -8,6 +8,7 @@ import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.PlayerData;
+import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -79,7 +80,7 @@ public class Teleport
     public static boolean escape(Entity entity)
     {
         DimensionType type = entity.world.provider.getDimensionType();
-        if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.libraryOfWorldsDimType) return false;
+        if (!Tools.contains(InstanceTypes.instanceTypes, type)) return false;
 
         Set<String> strings = entity.getTags();
         for (String s : strings.toArray(new String[0]))
@@ -156,7 +157,7 @@ public class Teleport
 
 
         DimensionType dimType = entity.world.provider.getDimensionType();
-        if (dimType != InstanceTypes.skyroomDimType && dimType != InstanceTypes.libraryOfWorldsDimType)
+        if (!Tools.contains(InstanceTypes.instanceTypes, dimType))
         {
             Set<String> strings = entity.getTags();
             for (String s : strings.toArray(new String[0]))
