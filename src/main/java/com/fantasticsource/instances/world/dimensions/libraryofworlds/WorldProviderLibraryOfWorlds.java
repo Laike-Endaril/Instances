@@ -18,11 +18,10 @@ import net.minecraftforge.fml.common.Loader;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.UUID;
 
 public class WorldProviderLibraryOfWorlds extends WorldProvider
 {
-    private static final String TYPE_NAME = InstanceTypes.skyroomDimType.getName().replaceAll(" ", "_");
+    private static final String TYPE_NAME = InstanceTypes.libraryOfWorldsDimType.getName().replaceAll(" ", "_");
     private final boolean XAEROS;
     private static final Vec3d FOG_COLOR = new Vec3d(0, 0, 0);
 
