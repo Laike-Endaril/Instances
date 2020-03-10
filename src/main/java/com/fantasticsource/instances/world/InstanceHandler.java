@@ -188,7 +188,7 @@ public class InstanceHandler
         PlayerData data = PlayerData.get(owner);
         Entity ownerEntity = data == null ? null : data.player;
 
-        return createInstance(sender, dimType, owner, ownerEntity == null ? dimType.name() : ownerEntity.getName() + "'s " + InstanceTypes.skyroomDimType.getName(), save);
+        return createInstance(sender, dimType, owner, ownerEntity == null ? dimType.name() : ownerEntity.getName() + "'s " + dimType.getName(), save);
     }
 
     public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType dimType, UUID owner, String name, boolean save)
