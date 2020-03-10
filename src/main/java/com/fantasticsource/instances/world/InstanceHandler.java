@@ -107,7 +107,7 @@ public class InstanceHandler
                 BufferedReader reader = new BufferedReader(new FileReader(instanceFile));
                 try
                 {
-                    switch (Integer.parseInt(reader.readLine()))
+                    switch (Integer.parseInt(reader.readLine())) //Instance world data format version
                     {
                         case 0:
                             UUID owner = null;
