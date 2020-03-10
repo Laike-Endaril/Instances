@@ -245,7 +245,7 @@ public class Instances
             //Teleport out of the void if need be
             if (entity.posY < 0 && entity instanceof EntityPlayer)
             {
-                if (dimType == InstanceTypes.libraryOfWorldsDimType) Teleport.gotoHub((EntityPlayerMP) entity);
+                if (dimType == InstanceTypes.libraryOfWorldsDimType) Teleport.joinHubPossiblyCreating((EntityPlayerMP) entity);
                 else Teleport.joinSkyroomPossiblyCreating(entity, entity.dimension);
             }
         }
@@ -265,7 +265,7 @@ public class Instances
             //Teleport out of the void if need be
             if (entity.posY < 0 && entity instanceof EntityPlayer)
             {
-                if (dimType == InstanceTypes.libraryOfWorldsDimType) Teleport.gotoHub((EntityPlayerMP) entity);
+                if (dimType == InstanceTypes.libraryOfWorldsDimType) Teleport.joinHubPossiblyCreating((EntityPlayerMP) entity);
                 else Teleport.joinSkyroomPossiblyCreating(entity, entity.dimension);
             }
         }

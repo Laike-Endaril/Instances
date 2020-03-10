@@ -53,7 +53,31 @@ public class Teleport
         }
     }
 
-    public static boolean gotoHub(EntityPlayerMP player)
+    public static boolean joinTemplatePossiblyCreating(EntityPlayerMP player, String templateName)
+    {
+        //If we're already in the template, just teleport locally
+        if (player.world.provider.getDimensionType() == InstanceTypes.templateDimType && player.world.getWorldInfo().getWorldName().equals(templateName))
+        {
+            return teleport(player, player.world.provider.getDimension(), 0.5, 1, 0.5, player.rotationYaw, player.rotationPitch);
+        }
+
+        //Try finding an existing template with the given name
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
+        {
+            InstanceWorldInfo info = entry.getValue();
+            if (info.getDimensionType() == InstanceTypes.templateDimType && info.getWorldName().equals(templateName))
+            {
+                return teleport(player, entry.getKey(), 0.5, 1, 0.5, player.rotationYaw, player.rotationPitch);
+            }
+        }
+
+        //Not found
+        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.templateDimType, null, templateName, false);
+        InstanceHandler.load(pair.getValue());
+        return teleport(player, pair.getKey(), 0.5, 1, 0.5, player.rotationYaw, player.rotationPitch);
+    }
+
+    public static boolean joinHubPossiblyCreating(EntityPlayerMP player)
     {
         //If we're already in the hub, just teleport locally
         if (player.world.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)

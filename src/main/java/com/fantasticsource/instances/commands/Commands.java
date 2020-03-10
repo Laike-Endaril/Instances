@@ -60,7 +60,7 @@ public class Commands extends CommandBase
         switch (args[0])
         {
             case "hub":
-                if (sender instanceof EntityPlayerMP) Teleport.gotoHub((EntityPlayerMP) sender);
+                if (sender instanceof EntityPlayerMP) Teleport.joinHubPossiblyCreating((EntityPlayerMP) sender);
                 break;
 
             case "personal":
@@ -83,19 +83,12 @@ public class Commands extends CommandBase
                 break;
 
             case "template":
-                if (sender instanceof EntityPlayerMP)
+                if (sender instanceof EntityPlayerMP && args.length > 1)
                 {
-                    if (args.length == 1)
-                    {
-                        Teleport.joinSkyroomPossiblyCreating((EntityPlayerMP) sender);
-                    }
-                    else if (args.length == 2)
-                    {
-                        if (!Teleport.joinSkyroomPossiblyCreating((EntityPlayerMP) sender, args[1]))
-                        {
-                            sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
-                        }
-                    }
+                    StringBuilder name = new StringBuilder(args[1]);
+                    for (int i = 3; i < args.length; i++) name.append("_").append(args[i]);
+
+                    if (!name.toString().equals("")) Teleport.joinTemplatePossiblyCreating((EntityPlayerMP) sender, name.toString());
                     else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
@@ -197,7 +190,7 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "delete", "list", "setowner", "personal", "hub");
+            return getListOfStringsMatchingLastWord(args, "hub", "personal", "template", "list", "delete", "setowner");
         }
         else if (args.length == 2)
         {
@@ -213,6 +206,10 @@ public class Commands extends CommandBase
             else if (args[0].equals("personal"))
             {
                 return getListOfStringsMatchingLastWord(args, playernames());
+            }
+            else if (args[0].equals("template"))
+            {
+                return getListOfStringsMatchingLastWord(args, "<name>");
             }
             else return new ArrayList<>();
         }
