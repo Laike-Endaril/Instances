@@ -4,6 +4,7 @@ import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.instances.world.dimensions.skyroom.ChunkGeneratorSkyroom;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -69,7 +70,7 @@ public class ItemPlotUpgrade extends Item
         boolean creative = player.capabilities.isCreativeMode;
 
         InstanceWorldInfo info = InstanceHandler.instanceInfo.get(player.dimension);
-        if (info == null)
+        if (info == null || info.getDimensionType() != InstanceTypes.skyroomDimType)
         {
             if (!world.isRemote)
             {

@@ -7,6 +7,7 @@ import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.datastructures.SortableTable;
@@ -48,7 +49,7 @@ public class Network
         EntityPlayerMP player;
         ArrayList<String> namesIn;
         public String[] namesOut;
-        public boolean isInInstance, isInOwnedInstance;
+        public boolean isInInstance, isInOwnedSkyroom;
 
         public PersonalPortalGUIPacket()
         {
@@ -68,7 +69,7 @@ public class Network
             InstanceWorldInfo info = InstanceHandler.get(player.dimension);
 
             buf.writeBoolean(info != null);
-            buf.writeBoolean(info != null && player.getPersistentID().equals(info.getOwner()));
+            buf.writeBoolean(info != null && info.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info.getOwner()));
 
             String ownername = info == null ? null : PlayerData.getName(info.getOwner());
             namesIn = new ArrayList<>();
@@ -93,7 +94,7 @@ public class Network
         public void fromBytes(ByteBuf buf)
         {
             isInInstance = buf.readBoolean();
-            isInOwnedInstance = buf.readBoolean();
+            isInOwnedSkyroom = buf.readBoolean();
 
             int size = buf.readInt();
             namesOut = new String[size];

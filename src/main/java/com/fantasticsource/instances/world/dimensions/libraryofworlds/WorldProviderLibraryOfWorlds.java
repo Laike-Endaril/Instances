@@ -105,8 +105,6 @@ public class WorldProviderLibraryOfWorlds extends WorldProvider
         InstanceWorldInfo info = InstanceHandler.get(dim);
         if (info == null) return null;
 
-        UUID owner = info.getOwner();
-
-        return "instances" + File.separator + TYPE_NAME + File.separator + (owner != null ? owner : info.getWorldName());
+        return "instances" + File.separator + TYPE_NAME + File.separator + info.getWorldName();
     }
 }

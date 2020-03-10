@@ -55,7 +55,7 @@ public class CmdVisitors extends CommandBase
         InstanceWorldInfo info = null;
         for (InstanceWorldInfo info1 : InstanceHandler.instanceInfo.values())
         {
-            if (player.getPersistentID().equals(info1.getOwner()))
+            if (info1.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info1.getOwner()))
             {
                 info = info1;
                 break;
@@ -96,7 +96,7 @@ public class CmdVisitors extends CommandBase
             {
                 if (info == null)
                 {
-                    info = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, player.getPersistentID(), false).getValue();
+                    info = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, player.getPersistentID(), true).getValue();
                 }
 
                 if (info.visitorWhitelist.contains(playerData.id))
@@ -126,7 +126,7 @@ public class CmdVisitors extends CommandBase
                 if (otherPlayer != null)
                 {
                     InstanceWorldInfo info1 = InstanceHandler.get(otherPlayer.dimension);
-                    if (info1 != null && player.getPersistentID().equals(info1.getOwner())) Teleport.escape(otherPlayer);
+                    if (info1 != null && info1.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info1.getOwner())) Teleport.escape(otherPlayer);
                 }
 
                 VisitablePlayersData visitData = InstanceHandler.visitablePlayersData.get(playerData.id);

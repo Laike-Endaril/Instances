@@ -95,7 +95,7 @@ public class Instances
             return;
         }
 
-        if (player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
+        if (info.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
         else player.setGameType(GameType.ADVENTURE);
     }
 

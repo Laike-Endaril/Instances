@@ -71,7 +71,7 @@ public class Teleport
         }
 
         //Not found
-        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.libraryOfWorldsDimType, null, true);
+        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.libraryOfWorldsDimType, player.getPersistentID(), false);
         InstanceHandler.load(pair.getValue());
         return Teleport.teleport(player, pair.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
     }
@@ -116,10 +116,10 @@ public class Teleport
         UUID id = PlayerData.getID(ownername);
         if (id == null) return false;
 
-        //Try finding any instance owned by the player
+        //Try finding a skyroom owned by the player
         for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
         {
-            if (id.equals(entry.getValue().getOwner()))
+            if (entry.getValue().getDimensionType() == InstanceTypes.skyroomDimType && id.equals(entry.getValue().getOwner()))
             {
                 return Teleport.teleport(entity, entry.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
             }
