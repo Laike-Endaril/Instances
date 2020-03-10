@@ -98,6 +98,8 @@ public class WorldProviderLibraryOfWorlds extends WorldProvider
     @Override
     public String getSaveFolder()
     {
+        //If you return null here, it saves to the overworld
+
         if (XAEROS && world.isRemote && Tools.stackContainsSubstring("xaero")) return "instancesInstance";
 
         int dim = getDimension();
