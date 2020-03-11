@@ -130,22 +130,14 @@ public class Commands extends CommandBase
                         {
                             if (world.getWorldInfo() instanceof InstanceWorldInfo && world.provider.getSaveFolder().equals(args[1]))
                             {
-                                if (InstanceHandler.delete(sender, world))
-                                {
-                                    done = true;
-                                    break;
-                                }
+                                InstanceHandler.delete(sender, world);
+                                done = true;
+                                break;
                             }
                         }
 
-                        if (!done)
-                        {
-                            //Delete by filename
-                            if (!InstanceHandler.delete(sender, args[1]))
-                            {
-                                sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find instance to delete: " + args[1]));
-                            }
-                        }
+                        //Delete by filename
+                        if (!done) InstanceHandler.delete(sender, args[1]);
                     }
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));

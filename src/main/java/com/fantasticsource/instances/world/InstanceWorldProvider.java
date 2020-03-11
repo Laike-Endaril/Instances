@@ -24,6 +24,6 @@ public abstract class InstanceWorldProvider extends WorldProvider
 
         if (XAEROS && world.isRemote && Tools.stackContainsSubstring("xaero")) return "instancesInstance";
 
-        return "instances" + File.separator + world.provider.getDimensionType().getName() + File.separator + world.getWorldInfo().getWorldName();
+        return ("instances" + File.separator + world.provider.getDimensionType().getName() + File.separator + world.getWorldInfo().getWorldName()).replaceAll(" ", "_");
     }
 }

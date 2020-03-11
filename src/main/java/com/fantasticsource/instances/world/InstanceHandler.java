@@ -6,6 +6,7 @@ import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.ServerTickTimer;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
@@ -47,7 +48,7 @@ public class InstanceHandler
         }
 
         loadedInstances.remove(info.dimensionID);
-        DimensionManager.unregisterDimension(info.dimensionID);
+        if (DimensionManager.isDimensionRegistered(info.dimensionID)) DimensionManager.unregisterDimension(info.dimensionID);
 
         Network.WRAPPER.sendToAll(new SyncInstancesPacket());
     }
@@ -151,7 +152,7 @@ public class InstanceHandler
     /**
      * For loaded or unloaded instances
      */
-    public static boolean delete(ICommandSender sender, String folderName)
+    public static void delete(ICommandSender sender, String folderName)
     {
         folderName = "instances" + File.separator + folderName;
 
@@ -159,27 +160,28 @@ public class InstanceHandler
         {
             if (folderName.equals(world.provider.getSaveFolder()))
             {
-                return delete(sender, world);
+                delete(sender, world);
+                return;
             }
         }
 
-        return delete(sender, folderName, true);
+        delete(sender, folderName, true);
     }
 
     /**
      * For loaded instances
      */
-    public static boolean delete(ICommandSender sender, World world)
+    public static void delete(ICommandSender sender, World world)
     {
-        if (!(world instanceof WorldServer) || !(world.getWorldInfo() instanceof InstanceWorldInfo)) return false;
+        if (!(world instanceof WorldServer) || !(world.getWorldInfo() instanceof InstanceWorldInfo)) return;
 
-        return delete(sender, (InstanceWorldInfo) world.getWorldInfo());
+        delete(sender, (InstanceWorldInfo) world.getWorldInfo());
     }
 
     /**
      * For loaded instances
      */
-    public static boolean delete(ICommandSender sender, InstanceWorldInfo info)
+    public static void delete(ICommandSender sender, InstanceWorldInfo info)
     {
         int dimensionID = info.dimensionID;
         WorldServer world = info.world;
@@ -195,28 +197,44 @@ public class InstanceHandler
         unload(info);
 
 
-        return delete(sender, info.saveFolderName, true);
+        delete(sender, info.saveFolderName, true);
     }
 
     /**
      * For unloaded instances
      */
-    protected static boolean delete(ICommandSender sender, String folderName, boolean internal)
+    protected static void delete(ICommandSender sender, String folderName, boolean internal)
     {
         File file = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + folderName);
+        if (!file.exists())
+        {
+            System.err.println(TextFormatting.RED + "Could not find file: " + folderName);
+            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find instance to delete: " + folderName));
+            return;
+        }
+
         if (Tools.deleteFilesRecursively(file))
         {
             System.err.println(TextFormatting.GREEN + "Deleted file: " + file.getAbsolutePath());
             if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Completely deleted dimension " + folderName));
-            return true;
         }
         else
         {
-            System.err.println(TextFormatting.RED + "Error deleting file: " + file.getAbsolutePath());
+            ServerTickTimer.schedule(1, () ->
+            {
+                if (Tools.deleteFilesRecursively(file))
+                {
+                    System.err.println(TextFormatting.GREEN + "Deleted file: " + file.getAbsolutePath());
+                    if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Completely deleted dimension " + folderName));
+                }
+                else
+                {
+                    System.err.println(TextFormatting.RED + "Error deleting file: " + file.getAbsolutePath());
 
-            System.err.println(TextFormatting.RED + "Error deleting dimension folder for " + folderName + ". Has to be removed manually.");
-            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting dimension folder for " + folderName + ". Has to be removed manually."));
-            return false;
+                    System.err.println(TextFormatting.RED + "Error deleting dimension folder for " + folderName + ". Has to be removed manually.");
+                    if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting dimension folder for " + folderName + ". Has to be removed manually."));
+                }
+            });
         }
     }
 
