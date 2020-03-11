@@ -1,10 +1,9 @@
 package com.fantasticsource.instances.commands;
 
-import com.fantasticsource.instances.server.Teleport;
+import com.fantasticsource.instances.tags.SkyroomVisitors;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
-import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -53,7 +52,7 @@ public class CmdVisitors extends CommandBase
         EntityPlayerMP player = (EntityPlayerMP) sender;
 
         InstanceWorldInfo info = null;
-        for (InstanceWorldInfo info1 : InstanceHandler.instanceInfo.values())
+        for (InstanceWorldInfo info1 : InstanceHandler.loadedInstances.values())
         {
             if (info1.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info1.getOwner()))
             {
@@ -67,13 +66,13 @@ public class CmdVisitors extends CommandBase
             player.sendMessage(new TextComponentString("Allowed Visitors:"));
             if (info != null)
             {
-                for (UUID id : info.visitorWhitelist) player.sendMessage(new TextComponentString(PlayerData.getName(id)));
+                for (String id : SkyroomVisitors.visitables(server, player.getPersistentID())) player.sendMessage(new TextComponentString(PlayerData.getName(UUID.fromString(id))));
             }
             return;
         }
 
-        PlayerData playerData = PlayerData.get(args[0]);
-        if (playerData == null)
+        PlayerData otherPlayerData = PlayerData.get(args[0]);
+        if (otherPlayerData == null)
         {
             player.sendMessage(new TextComponentString("Player not found: " + args[0]));
             return;
@@ -87,61 +86,32 @@ public class CmdVisitors extends CommandBase
 
         if (args.length == 1)
         {
-            if (info == null || !info.visitorWhitelist.contains(playerData.id)) player.sendMessage(new TextComponentString(args[0] + " is currently NOT allowed to visit you"));
+            if (info == null || !SkyroomVisitors.canBeVisitedBy(server, player.getPersistentID(), otherPlayerData.id)) player.sendMessage(new TextComponentString(args[0] + " is currently NOT allowed to visit you"));
             else player.sendMessage(new TextComponentString(args[0] + " is currently allowed to visit you"));
         }
         else if (args.length == 2)
         {
             if (args[1].toLowerCase().equals("allow"))
             {
-                if (info == null)
+                if (SkyroomVisitors.setVisitable(server, otherPlayerData.id, player.getPersistentID(), true))
                 {
-                    info = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, player.getPersistentID(), true).getValue();
+                    player.sendMessage(new TextComponentString(args[0] + " can now visit you"));
                 }
-
-                if (info.visitorWhitelist.contains(playerData.id))
+                else
                 {
-                    player.sendMessage(new TextComponentString(args[0] + " can visit you"));
-                    return;
+                    player.sendMessage(new TextComponentString(args[0] + " can already visit you"));
                 }
-
-                InstanceHandler.visitablePlayersData.computeIfAbsent(playerData.id, o -> new VisitablePlayersData()).add(player.getPersistentID());
-
-
-                info.visitorWhitelist.add(playerData.id);
-                InstanceHandler.trySave(info);
-
-
-                player.sendMessage(new TextComponentString(args[0] + " can now visit you"));
             }
             else if (args[1].toLowerCase().equals("deny"))
             {
-                if (info == null || !info.visitorWhitelist.contains(playerData.id))
+                if (SkyroomVisitors.setVisitable(server, otherPlayerData.id, player.getPersistentID(), false))
                 {
-                    player.sendMessage(new TextComponentString(args[0] + " cannot visit you"));
-                    return;
+                    player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));
                 }
-
-                EntityPlayerMP otherPlayer = (EntityPlayerMP) playerData.player;
-                if (otherPlayer != null)
+                else
                 {
-                    InstanceWorldInfo info1 = InstanceHandler.get(otherPlayer.dimension);
-                    if (info1 != null && info1.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info1.getOwner())) Teleport.escape(otherPlayer);
+                    player.sendMessage(new TextComponentString(args[0] + " already cannot visit you"));
                 }
-
-                VisitablePlayersData visitData = InstanceHandler.visitablePlayersData.get(playerData.id);
-                if (visitData != null)
-                {
-                    visitData.remove(player.getPersistentID());
-                    if (visitData.visitablePlayers.size() == 0) InstanceHandler.visitablePlayersData.remove(playerData.id);
-                }
-
-
-                info.visitorWhitelist.remove(playerData.id);
-                InstanceHandler.trySave(info);
-
-
-                player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));
             }
             else player.sendMessage(new TextComponentString(getUsage(player)));
         }

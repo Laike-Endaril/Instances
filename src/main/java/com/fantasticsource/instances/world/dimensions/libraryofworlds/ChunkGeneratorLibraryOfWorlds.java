@@ -1,17 +1,12 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
-import com.fantasticsource.instances.blocksanditems.tileentities.TEVisitorPortal;
-import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
-import com.fantasticsource.tools.Tools;
-import com.fantasticsource.tools.datastructures.SortableTable;
 import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -26,7 +21,6 @@ import net.minecraft.world.gen.IChunkGenerator;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 {
@@ -96,39 +90,18 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
 
 
         EntityPlayer player = world.playerEntities.get(0);
-        UUID id = player.getPersistentID();
-        VisitablePlayersData chunkData = InstanceHandler.visitablePlayersData.getOrDefault(id, new VisitablePlayersData());
-        Object[] indexLetters = chunkData.visitablePlayers.getColumn(0);
-
-        boolean haveVisitables = indexLetters.length > 0;
 
 
-        //Isle Signs (in index order) and personal portals
+        //Personal portals
         if (chunkZ == 0)
         {
             TextComponentString text;
 
             for (int i = 0; i < 4; i++)
             {
-                BlockPos pos;
-                //Indexing Signs
-                if (haveVisitables)
-                {
-                    text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length)]);
-                    pos = new BlockPos(xx + (i << 2), 3, zz + 3);
-                    createSign(chunk, pos, EnumFacing.SOUTH, XXX_STRING, text, BLANK_STRING, XXX_STRING);
-                    pos = pos.east(3);
-                    createSign(chunk, pos, EnumFacing.SOUTH, XXX_STRING, text, BLANK_STRING, XXX_STRING);
-
-                    text = new TextComponentString("" + indexLetters[Tools.posMod((chunkX << 3) + (i << 1) + 1, indexLetters.length)]);
-                    pos = pos.south(9);
-                    createSign(chunk, pos, EnumFacing.NORTH, XXX_STRING, text, BLANK_STRING, XXX_STRING);
-                    pos = pos.west(3);
-                    createSign(chunk, pos, EnumFacing.NORTH, XXX_STRING, text, BLANK_STRING, XXX_STRING);
-                }
-
-
                 //Personal portals and return portals
+                BlockPos pos;
+
                 text = new TextComponentString(player.getName() + "'s");
                 pos = new BlockPos(xx + (i << 2), 3, zz + 1);
                 chunk.setBlockState(pos, PERSONAL_PORTAL);
@@ -143,75 +116,6 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
                 pos = pos.west(3);
                 chunk.setBlockState(pos, RETURN_PORTAL);
                 createSign(chunk, pos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, BLANK_STRING, ESCAPE_STRING, XXX_STRING);
-            }
-        }
-        else if (haveVisitables)
-        {
-            //Isles; not the main hall
-
-            //Visitable portals
-
-            SortableTable isleNames;
-            String name;
-            int index;
-            BlockPos portalPos;
-            TileEntity te;
-
-            if (chunkZ < 0)
-            {
-                for (int i = 0; i < 4; i++)
-                {
-                    isleNames = (SortableTable) chunkData.visitablePlayers.get(1, Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length));
-
-                    for (int z = 15; z >= 0; z -= 2)
-                    {
-                        //Western
-                        portalPos = new BlockPos(xx + (i << 2), 3, zz + z);
-                        chunk.setBlockState(portalPos, VISITOR_PORTAL);
-                        index = Tools.posMod(15 - z, isleNames.size());
-                        name = (String) isleNames.get(0, index);
-                        te = world.getTileEntity(portalPos);
-                        if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
-                        createSign(chunk, portalPos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
-
-                        //Eastern
-                        portalPos = portalPos.east(3);
-                        chunk.setBlockState(portalPos, VISITOR_PORTAL);
-                        index = Tools.posMod(++index, isleNames.size());
-                        name = (String) isleNames.get(0, index);
-                        te = world.getTileEntity(portalPos);
-                        if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
-                        createSign(chunk, portalPos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
-                    }
-                }
-            }
-            else
-            {
-                for (int i = 0; i < 4; i++)
-                {
-                    isleNames = (SortableTable) chunkData.visitablePlayers.get(1, Tools.posMod((chunkX << 3) + (i << 1), indexLetters.length));
-
-                    for (int z = 0; z < 16; z += 2)
-                    {
-                        //Eastern
-                        portalPos = new BlockPos(xx + (i << 2) + 3, 3, zz + z);
-                        chunk.setBlockState(portalPos, VISITOR_PORTAL);
-                        index = Tools.posMod(z, isleNames.size());
-                        name = (String) isleNames.get(0, index);
-                        te = world.getTileEntity(portalPos);
-                        if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
-                        createSign(chunk, portalPos.add(-1, 1, 0), EnumFacing.WEST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
-
-                        //Western
-                        portalPos = portalPos.west(3);
-                        chunk.setBlockState(portalPos, VISITOR_PORTAL);
-                        index = Tools.posMod(++index, isleNames.size());
-                        name = (String) isleNames.get(0, index);
-                        te = world.getTileEntity(portalPos);
-                        if (te instanceof TEVisitorPortal) ((TEVisitorPortal) te).ownername = name;
-                        createSign(chunk, portalPos.add(1, 1, 0), EnumFacing.EAST, XXX_STRING, new TextComponentString(name + "'s"), HOUSE_STRING, XXX_STRING);
-                    }
-                }
             }
         }
     }

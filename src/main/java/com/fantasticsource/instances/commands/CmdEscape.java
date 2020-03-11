@@ -5,6 +5,7 @@ import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
@@ -41,6 +42,12 @@ public class CmdEscape extends CommandBase
         if (sender instanceof Entity)
         {
             Entity entity = (Entity) sender;
+            if (entity instanceof EntityPlayerMP && ((EntityPlayerMP) entity).isCreative())
+            {
+                Teleport.escape(entity);
+                return;
+            }
+
             DimensionType type = entity.world.provider.getDimensionType();
             if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.libraryOfWorldsDimType)
             {

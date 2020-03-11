@@ -4,8 +4,6 @@ import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
-import com.fantasticsource.instances.world.dimensions.InstanceTypes;
-import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.Tools;
@@ -24,15 +22,17 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class InstanceHandler
 {
     private static final int INSTANCE_SAVE_FORMAT = 0;
 
-    public static LinkedHashMap<Integer, InstanceWorldInfo> instanceInfo = new LinkedHashMap<>();
-    public static LinkedHashMap<UUID, VisitablePlayersData> visitablePlayersData = new LinkedHashMap<>();
+    public static LinkedHashMap<Integer, InstanceWorldInfo> loadedInstances = new LinkedHashMap<>();
 
 
     public static void unload(InstanceWorldInfo info)
@@ -67,11 +67,6 @@ public class InstanceHandler
             UUID owner = info.getOwner();
             writer.write((owner == null ? "" : owner) + "\r\n");
 
-            for (UUID id : info.visitorWhitelist)
-            {
-                writer.write(id + "\r\n");
-            }
-
             writer.close();
         }
         catch (IOException e)
@@ -80,106 +75,43 @@ public class InstanceHandler
         }
     }
 
-    public static void init(FMLServerStartingEvent event) throws IOException
+    public static void init(FMLServerStartingEvent event)
     {
         clear();
+    }
 
+    public static ArrayList<String> instanceFolderNames()
+    {
+        ArrayList<String> result = new ArrayList<>();
 
-        File instancesFolder = new File(getInstancesDir(event.getServer()));
-        if (!instancesFolder.isDirectory()) return;
+        File instancesFolder = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()));
+        if (!instancesFolder.isDirectory()) return result;
 
-        for (DimensionType instanceType : InstanceTypes.instanceTypes)
+        File[] instanceTypeFolders = instancesFolder.listFiles();
+        if (instanceTypeFolders == null) return result;
+
+        for (File instanceTypeFolder : instanceTypeFolders)
         {
-            File typeFolder = new File(instancesFolder.getAbsolutePath() + File.separator + instanceType.getName().replaceAll(" ", "_"));
-            if (!typeFolder.isDirectory()) continue;
+            if (!instancesFolder.isDirectory()) continue;
 
-            File[] instanceFolders = typeFolder.listFiles();
+            File[] instanceFolders = instanceTypeFolder.listFiles();
             if (instanceFolders == null) continue;
 
-            for (File instanceFolder : instanceFolders)
-            {
-                if (!instanceFolder.isDirectory()) continue;
-
-                File instanceFile = new File(instanceFolder.getAbsolutePath() + File.separator + "instanceData.txt");
-                if (!instanceFile.exists() || instanceFile.isDirectory()) continue;
-
-
-                BufferedReader reader = new BufferedReader(new FileReader(instanceFile));
-                try
-                {
-                    switch (Integer.parseInt(reader.readLine())) //Instance world data format version
-                    {
-                        case 0:
-                            UUID owner = null;
-                            String s = reader.readLine();
-                            if (s != null)
-                            {
-                                s = s.trim();
-                                if (!s.equals(""))
-                                {
-                                    try
-                                    {
-                                        owner = UUID.fromString(s);
-                                    }
-                                    catch (IllegalArgumentException e)
-                                    {
-                                        //Leave set to null
-                                    }
-                                }
-                            }
-
-                            //TODO This code doesn't seem to have been necessary, but I'm leaving it commented out here for now just in case
-//                            if (instanceType == InstanceTypes.skyroomDimType)
-//                            {
-//                                String playername = PlayerData.getName(owner);
-//                                createInstance(null, instanceType, owner, playername != null ? playername + "'s " + InstanceTypes.skyroomDimType.getName() : instanceFolder.getName(), false);
-//                            }
-//                            else
-//                            {
-//                                throw new IllegalStateException("Found unknown file: " + instanceFile);
-//                            }
-
-                            s = reader.readLine();
-                            while (s != null)
-                            {
-                                try
-                                {
-                                    UUID id = UUID.fromString(s.trim());
-                                    visitablePlayersData.computeIfAbsent(id, o -> new VisitablePlayersData()).add(owner);
-                                }
-                                catch (IllegalArgumentException e)
-                                {
-                                }
-
-                                s = reader.readLine();
-                            }
-
-                            break;
-
-
-                        default:
-                            throw new IllegalArgumentException("Unknown instance world data format!  Skipping: " + instanceFile.getName());
-                    }
-                }
-                catch (IllegalArgumentException e) //NumberFormatException is a subclass
-                {
-                    reader.close();
-                    continue;
-                }
-            }
+            for (File instanceFolder : instanceFolders) result.add(instanceTypeFolder.getName() + File.separator + instanceFolder.getName());
         }
+
+        return result;
     }
 
     public static void clear()
     {
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : loadedInstances.entrySet())
         {
             unload(entry.getValue());
             DimensionManager.unregisterDimension(entry.getKey());
         }
 
-        instanceInfo.clear();
-        visitablePlayersData.clear();
+        loadedInstances.clear();
     }
 
 
@@ -201,7 +133,7 @@ public class InstanceHandler
         WorldSettings settings = new WorldSettings(new Random().nextLong(), GameType.CREATIVE, true, false, worldType);
         InstanceWorldInfo worldInfo = new InstanceWorldInfo(dimensionID, settings, owner, name, dimType, save);
 
-        instanceInfo.put(dimensionID, worldInfo);
+        loadedInstances.put(dimensionID, worldInfo);
 
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
 
@@ -248,7 +180,7 @@ public class InstanceHandler
         }
         DimensionManager.unregisterDimension(dimensionID);
 
-        instanceInfo.remove(dimensionID);
+        loadedInstances.remove(dimensionID);
 
 
         File file = new File(info.SAVE_FOLDER_NAME);
@@ -270,7 +202,7 @@ public class InstanceHandler
     public static ArrayList<String> list()
     {
         ArrayList<String> result = new ArrayList<>();
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : instanceInfo.entrySet())
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : loadedInstances.entrySet())
         {
             InstanceWorldInfo info = entry.getValue();
             result.add(entry.getKey() + " (" + info.getWorldName() + ")");
@@ -280,7 +212,7 @@ public class InstanceHandler
 
     public static InstanceWorldInfo get(int instDimID)
     {
-        return instanceInfo.get(instDimID);
+        return loadedInstances.get(instDimID);
     }
 
     public static String getInstancesDir(MinecraftServer server)

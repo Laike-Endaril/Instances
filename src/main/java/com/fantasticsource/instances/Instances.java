@@ -7,6 +7,7 @@ import com.fantasticsource.instances.commands.*;
 import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
+import com.fantasticsource.instances.tags.SkyroomVisitors;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
@@ -107,6 +108,8 @@ public class Instances
     {
         Converter.convert();
 
+        SkyroomVisitors.init();
+
         MinecraftForge.EVENT_BUS.register(Instances.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
 
@@ -142,7 +145,6 @@ public class Instances
         event.registerServerCommand(new Commands());
         event.registerServerCommand(new CmdDimWeather());
         event.registerServerCommand(new CmdDimTime());
-        event.registerServerCommand(new CmdDimTP());
         event.registerServerCommand(new CmdEscape());
         event.registerServerCommand(new CmdVisitors());
 

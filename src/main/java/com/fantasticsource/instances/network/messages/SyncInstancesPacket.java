@@ -18,7 +18,7 @@ public class SyncInstancesPacket implements IMessage
     @Override
     public void toBytes(ByteBuf buf)
     {
-        Set<Map.Entry<Integer, InstanceWorldInfo>> entries = InstanceHandler.instanceInfo.entrySet();
+        Set<Map.Entry<Integer, InstanceWorldInfo>> entries = InstanceHandler.loadedInstances.entrySet();
         buf.writeInt(entries.size());
 
         for (Map.Entry<Integer, InstanceWorldInfo> entry : entries)

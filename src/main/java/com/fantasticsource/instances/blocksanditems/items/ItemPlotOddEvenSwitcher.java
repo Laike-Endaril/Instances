@@ -2,7 +2,6 @@ package com.fantasticsource.instances.blocksanditems.items;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
-import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.instances.world.dimensions.skyroom.ChunkGeneratorSkyroom;
@@ -20,14 +19,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.WorldInfo;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class ItemPlotOddEvenSwitcher extends Item
 {
-    private BlockPos size, allowedExistingSizes[];
-
     public ItemPlotOddEvenSwitcher()
     {
         setCreativeTab(BlocksAndItems.creativeTab);
@@ -43,20 +41,21 @@ public class ItemPlotOddEvenSwitcher extends Item
 
         boolean creative = player.capabilities.isCreativeMode;
 
-        InstanceWorldInfo info = InstanceHandler.instanceInfo.get(player.dimension);
-        if (info == null || info.getDimensionType() != InstanceTypes.skyroomDimType)
+        WorldInfo worldInfo = player.world.getWorldInfo();
+        if (!(worldInfo instanceof InstanceWorldInfo) || ((InstanceWorldInfo) worldInfo).getDimensionType() != InstanceTypes.skyroomDimType)
         {
             if (!world.isRemote)
             {
-                if (creative) player.sendMessage(new TextComponentString("Plot changing items can only be used in personal instances!"));
-                else player.sendMessage(new TextComponentString("Plot changing items can only be used in your own personal instances!"));
+                if (creative) player.sendMessage(new TextComponentString("Plot changing items can only be used in skyroom instances!"));
+                else player.sendMessage(new TextComponentString("Plot changing items can only be used in your own skyroom instance!"));
             }
             return new ActionResult<>(EnumActionResult.FAIL, itemstack);
         }
 
-        if (!creative && !player.getPersistentID().equals(info.getOwner()))
+
+        if (!creative && !player.getPersistentID().equals(((InstanceWorldInfo) worldInfo).getOwner()))
         {
-            if (!world.isRemote) player.sendMessage(new TextComponentString("Plot changing items can only be used in your own personal instances!"));
+            if (!world.isRemote) player.sendMessage(new TextComponentString("Plot changing items can only be used in your own skyroom instance!"));
             return new ActionResult<>(EnumActionResult.FAIL, itemstack);
         }
 

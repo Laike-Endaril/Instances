@@ -5,8 +5,6 @@ import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
@@ -16,7 +14,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,7 +22,6 @@ public class InstanceWorldInfo extends WorldInfo
     public final String SAVE_FOLDER_NAME;
     public final int dimensionID;
     private final DimensionType dimensionType;
-    public ArrayList<UUID> visitorWhitelist = new ArrayList<>();
     public WorldInstance world = null;
     public boolean save;
     private UUID owner;
@@ -62,10 +58,6 @@ public class InstanceWorldInfo extends WorldInfo
         result.setString("dimType", dimensionType.getName());
         result.setString("owner", owner == null ? "null" : owner.toString());
 
-        NBTTagList list = new NBTTagList();
-        for (UUID id : visitorWhitelist) list.appendTag(new NBTTagString(id.toString()));
-        result.setTag("visitorWhitelist", list);
-
         return result;
     }
 
@@ -88,7 +80,7 @@ public class InstanceWorldInfo extends WorldInfo
     {
         owner = id;
 
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.instanceInfo.entrySet())
+        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.loadedInstances.entrySet())
         {
             if (entry.getValue() == this)
             {

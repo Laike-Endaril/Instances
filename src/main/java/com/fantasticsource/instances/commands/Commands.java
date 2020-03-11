@@ -3,6 +3,7 @@ package com.fantasticsource.instances.commands;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -72,7 +73,8 @@ public class Commands extends CommandBase
                     }
                     else if (args.length == 2)
                     {
-                        if (!Teleport.joinSkyroomPossiblyCreating((EntityPlayerMP) sender, args[1]))
+                        PlayerData otherPlayerData = PlayerData.get(args[1]);
+                        if (otherPlayerData == null || !Teleport.joinSkyroomPossiblyCreating((EntityPlayerMP) sender, otherPlayerData.id))
                         {
                             sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
                         }
@@ -95,7 +97,7 @@ public class Commands extends CommandBase
                 break;
 
             case "list":
-                for (String s : InstanceHandler.list())
+                for (String s : InstanceHandler.instanceFolderNames())
                 {
                     sender.sendMessage(new TextComponentString(s));
                 }
@@ -104,13 +106,14 @@ public class Commands extends CommandBase
             case "delete":
                 if (args.length <= 2)
                 {
-                    InstanceWorldInfo info = null;
+                    InstanceWorldInfo info = null; //This null is necessary!
                     if (args.length == 1)
                     {
                         if (sender instanceof EntityPlayerMP)
                         {
                             info = InstanceHandler.get(((EntityPlayerMP) sender).dimension);
                             if (info == null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleting the 'current instance' only works while inside an instance"));
+                            else InstanceHandler.delete(sender, info);
                         }
                         else System.err.println("Deleting the 'current instance' is only usable when logged in as a player (and inside an instance)");
                     }
@@ -119,22 +122,13 @@ public class Commands extends CommandBase
                         try
                         {
                             info = InstanceHandler.get(Integer.parseInt(args[1]));
+                            InstanceHandler.delete(sender, info);
                         }
                         catch (NumberFormatException e)
                         {
-                            for (InstanceWorldInfo info1 : InstanceHandler.instanceInfo.values())
-                            {
-                                if (info1.getWorldName().equals(args[1]))
-                                {
-                                    info = info1;
-                                    break;
-                                }
-                            }
+//                            File file =
                         }
                     }
-
-                    if (info != null) InstanceHandler.delete(sender, info);
-                    else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
@@ -149,7 +143,7 @@ public class Commands extends CommandBase
                     }
                     catch (NumberFormatException e)
                     {
-                        for (InstanceWorldInfo info1 : InstanceHandler.instanceInfo.values())
+                        for (InstanceWorldInfo info1 : InstanceHandler.loadedInstances.values())
                         {
                             if (info1.getWorldName().equals(args[1]))
                             {
@@ -196,12 +190,7 @@ public class Commands extends CommandBase
         {
             if (args[0].equals("delete") || args[0].equals("setowner"))
             {
-                ArrayList<String> strings = new ArrayList<>();
-
-                for (InstanceWorldInfo info : InstanceHandler.instanceInfo.values()) strings.add(info.getWorldName());
-                for (int i : InstanceHandler.instanceInfo.keySet()) strings.add("" + i);
-
-                return getListOfStringsMatchingLastWord(args, strings);
+                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames());
             }
             else if (args[0].equals("personal"))
             {
@@ -209,7 +198,15 @@ public class Commands extends CommandBase
             }
             else if (args[0].equals("template"))
             {
-                return getListOfStringsMatchingLastWord(args, "<name>");
+                ArrayList<String> strings = new ArrayList<>();
+
+                for (InstanceWorldInfo info : InstanceHandler.loadedInstances.values())
+                {
+                    if (info.getDimensionType() == InstanceTypes.templateDimType) strings.add(info.getWorldName());
+                }
+                strings.add("<name>");
+
+                return getListOfStringsMatchingLastWord(args, strings);
             }
             else return new ArrayList<>();
         }

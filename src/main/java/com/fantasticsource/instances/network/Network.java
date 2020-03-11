@@ -5,15 +5,15 @@ import com.fantasticsource.instances.client.gui.PersonalPortalGUI;
 import com.fantasticsource.instances.network.handler.SyncInstancesPacketHandler;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
+import com.fantasticsource.instances.tags.SkyroomVisitors;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
-import com.fantasticsource.instances.world.dimensions.libraryofworlds.VisitablePlayersData;
 import com.fantasticsource.mctools.PlayerData;
-import com.fantasticsource.tools.datastructures.SortableTable;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -71,21 +71,7 @@ public class Network
             buf.writeBoolean(info != null);
             buf.writeBoolean(info != null && info.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info.getOwner()));
 
-            String ownername = info == null ? null : PlayerData.getName(info.getOwner());
-            namesIn = new ArrayList<>();
-            VisitablePlayersData data = InstanceHandler.visitablePlayersData.get(player.getPersistentID());
-            if (data != null)
-            {
-                Object[] nameTables = data.visitablePlayers.getColumn(1);
-                for (Object nameTable : nameTables)
-                {
-                    for (Object name : ((SortableTable) nameTable).getColumn(0))
-                    {
-                        if (!name.equals(ownername)) namesIn.add((String) name);
-                    }
-                }
-            }
-
+            namesIn = SkyroomVisitors.visitables(FMLCommonHandler.instance().getMinecraftServerInstance(), player.getPersistentID());
             buf.writeInt(namesIn.size());
             for (String name : namesIn) ByteBufUtils.writeUTF8String(buf, name);
         }
@@ -149,7 +135,8 @@ public class Network
         @Override
         public IMessage onMessage(PersonalPortalPacket message, MessageContext ctx)
         {
-            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() ->
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            server.addScheduledTask(() ->
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;
                 if (player.world != personalPortalWorlds.get(player)) return;
@@ -169,13 +156,10 @@ public class Network
                         return;
 
                     default:
-                        VisitablePlayersData data = InstanceHandler.visitablePlayersData.get(player.getPersistentID());
-                        if (data == null) return;
+                        PlayerData data = PlayerData.get(s);
+                        if (data == null || !SkyroomVisitors.canVisit(server, player.getPersistentID(), data.id)) return;
 
-                        SortableTable nameTable = (SortableTable) data.visitablePlayers.get(0, s.charAt(0), 1);
-                        if (nameTable == null || !nameTable.contains(s, 0)) return;
-
-                        Teleport.joinSkyroomPossiblyCreating(player, s);
+                        Teleport.joinSkyroomPossiblyCreating(player, data.id);
                 }
             });
             return null;

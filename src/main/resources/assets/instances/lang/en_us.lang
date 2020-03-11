@@ -18,7 +18,7 @@ instances.instanceType=Dimension Type:
 
 instances.commands.dimweather.usage=/dimweather <dimension> <clear|rain|thunder> [duration in seconds]
 instances.commands.dimtime.usage=/dimtime <dimension> <set|add|query> <value>
-instances.commands.dimtp.usage=/dimtp [target player] <destination player> OR /dimtp [dimensionID] [target player] <x> <y> <z> [<y-rot> <x-rot>]
+instances.commands.dimtp.usage=/dimtp [dimensionID] [target player] <x> <y> <z> [<y-rot> <x-rot>]
 
 instances.worldType.void=Void Instance
 instances.worldType.skyroom=Skyroom Instance

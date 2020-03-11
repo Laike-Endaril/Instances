@@ -4,16 +4,18 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 
+import java.util.UUID;
+
 public class TEVisitorPortal extends TileEntity
 {
-    public String ownername;
+    public UUID owner;
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
         compound = super.writeToNBT(compound);
 
-        compound.setTag("ownername", new NBTTagString(ownername));
+        compound.setTag("owner", new NBTTagString("" + owner));
 
         return compound;
     }
@@ -23,6 +25,6 @@ public class TEVisitorPortal extends TileEntity
     {
         super.readFromNBT(compound);
 
-        ownername = compound.getString("ownername");
+        owner = UUID.fromString(compound.getString("owner"));
     }
 }
