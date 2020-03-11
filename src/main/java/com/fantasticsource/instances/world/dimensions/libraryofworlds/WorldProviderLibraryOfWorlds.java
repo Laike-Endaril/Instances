@@ -24,6 +24,7 @@ public class WorldProviderLibraryOfWorlds extends InstanceWorldProvider
     {
         hasSkyLight = false;
         biomeProvider = BiomeProviders.VOID;
+        setSpawnPoint(new BlockPos(8, 2, 8));
     }
 
     @Override

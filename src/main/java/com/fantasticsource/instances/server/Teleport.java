@@ -50,23 +50,28 @@ public class Teleport
         //If we're already in the template, just teleport locally
         if (player.world.provider.getDimensionType() == InstanceTypes.templateDimType && player.world.getWorldInfo().getWorldName().equals(templateName))
         {
-            return teleport(player, player.world.provider.getDimension(), 0.5, 1, 0.5, player.rotationYaw, player.rotationPitch);
+            InstanceWorldInfo info = (InstanceWorldInfo) player.world.getWorldInfo();
+            return teleport(player, player.world.provider.getDimension(), info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, player.rotationYaw, player.rotationPitch);
         }
 
         //Try finding an existing template with the given name
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.loadedInstances.entrySet())
+        for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
         {
-            InstanceWorldInfo info = entry.getValue();
-            if (info.getDimensionType() == InstanceTypes.templateDimType && info.getWorldName().equals(templateName))
-            {
-                return teleport(player, entry.getKey(), 0.5, 1, 0.5, player.rotationYaw, player.rotationPitch);
-            }
+            if (!(world.provider.getDimensionType() == InstanceTypes.templateDimType)) continue;
+
+            InstanceWorldInfo info = (InstanceWorldInfo) world.getWorldInfo();
+            if (!info.getWorldName().equals(templateName)) continue;
+
+            System.out.println("Found with name: " + templateName);
+            return teleport(player, world.provider.getDimension(), info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, player.rotationYaw, player.rotationPitch);
         }
 
         //Not found
+        System.out.println("Not found: " + templateName);
         Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.templateDimType, null, templateName, false);
-        InstanceHandler.load(pair.getValue());
-        return teleport(player, pair.getKey(), 0.5, 1, 0.5, player.rotationYaw, player.rotationPitch);
+        InstanceWorldInfo info = pair.getValue();
+        InstanceHandler.load(info);
+        return teleport(player, pair.getKey(), info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, player.rotationYaw, player.rotationPitch);
     }
 
     public static boolean joinHubPossiblyCreating(EntityPlayerMP player)

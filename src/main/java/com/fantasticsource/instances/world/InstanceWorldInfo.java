@@ -69,6 +69,11 @@ public class InstanceWorldInfo extends WorldInfo
         return owner;
     }
 
+    public void setOwner(EntityPlayerMP player)
+    {
+        setOwner(player.getPersistentID());
+    }
+
     public void setOwner(UUID id)
     {
         owner = id;
@@ -86,10 +91,5 @@ public class InstanceWorldInfo extends WorldInfo
                 }
             }
         }
-    }
-
-    public void setOwner(EntityPlayerMP player)
-    {
-        setOwner(player.getPersistentID());
     }
 }

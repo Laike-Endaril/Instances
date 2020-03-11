@@ -26,7 +26,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Random;
+import java.util.UUID;
 
 public class InstanceHandler
 {
@@ -42,6 +45,11 @@ public class InstanceHandler
             trySave(info);
             info.world = null;
         }
+
+        loadedInstances.remove(info.dimensionID);
+        DimensionManager.unregisterDimension(info.dimensionID);
+
+        Network.WRAPPER.sendToAll(new SyncInstancesPacket());
     }
 
     public static void trySave(InstanceWorldInfo info)
@@ -82,13 +90,11 @@ public class InstanceHandler
 
     public static void clear()
     {
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : loadedInstances.entrySet())
+        loadedInstances.entrySet().removeIf(entry ->
         {
             unload(entry.getValue());
-            DimensionManager.unregisterDimension(entry.getKey());
-        }
-
-        loadedInstances.clear();
+            return true;
+        });
     }
 
 
@@ -184,12 +190,9 @@ public class InstanceHandler
             world.flush();
             DimensionManager.setWorld(dimensionID, null, FMLCommonHandler.instance().getMinecraftServerInstance());
         }
-        DimensionManager.unregisterDimension(dimensionID);
-
-        loadedInstances.remove(dimensionID);
 
 
-        Network.WRAPPER.sendToAll(new SyncInstancesPacket());
+        unload(info);
 
 
         return delete(sender, info.saveFolderName, true);
