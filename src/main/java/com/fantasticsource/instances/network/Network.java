@@ -5,7 +5,7 @@ import com.fantasticsource.instances.client.gui.PersonalPortalGUI;
 import com.fantasticsource.instances.network.handler.SyncInstancesPacketHandler;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
-import com.fantasticsource.instances.tags.SkyroomVisitors;
+import com.fantasticsource.instances.tags.world.SkyroomVisitors;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;

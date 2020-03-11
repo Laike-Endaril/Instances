@@ -1,6 +1,6 @@
 package com.fantasticsource.instances.commands;
 
-import com.fantasticsource.instances.tags.SkyroomVisitors;
+import com.fantasticsource.instances.tags.world.SkyroomVisitors;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;

@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.tags;
+package com.fantasticsource.instances.tags.world;
 
 import com.fantasticsource.fantasticlib.api.FLibAPI;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,12 +14,6 @@ import static com.fantasticsource.fantasticlib.FantasticLib.MODID;
 
 public class SkyroomVisitors
 {
-    public static void init()
-    {
-        FLibAPI.attachNBTCapToWorldIf(MODID, world -> world.provider.getDimension() == 0);
-    }
-
-
     public static boolean setVisitable(MinecraftServer server, UUID visitor, UUID visitable, boolean canVisit)
     {
         NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);

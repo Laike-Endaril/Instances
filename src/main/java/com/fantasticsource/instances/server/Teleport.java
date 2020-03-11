@@ -1,7 +1,8 @@
 package com.fantasticsource.instances.server;
 
+import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.Instances;
-import com.fantasticsource.instances.blocksanditems.tileentities.TEInstancePortal;
+import com.fantasticsource.instances.tags.entity.EscapePoint;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
@@ -14,7 +15,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.network.play.server.SPacketSetExperience;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
@@ -24,7 +24,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.lang.reflect.Method;
-import java.util.Set;
 import java.util.UUID;
 
 public class Teleport
@@ -91,20 +90,13 @@ public class Teleport
         DimensionType type = entity.world.provider.getDimensionType();
         if (!Tools.contains(InstanceTypes.instanceTypes, type)) return false;
 
-        Set<String> strings = entity.getTags();
-        for (String s : strings.toArray(new String[0]))
-        {
-            if (s.contains("instances.lastgoodpos"))
-            {
-                String[] tokens = s.replace("instances.lastgoodpos", "").split(",");
-                return teleport(entity, Integer.parseInt(tokens[0]), 0.5d + Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), 0.5d + Integer.parseInt(tokens[3]), entity.rotationYaw, entity.rotationPitch);
-            }
-        }
+        Destination lastGoodPos = EscapePoint.getEscapePoint(entity);
+        if (lastGoodPos != null) return teleport(entity, lastGoodPos);
 
         return false;
     }
 
-    public static boolean teleport(Entity entity, TEInstancePortal.Destination destination)
+    public static boolean teleport(Entity entity, Destination destination)
     {
         return teleport(entity, destination.dimension, destination.x, destination.y, destination.z, entity.rotationYaw, entity.rotationPitch);
     }
@@ -119,17 +111,7 @@ public class Teleport
         //Save current position if we're not currently in an instance (for instance escaping)
         if (!Tools.contains(InstanceTypes.instanceTypes, entity.world.provider.getDimensionType()))
         {
-            Set<String> strings = entity.getTags();
-            for (String s : strings.toArray(new String[0]))
-            {
-                if (s.contains("instances.lastgoodpos"))
-                {
-                    strings.remove(s);
-                    break;
-                }
-            }
-            BlockPos pos = entity.getPosition();
-            strings.add("instances.lastgoodpos" + entity.dimension + "," + pos.getX() + "," + pos.getY() + "," + pos.getZ());
+            EscapePoint.setEscapePointToCurrentPosition(entity);
         }
 
 

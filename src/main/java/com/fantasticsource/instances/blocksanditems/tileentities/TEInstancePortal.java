@@ -1,12 +1,14 @@
 package com.fantasticsource.instances.blocksanditems.tileentities;
 
-import net.minecraft.nbt.*;
+import com.fantasticsource.instances.Destination;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagDouble;
+import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class TEInstancePortal extends TileEntity
 {
@@ -52,55 +54,6 @@ public class TEInstancePortal extends TileEntity
             pitch = ((NBTTagDouble) list.get(i * 6 + 6)).getFloat();
 
             destinations.add(new Destination(dimension, x, y, z, yaw, pitch));
-        }
-    }
-
-
-    public static class Destination
-    {
-        public int dimension;
-        public double x, y, z;
-        public float yaw, pitch;
-
-
-        public Destination(int dimension, double x, double y, double z, float yaw, float pitch)
-        {
-            this.dimension = dimension;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.yaw = yaw;
-            this.pitch = pitch;
-        }
-
-        public void addNBTTo(NBTTagList list)
-        {
-            List<NBTBase> tags = list.tagList;
-            tags.add(new NBTTagInt(dimension));
-            tags.add(new NBTTagDouble(x));
-            tags.add(new NBTTagDouble(y));
-            tags.add(new NBTTagDouble(z));
-            tags.add(new NBTTagFloat(yaw));
-            tags.add(new NBTTagFloat(pitch));
-        }
-
-        public Destination setDimension(int dimension)
-        {
-            this.dimension = dimension;
-            return this;
-        }
-
-        public Destination setPosition(double x, double y, double z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            return this;
-        }
-
-        public Destination setPosition(BlockPos pos)
-        {
-            return setPosition(pos.getX(), pos.getY(), pos.getZ());
         }
     }
 }

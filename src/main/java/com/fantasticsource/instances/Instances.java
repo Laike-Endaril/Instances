@@ -1,5 +1,6 @@
 package com.fantasticsource.instances;
 
+import com.fantasticsource.fantasticlib.api.FLibAPI;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.client.ClientHandler;
 import com.fantasticsource.instances.client.LightFixer;
@@ -7,7 +8,8 @@ import com.fantasticsource.instances.commands.*;
 import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
-import com.fantasticsource.instances.tags.SkyroomVisitors;
+import com.fantasticsource.instances.tags.entity.CurrentWorldname;
+import com.fantasticsource.instances.tags.entity.EscapePoint;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
@@ -16,8 +18,9 @@ import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
@@ -40,8 +43,6 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Set;
 
 @Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.034a,)")
 public class Instances
@@ -104,12 +105,14 @@ public class Instances
     }
 
     @EventHandler
-    public static void preInit(FMLPreInitializationEvent event) throws IOException
+    public static void preInit(FMLPreInitializationEvent event)
     {
-        SkyroomVisitors.init();
+        FLibAPI.attachNBTCapToWorldIf(MODID, world -> world.provider.getDimension() == 0);
+        FLibAPI.attachNBTCapToEntityIf(MODID, entity -> true);
 
         MinecraftForge.EVENT_BUS.register(Instances.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
+        MinecraftForge.EVENT_BUS.register(CurrentWorldname.class);
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
@@ -173,33 +176,36 @@ public class Instances
     }
 
     @SubscribeEvent
-    public static void playerLoading(net.minecraftforge.event.entity.player.PlayerEvent.LoadFromFile event)
+    public static void serverConnectionFromClient(FMLNetworkEvent.ServerConnectionFromClientEvent event)
     {
-        EntityPlayer player = event.getEntityPlayer();
+        NetHandlerPlayServer netHandler = (NetHandlerPlayServer) event.getManager().getNetHandler();
+        EntityPlayerMP player = netHandler.player;
         int dim = player.dimension;
+
+
+        //TODO check world name for match, and if it doesn't, set player dimension to an invalid one
+        String worldName = CurrentWorldname.getCurrentWorldName(player);
+        if (worldName != null && !worldName.equals(player.world.getWorldInfo().getWorldName())) dim = nextFreeDimTypeID();
+
 
         if (FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(dim) == null)
         {
             System.err.println(TextFormatting.RED + "This error was due to a player loading into a no-longer-existent dimension, which may happen if the server shut down forcefully, among other things");
 
-            Set<String> strings = player.getTags();
-            boolean found = false;
-            for (String s : strings.toArray(new String[0]))
+
+            Destination escapePoint = EscapePoint.getEscapePoint(player);
+            if (escapePoint != null)
             {
-                if (s.contains("instances.lastgoodpos"))
-                {
-                    String[] tokens = s.replace("instances.lastgoodpos", "").split(",");
-                    player.dimension = Integer.parseInt(tokens[0]);
-                    player.posX = 0.5d + Integer.parseInt(tokens[1]);
-                    player.posY = Integer.parseInt(tokens[2]);
-                    player.posZ = 0.5d + Integer.parseInt(tokens[3]);
-                    found = true;
-                    System.err.println(TextFormatting.RED + "The player (" + player.getName() + ") will end up at their last 'instance escape point': " + player.posX + ", " + player.posY + ", " + player.posZ + " in dimension " + player.dimension);
-                    break;
-                }
+                Teleport.teleport(player, escapePoint);
+                System.err.println(TextFormatting.RED + "The player (" + player.getName() + ") will end up at their last 'instance escape point': " + player.posX + ", " + player.posY + ", " + player.posZ + " in dimension " + player.dimension);
+                return;
             }
 
-            if (!found) System.err.println(TextFormatting.RED + "The player (" + player.getName() + ") will end up at spawn (no instance escape point was found)");
+
+            World overworld = FMLCommonHandler.instance().getMinecraftServerInstance().worlds[0];
+            BlockPos spawnPoint = overworld.provider.getRandomizedSpawnPoint();
+            Teleport.teleport(player, overworld.provider.getDimension(), spawnPoint.getX() + 0.5, spawnPoint.getY(), spawnPoint.getZ() + 0.5, player.rotationYawHead, player.rotationPitch);
+            System.err.println(TextFormatting.RED + "The player (" + player.getName() + ") will end up at spawn (no instance escape point was found)");
         }
     }
 

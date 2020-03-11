@@ -2,6 +2,7 @@ package com.fantasticsource.instances.world;
 
 import net.minecraft.profiler.Profiler;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.village.VillageCollection;
 import net.minecraft.world.WorldServer;
@@ -68,7 +69,7 @@ public class WorldInstance extends WorldServer
     {
         super.init();
         mapStorage = delegate.getMapStorage();
-        worldScoreboard = new Scoreboard();
+        worldScoreboard = new ServerScoreboard(getMinecraftServer());
         lootTable = delegate.getLootTableManager();
         String s = VillageCollection.fileNameForProvider(provider);
         VillageCollection villagecollection = (VillageCollection) perWorldStorage.getOrLoadData(VillageCollection.class, s);
