@@ -27,6 +27,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 public class Network
 {
@@ -73,7 +74,7 @@ public class Network
 
             namesIn = SkyroomVisitors.visitables(FMLCommonHandler.instance().getMinecraftServerInstance(), player.getPersistentID());
             buf.writeInt(namesIn.size());
-            for (String name : namesIn) ByteBufUtils.writeUTF8String(buf, name);
+            for (String id : namesIn) ByteBufUtils.writeUTF8String(buf, PlayerData.getName(UUID.fromString(id)));
         }
 
         @Override
