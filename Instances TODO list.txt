@@ -9,10 +9,6 @@ If a player was in an instance with ID X when the server force-quits...
 
 
 
-Are players not properly being added to an instance world's player entity list upon teleport?
-
-
-
 Low priority
 
 Get the client F3 to show the biome correctly
