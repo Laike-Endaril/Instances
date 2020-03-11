@@ -171,14 +171,7 @@ public class Commands extends CommandBase
             }
             else if (args[0].equals("template"))
             {
-                ArrayList<String> strings = new ArrayList<>();
-
-                for (InstanceWorldInfo info : InstanceHandler.loadedInstances.values())
-                {
-                    if (info.getDimensionType() == InstanceTypes.templateDimType) strings.add(info.getWorldName());
-                }
-
-                return getListOfStringsMatchingLastWord(args, strings);
+                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(InstanceTypes.templateDimType, false));
             }
             else return new ArrayList<>();
         }

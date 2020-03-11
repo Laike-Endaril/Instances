@@ -4,6 +4,7 @@ import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
@@ -77,29 +78,6 @@ public class InstanceHandler
     public static void init(FMLServerStartingEvent event)
     {
         clear();
-    }
-
-    public static ArrayList<String> instanceFolderNames()
-    {
-        ArrayList<String> result = new ArrayList<>();
-
-        File instancesFolder = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()));
-        if (!instancesFolder.isDirectory()) return result;
-
-        File[] instanceTypeFolders = instancesFolder.listFiles();
-        if (instanceTypeFolders == null) return result;
-
-        for (File instanceTypeFolder : instanceTypeFolders)
-        {
-            if (!instancesFolder.isDirectory()) continue;
-
-            File[] instanceFolders = instanceTypeFolder.listFiles();
-            if (instanceFolders == null) continue;
-
-            for (File instanceFolder : instanceFolders) result.add(instanceTypeFolder.getName() + File.separator + instanceFolder.getName());
-        }
-
-        return result;
     }
 
     public static void clear()
@@ -240,24 +218,41 @@ public class InstanceHandler
     }
 
 
-    public static ArrayList<String> list()
-    {
-        ArrayList<String> result = new ArrayList<>();
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : loadedInstances.entrySet())
-        {
-            InstanceWorldInfo info = entry.getValue();
-            result.add(entry.getKey() + " (" + info.getWorldName() + ")");
-        }
-        return result;
-    }
-
     public static InstanceWorldInfo get(int instDimID)
     {
         return loadedInstances.get(instDimID);
     }
 
+
     public static String getInstancesDir(MinecraftServer server)
     {
         return MCTools.getWorldSaveDir(server) + "instances" + File.separator;
+    }
+
+
+    public static ArrayList<String> instanceFolderNames()
+    {
+        ArrayList<String> result = new ArrayList<>();
+
+        for (DimensionType instanceType : InstanceTypes.instanceTypes) result.addAll(instanceFolderNames(instanceType, true));
+
+        return result;
+    }
+
+    public static ArrayList<String> instanceFolderNames(DimensionType instanceType, boolean withPath)
+    {
+        ArrayList<String> result = new ArrayList<>();
+        if (!Tools.contains(InstanceTypes.instanceTypes, instanceType)) return result;
+
+        File instanceTypeFolder = new File(InstanceTypes.getInstanceTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), instanceType));
+        if (!instanceTypeFolder.isDirectory()) return result;
+
+        File[] instanceFolders = instanceTypeFolder.listFiles();
+        if (instanceFolders == null) return result;
+
+        if (withPath) for (File instanceFolder : instanceFolders) result.add(instanceTypeFolder.getName() + File.separator + instanceFolder.getName());
+        else for (File instanceFolder : instanceFolders) result.add(instanceFolder.getName());
+
+        return result;
     }
 }
