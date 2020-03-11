@@ -204,6 +204,7 @@ public class Instances
 
             World overworld = FMLCommonHandler.instance().getMinecraftServerInstance().worlds[0];
             BlockPos spawnPoint = overworld.provider.getRandomizedSpawnPoint();
+            //TODO I think this position is the one putting players in the ground
             Teleport.teleport(player, overworld.provider.getDimension(), spawnPoint.getX() + 0.5, spawnPoint.getY(), spawnPoint.getZ() + 0.5, player.rotationYawHead, player.rotationPitch);
             System.err.println(TextFormatting.RED + "The player (" + player.getName() + ") will end up at spawn (no instance escape point was found)");
         }

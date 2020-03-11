@@ -1,3 +1,7 @@
+Fix players spawning in ground on login (see TODOs in code)
+
+
+
 Ability to copy templates
 
 
