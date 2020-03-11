@@ -16,7 +16,7 @@ import net.minecraft.network.play.server.SPacketSetExperience;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
@@ -24,7 +24,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,57 +44,46 @@ public class Teleport
         }
     }
 
-    public static boolean joinTemplatePossiblyCreating(EntityPlayerMP player, String templateName)
+    public static boolean joinPossiblyCreating(Entity entity, DimensionType instanceType, String name, UUID owner)
     {
-        //If we're already in the template, just teleport locally
-        if (player.world.provider.getDimensionType() == InstanceTypes.templateDimType && player.world.getWorldInfo().getWorldName().equals(templateName))
+        if (entity.world.isRemote) throw new IllegalArgumentException(TextFormatting.RED + "Attempted to call server-only method from client!!!");
+
+
+        if (!Tools.contains(InstanceTypes.instanceTypes, instanceType)) return false;
+
+
+        //See if we're in the instance already
+        InstanceWorldInfo info = null;
+        if (entity.world.provider.getDimensionType() == instanceType && entity.world.getWorldInfo().getWorldName().equals(name))
         {
-            InstanceWorldInfo info = (InstanceWorldInfo) player.world.getWorldInfo();
-            return teleport(player, player.world.provider.getDimension(), info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, player.rotationYaw, player.rotationPitch);
+            info = (InstanceWorldInfo) entity.world.getWorldInfo();
         }
 
-        //Try finding an existing template with the given name
-        for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
+        //Not yet found?
+        if (info == null)
         {
-            if (!(world.provider.getDimensionType() == InstanceTypes.templateDimType)) continue;
-
-            InstanceWorldInfo info = (InstanceWorldInfo) world.getWorldInfo();
-            if (!info.getWorldName().equals(templateName)) continue;
-
-            System.out.println("Found with name: " + templateName);
-            return teleport(player, world.provider.getDimension(), info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, player.rotationYaw, player.rotationPitch);
-        }
-
-        //Not found
-        System.out.println("Not found: " + templateName);
-        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.templateDimType, null, templateName, false);
-        InstanceWorldInfo info = pair.getValue();
-        InstanceHandler.load(info);
-        return teleport(player, pair.getKey(), info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, player.rotationYaw, player.rotationPitch);
-    }
-
-    public static boolean joinHubPossiblyCreating(EntityPlayerMP player)
-    {
-        //If we're already in the hub, just teleport locally
-        if (player.world.provider.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
-        {
-            return teleport(player, player.world.provider.getDimension(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
-        }
-
-        //Try finding an existing hub for said player
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.loadedInstances.entrySet())
-        {
-            InstanceWorldInfo info = entry.getValue();
-            if (info.getDimensionType() == InstanceTypes.libraryOfWorldsDimType && info.getWorldName().equals((player.getName() + "'s " + InstanceTypes.libraryOfWorldsDimType.getName()).replace(" ", "_")))
+            //Try finding an existing instance with the given name
+            for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
             {
-                return teleport(player, entry.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
+                if (!(world.provider.getDimensionType() == instanceType)) continue;
+
+                InstanceWorldInfo info2 = (InstanceWorldInfo) world.getWorldInfo();
+                if (!info2.getWorldName().equals(name)) continue;
+
+                info = info2;
             }
         }
 
-        //Not found
-        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.libraryOfWorldsDimType, player.getPersistentID(), false);
-        InstanceHandler.load(pair.getValue());
-        return teleport(player, pair.getKey(), 8, 2, 8, player.rotationYaw, player.rotationPitch);
+        //Not yet found?
+        if (info == null)
+        {
+            //Create it (loading from disk if files exist, or generating otherwise)
+            Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, instanceType, owner, name, false);
+            info = pair.getValue();
+            InstanceHandler.load(info);
+        }
+
+        return teleport(entity, info.dimensionID, info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, entity.rotationYaw, entity.rotationPitch);
     }
 
     public static boolean escape(Entity entity)
@@ -115,43 +103,6 @@ public class Teleport
 
         return false;
     }
-
-    public static boolean joinSkyroomPossiblyCreating(EntityPlayerMP player)
-    {
-        return joinSkyroomPossiblyCreating(player, player.getPersistentID());
-    }
-
-    public static boolean joinSkyroomPossiblyCreating(Entity entity, int dimension)
-    {
-        InstanceWorldInfo info = InstanceHandler.get(dimension);
-        if (info == null)
-        {
-            entity.sendMessage(new TextComponentString("Instance not found: " + dimension));
-            return false;
-        }
-
-        return teleport(entity, dimension, 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
-    }
-
-    public static boolean joinSkyroomPossiblyCreating(Entity entity, UUID ownerID)
-    {
-        if (ownerID == null) return false;
-
-        //Try finding a skyroom owned by the player
-        for (Map.Entry<Integer, InstanceWorldInfo> entry : InstanceHandler.loadedInstances.entrySet())
-        {
-            if (entry.getValue().getDimensionType() == InstanceTypes.skyroomDimType && ownerID.equals(entry.getValue().getOwner()))
-            {
-                return teleport(entity, entry.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
-            }
-        }
-
-        //Not found
-        Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, InstanceTypes.skyroomDimType, ownerID, true);
-        InstanceHandler.load(pair.getValue());
-        return teleport(entity, pair.getKey(), 0.5, 77, -13.5, entity.rotationYaw, entity.rotationPitch);
-    }
-
 
     public static boolean teleport(Entity entity, TEInstancePortal.Destination destination)
     {

@@ -61,7 +61,11 @@ public class Commands extends CommandBase
         switch (args[0])
         {
             case "hub":
-                if (sender instanceof EntityPlayerMP) Teleport.joinHubPossiblyCreating((EntityPlayerMP) sender);
+                if (sender instanceof EntityPlayerMP)
+                {
+                    EntityPlayerMP player = (EntityPlayerMP) sender;
+                    Teleport.joinPossiblyCreating(player, InstanceTypes.libraryOfWorldsDimType, "" + player.getPersistentID(), player.getPersistentID());
+                }
                 break;
 
             case "personal":
@@ -69,15 +73,15 @@ public class Commands extends CommandBase
                 {
                     if (args.length == 1)
                     {
-                        Teleport.joinSkyroomPossiblyCreating((EntityPlayerMP) sender);
+                        EntityPlayerMP player = (EntityPlayerMP) sender;
+                        Teleport.joinPossiblyCreating(player, InstanceTypes.skyroomDimType, "" + player.getPersistentID(), player.getPersistentID());
                     }
                     else if (args.length == 2)
                     {
+                        EntityPlayerMP player = (EntityPlayerMP) sender;
                         PlayerData otherPlayerData = PlayerData.get(args[1]);
-                        if (otherPlayerData == null || !Teleport.joinSkyroomPossiblyCreating((EntityPlayerMP) sender, otherPlayerData.id))
-                        {
-                            sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
-                        }
+                        if (otherPlayerData == null) sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
+                        else Teleport.joinPossiblyCreating(player, InstanceTypes.skyroomDimType, "" + otherPlayerData.id, otherPlayerData.id);
                     }
                     else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 }
@@ -90,7 +94,7 @@ public class Commands extends CommandBase
                     StringBuilder name = new StringBuilder(args[1]);
                     for (int i = 3; i < args.length; i++) name.append("_").append(args[i]);
 
-                    if (!name.toString().equals("")) Teleport.joinTemplatePossiblyCreating((EntityPlayerMP) sender, name.toString());
+                    if (!name.toString().equals("")) Teleport.joinPossiblyCreating((EntityPlayerMP) sender, InstanceTypes.templateDimType, name.toString(), null);
                     else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));

@@ -234,40 +234,33 @@ public class Instances
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void entityDamagePre(LivingHurtEvent event)
     {
-        Entity entity = event.getEntity();
-        DimensionType dimType = event.getEntity().world.provider.getDimensionType();
-        if (dimType == InstanceTypes.libraryOfWorldsDimType || dimType == InstanceTypes.skyroomDimType)
-        {
-            //Cancel damage
-            event.setAmount(0);
-            event.setCanceled(true);
-
-            //Teleport out of the void if need be
-            if (entity.posY < 0 && entity instanceof EntityPlayer)
-            {
-                if (dimType == InstanceTypes.libraryOfWorldsDimType) Teleport.joinHubPossiblyCreating((EntityPlayerMP) entity);
-                else Teleport.joinSkyroomPossiblyCreating(entity, entity.dimension);
-            }
-        }
+        checkCancelDamageAndPort(event);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void entityDamagePost(LivingHurtEvent event)
     {
+        checkCancelDamageAndPort(event);
+    }
+
+    public static void checkCancelDamageAndPort(LivingHurtEvent event)
+    {
         Entity entity = event.getEntity();
-        DimensionType dimType = event.getEntity().world.provider.getDimensionType();
+        World world = entity.world;
+        DimensionType dimType = world.provider.getDimensionType();
         if (dimType == InstanceTypes.libraryOfWorldsDimType || dimType == InstanceTypes.skyroomDimType)
         {
             //Cancel damage
             event.setAmount(0);
             event.setCanceled(true);
 
+            if (world.isRemote) return;
+
+
+            InstanceWorldInfo info = (InstanceWorldInfo) entity.world.getWorldInfo();
+
             //Teleport out of the void if need be
-            if (entity.posY < 0 && entity instanceof EntityPlayer)
-            {
-                if (dimType == InstanceTypes.libraryOfWorldsDimType) Teleport.joinHubPossiblyCreating((EntityPlayerMP) entity);
-                else Teleport.joinSkyroomPossiblyCreating(entity, entity.dimension);
-            }
+            if (entity.posY < 0) Teleport.joinPossiblyCreating(entity, dimType, info.getWorldName(), info.getOwner());
         }
     }
 

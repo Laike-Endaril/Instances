@@ -4,11 +4,13 @@ import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.blocksanditems.tileentities.TEVisitorPortal;
 import com.fantasticsource.instances.server.Teleport;
+import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -16,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class BlockVisitorPortal extends Block
 {
@@ -42,7 +45,8 @@ public class BlockVisitorPortal extends Block
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof TEVisitorPortal)) return false;
 
-        return Teleport.joinSkyroomPossiblyCreating(player, ((TEVisitorPortal) te).owner);
+        UUID owner = ((TEVisitorPortal) te).owner;
+        return Teleport.joinPossiblyCreating((EntityPlayerMP) player, InstanceTypes.skyroomDimType, "" + owner, owner);
     }
 
     @Override
