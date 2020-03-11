@@ -13,12 +13,6 @@ Are players not properly being added to an instance world's player entity list u
 
 
 
-Non-Faerun
-
-Disallow duplicate instance names
-
-
-
 Low priority
 
 Get the client F3 to show the biome correctly

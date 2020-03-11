@@ -5,7 +5,6 @@ import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.mctools.MCTools;
-import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
@@ -49,7 +48,7 @@ public class InstanceHandler
         if (!info.save) return;
 
 
-        File f = new File(info.SAVE_FOLDER_NAME);
+        File f = new File(info.saveFolderName);
         if (!f.exists())
         {
             if (!f.mkdirs()) throw new IllegalStateException("Failed to create " + f);
@@ -117,10 +116,7 @@ public class InstanceHandler
 
     public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType dimType, UUID owner, boolean save)
     {
-        PlayerData data = PlayerData.get(owner);
-        Entity ownerEntity = data == null ? null : data.player;
-
-        return createInstance(sender, dimType, owner, ownerEntity == null ? dimType.name() : ownerEntity.getName() + "'s " + dimType.getName(), save);
+        return createInstance(sender, dimType, owner, "" + owner, save);
     }
 
     public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType dimType, UUID owner, String name, boolean save)
@@ -167,7 +163,39 @@ public class InstanceHandler
         }
     }
 
-    public static void delete(ICommandSender sender, InstanceWorldInfo info)
+
+    /**
+     * For loaded or unloaded instances
+     */
+    public static boolean delete(ICommandSender sender, String folderName)
+    {
+        folderName = "instances" + File.separator + folderName;
+
+        for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
+        {
+            if (folderName.equals(world.provider.getSaveFolder()))
+            {
+                return delete(sender, world);
+            }
+        }
+
+        return delete(sender, folderName, true);
+    }
+
+    /**
+     * For loaded instances
+     */
+    public static boolean delete(ICommandSender sender, World world)
+    {
+        if (!(world instanceof WorldServer) || !(world.getWorldInfo() instanceof InstanceWorldInfo)) return false;
+
+        return delete(sender, (InstanceWorldInfo) world.getWorldInfo());
+    }
+
+    /**
+     * For loaded instances
+     */
+    public static boolean delete(ICommandSender sender, InstanceWorldInfo info)
     {
         int dimensionID = info.dimensionID;
         WorldServer world = info.world;
@@ -183,21 +211,34 @@ public class InstanceHandler
         loadedInstances.remove(dimensionID);
 
 
-        File file = new File(info.SAVE_FOLDER_NAME);
+        Network.WRAPPER.sendToAll(new SyncInstancesPacket());
+
+
+        return delete(sender, info.saveFolderName, true);
+    }
+
+    /**
+     * For unloaded instances
+     */
+    protected static boolean delete(ICommandSender sender, String folderName, boolean internal)
+    {
+        File file = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + folderName);
         if (Tools.deleteFilesRecursively(file))
         {
-            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Completely deleted dimension " + dimensionID));
+            System.err.println(TextFormatting.GREEN + "Deleted file: " + file.getAbsolutePath());
+            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Completely deleted dimension " + folderName));
+            return true;
         }
         else
         {
             System.err.println(TextFormatting.RED + "Error deleting file: " + file.getAbsolutePath());
 
-            System.err.println(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually.");
-            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting dimension folder of " + dimensionID + ". Has to be removed manually."));
+            System.err.println(TextFormatting.RED + "Error deleting dimension folder for " + folderName + ". Has to be removed manually.");
+            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error deleting dimension folder for " + folderName + ". Has to be removed manually."));
+            return false;
         }
-
-        Network.WRAPPER.sendToAll(new SyncInstancesPacket());
     }
+
 
     public static ArrayList<String> list()
     {

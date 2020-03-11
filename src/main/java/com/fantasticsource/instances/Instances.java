@@ -106,8 +106,6 @@ public class Instances
     @EventHandler
     public static void preInit(FMLPreInitializationEvent event) throws IOException
     {
-        Converter.convert();
-
         SkyroomVisitors.init();
 
         MinecraftForge.EVENT_BUS.register(Instances.class);
@@ -140,7 +138,7 @@ public class Instances
     }
 
     @EventHandler
-    public static void serverStarting(FMLServerStartingEvent event) throws IOException
+    public static void serverStarting(FMLServerStartingEvent event)
     {
         event.registerServerCommand(new Commands());
         event.registerServerCommand(new CmdDimWeather());

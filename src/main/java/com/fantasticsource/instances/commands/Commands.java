@@ -12,10 +12,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.WorldServer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class Commands extends CommandBase
 {
@@ -40,7 +40,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <hub:personal:template:list:delete:setowner>";
+        return "Usage: /instances <hub:personal:template:list:delete>";
     }
 
     @Override
@@ -109,6 +109,7 @@ public class Commands extends CommandBase
                     InstanceWorldInfo info = null; //This null is necessary!
                     if (args.length == 1)
                     {
+                        //Delete from within instance
                         if (sender instanceof EntityPlayerMP)
                         {
                             info = InstanceHandler.get(((EntityPlayerMP) sender).dimension);
@@ -119,57 +120,29 @@ public class Commands extends CommandBase
                     }
                     else
                     {
-                        try
+                        //Delete by instance folder
+                        boolean done = false;
+                        for (WorldServer world : server.worlds)
                         {
-                            info = InstanceHandler.get(Integer.parseInt(args[1]));
-                            InstanceHandler.delete(sender, info);
-                        }
-                        catch (NumberFormatException e)
-                        {
-//                            File file =
-                        }
-                    }
-                }
-                else sender.sendMessage(new TextComponentString(getUsage(sender)));
-                break;
-
-            case "setowner":
-                if (args.length == 3)
-                {
-                    InstanceWorldInfo info = null;
-                    try
-                    {
-                        info = InstanceHandler.get(Integer.parseInt(args[1]));
-                    }
-                    catch (NumberFormatException e)
-                    {
-                        for (InstanceWorldInfo info1 : InstanceHandler.loadedInstances.values())
-                        {
-                            if (info1.getWorldName().equals(args[1]))
+                            if (world.getWorldInfo() instanceof InstanceWorldInfo && world.provider.getSaveFolder().equals(args[1]))
                             {
-                                info = info1;
-                                break;
+                                if (InstanceHandler.delete(sender, world))
+                                {
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!done)
+                        {
+                            //Delete by filename
+                            if (!InstanceHandler.delete(sender, args[1]))
+                            {
+                                sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find instance to delete: " + args[1]));
                             }
                         }
                     }
-
-                    if (info == null)
-                    {
-                        sender.sendMessage(new TextComponentString("Instance not found: " + args[1]));
-                        return;
-                    }
-
-                    UUID id = PlayerData.getID(args[2]);
-                    if (id == null)
-                    {
-                        sender.sendMessage(new TextComponentString("Player not found: " + args[2]));
-                        return;
-                    }
-
-                    info.setOwner(id);
-                    InstanceHandler.trySave(info);
-
-                    sender.sendMessage(new TextComponentString("Set owner of " + info.getWorldName() + " to " + PlayerData.getName(id) + " (ID = " + args[1] + ", type = " + info.getDimensionType().getName() + ")"));
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
@@ -184,11 +157,11 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "hub", "personal", "template", "list", "delete", "setowner");
+            return getListOfStringsMatchingLastWord(args, "hub", "personal", "template", "list", "delete");
         }
         else if (args.length == 2)
         {
-            if (args[0].equals("delete") || args[0].equals("setowner"))
+            if (args[0].equals("delete"))
             {
                 return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames());
             }
@@ -204,15 +177,9 @@ public class Commands extends CommandBase
                 {
                     if (info.getDimensionType() == InstanceTypes.templateDimType) strings.add(info.getWorldName());
                 }
-                strings.add("<name>");
 
                 return getListOfStringsMatchingLastWord(args, strings);
             }
-            else return new ArrayList<>();
-        }
-        else if (args.length == 3)
-        {
-            if (args[0].equals("setowner")) return getListOfStringsMatchingLastWord(args, playernames());
             else return new ArrayList<>();
         }
         else

@@ -1,9 +1,6 @@
 package com.fantasticsource.instances.commands;
 
 import com.fantasticsource.instances.tags.SkyroomVisitors;
-import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.instances.world.InstanceWorldInfo;
-import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -51,23 +48,10 @@ public class CmdVisitors extends CommandBase
 
         EntityPlayerMP player = (EntityPlayerMP) sender;
 
-        InstanceWorldInfo info = null;
-        for (InstanceWorldInfo info1 : InstanceHandler.loadedInstances.values())
-        {
-            if (info1.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info1.getOwner()))
-            {
-                info = info1;
-                break;
-            }
-        }
-
         if (args.length == 0)
         {
             player.sendMessage(new TextComponentString("Allowed Visitors:"));
-            if (info != null)
-            {
-                for (String id : SkyroomVisitors.visitables(server, player.getPersistentID())) player.sendMessage(new TextComponentString(PlayerData.getName(UUID.fromString(id))));
-            }
+            for (String id : SkyroomVisitors.visitables(server, player.getPersistentID())) player.sendMessage(new TextComponentString(PlayerData.getName(UUID.fromString(id))));
             return;
         }
 
@@ -86,7 +70,7 @@ public class CmdVisitors extends CommandBase
 
         if (args.length == 1)
         {
-            if (info == null || !SkyroomVisitors.canBeVisitedBy(server, player.getPersistentID(), otherPlayerData.id)) player.sendMessage(new TextComponentString(args[0] + " is currently NOT allowed to visit you"));
+            if (!SkyroomVisitors.canBeVisitedBy(server, player.getPersistentID(), otherPlayerData.id)) player.sendMessage(new TextComponentString(args[0] + " is currently NOT allowed to visit you"));
             else player.sendMessage(new TextComponentString(args[0] + " is currently allowed to visit you"));
         }
         else if (args.length == 2)

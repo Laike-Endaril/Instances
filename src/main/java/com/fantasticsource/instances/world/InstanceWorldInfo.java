@@ -1,7 +1,6 @@
 package com.fantasticsource.instances.world;
 
 import com.fantasticsource.instances.Instances;
-import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,7 +9,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -19,7 +17,7 @@ import java.util.UUID;
 
 public class InstanceWorldInfo extends WorldInfo
 {
-    public final String SAVE_FOLDER_NAME;
+    public final String saveFolderName;
     public final int dimensionID;
     private final DimensionType dimensionType;
     public WorldInstance world = null;
@@ -44,7 +42,7 @@ public class InstanceWorldInfo extends WorldInfo
         this.dimensionID = dimensionID;
         this.owner = owner;
 
-        SAVE_FOLDER_NAME = InstanceTypes.getInstanceTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), dimensionType) + (owner != null ? owner : getWorldName()) + File.separator;
+        saveFolderName = dimensionType + File.separator + (owner != null ? owner : getWorldName());
 
         this.save = save;
         InstanceHandler.trySave(this);
@@ -71,11 +69,6 @@ public class InstanceWorldInfo extends WorldInfo
         return owner;
     }
 
-    public void setOwner(EntityPlayerMP player)
-    {
-        setOwner(player.getPersistentID());
-    }
-
     public void setOwner(UUID id)
     {
         owner = id;
@@ -93,5 +86,10 @@ public class InstanceWorldInfo extends WorldInfo
                 }
             }
         }
+    }
+
+    public void setOwner(EntityPlayerMP player)
+    {
+        setOwner(player.getPersistentID());
     }
 }

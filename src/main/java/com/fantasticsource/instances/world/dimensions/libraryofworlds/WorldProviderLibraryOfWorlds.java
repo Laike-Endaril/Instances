@@ -1,35 +1,22 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
-import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.instances.world.InstanceWorldInfo;
+import com.fantasticsource.instances.world.InstanceWorldProvider;
 import com.fantasticsource.instances.world.boimes.BiomeProviders;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
-import com.fantasticsource.tools.Tools;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
-import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.client.IRenderHandler;
-import net.minecraftforge.fml.common.Loader;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.util.UUID;
 
-public class WorldProviderLibraryOfWorlds extends WorldProvider
+public class WorldProviderLibraryOfWorlds extends InstanceWorldProvider
 {
-    private static final String TYPE_NAME = InstanceTypes.libraryOfWorldsDimType.getName().replaceAll(" ", "_");
     private static final Vec3d FOG_COLOR = new Vec3d(0, 0, 0);
-    private final boolean XAEROS;
-
-    public WorldProviderLibraryOfWorlds()
-    {
-        XAEROS = Loader.isModLoaded("xaeroworldmap");
-    }
 
 
     @Override
@@ -93,21 +80,5 @@ public class WorldProviderLibraryOfWorlds extends WorldProvider
     public BiomeProvider getBiomeProvider()
     {
         return BiomeProviders.VOID;
-    }
-
-    @Nullable
-    @Override
-    public String getSaveFolder()
-    {
-        //If you return null here, it saves to the overworld
-
-        if (XAEROS && world.isRemote && Tools.stackContainsSubstring("xaero")) return "instancesInstance";
-
-        int dim = getDimension();
-        InstanceWorldInfo info = InstanceHandler.get(dim);
-        if (info == null) return null;
-
-        UUID owner = info.getOwner();
-        return "instances" + File.separator + TYPE_NAME + File.separator + (owner != null ? owner : info.getWorldName());
     }
 }
