@@ -1,5 +1,16 @@
-Move instance-specific data (ownership, saving) to file-stored data instead of transient data
+Convert visitor data to savefile tags
+
+Make visitor data per-instance instead of per-owner
+
+Convert ownership to savefile tags
+
+Convert saving to top-level instances directory
+instances/Saved/instanceType/instance
+instances/Temp/instanceType/instance
+
 Add spawn point to instance-specific data
+
+
 
 
 
