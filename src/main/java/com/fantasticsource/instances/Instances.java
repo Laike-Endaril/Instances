@@ -264,10 +264,8 @@ public class Instances
             if (world.isRemote) return;
 
 
-            InstanceWorldInfo info = (InstanceWorldInfo) entity.world.getWorldInfo();
-
             //Teleport out of the void if need be
-            if (entity.posY < 0) Teleport.joinPossiblyCreating(entity, dimType, info.getWorldName(), info.getOwner());
+            if (entity.posY < 0) Teleport.teleport(entity, entity.dimension);
         }
     }
 

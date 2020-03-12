@@ -21,8 +21,10 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
@@ -43,19 +45,34 @@ public class Teleport
         }
     }
 
-    public static boolean joinPossiblyCreating(Entity entity, DimensionType instanceType, String name, UUID owner)
+    public static boolean tryJoinWithoutCreating(Entity entity, String name)
+    {
+        name = Tools.fixFileSeparators(name);
+        String typeName = name.substring(0, name.indexOf(File.separator));
+
+        for (DimensionType instanceType : InstanceTypes.instanceTypes)
+        {
+            if (instanceType.getName().equals(typeName))
+            {
+                return joinPossiblyCreating(entity, name, instanceType, instanceType == InstanceTypes.skyroomDimType || instanceType == InstanceTypes.libraryOfWorldsDimType ? UUID.fromString(name.substring(name.indexOf(File.separator) + 1)) : null, instanceType != InstanceTypes.libraryOfWorldsDimType);
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean joinPossiblyCreating(Entity entity, String name, DimensionType instanceType, UUID owner, boolean save)
     {
         if (entity.world.isRemote) throw new IllegalArgumentException(TextFormatting.RED + "Attempted to call server-only method from client!!!");
 
 
-        if (!Tools.contains(InstanceTypes.instanceTypes, instanceType)) return false;
-
-
         //See if we're in the instance already
-        InstanceWorldInfo info = null;
-        if (entity.world.provider.getDimensionType() == instanceType && entity.world.getWorldInfo().getWorldName().equals(name))
+        WorldInfo info = null;
+        Integer dimension = null;
+        if (entity.world.getWorldInfo().getWorldName().equals(name))
         {
-            info = (InstanceWorldInfo) entity.world.getWorldInfo();
+            info = entity.world.getWorldInfo();
+            dimension = entity.dimension;
         }
 
         //Not yet found?
@@ -64,25 +81,33 @@ public class Teleport
             //Try finding an existing instance with the given name
             for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
             {
-                if (!(world.provider.getDimensionType() == instanceType)) continue;
-
-                InstanceWorldInfo info2 = (InstanceWorldInfo) world.getWorldInfo();
-                if (!info2.getWorldName().equals(name)) continue;
-
-                info = info2;
+                WorldInfo info2 = world.getWorldInfo();
+                if (info2.getWorldName().equals(name))
+                {
+                    info = info2;
+                    dimension = world.provider.getDimension();
+                    break;
+                }
             }
         }
 
         //Not yet found?
         if (info == null)
         {
-            //Create it (loading from disk if files exist, or generating otherwise)
-            Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.createInstance(null, instanceType, owner, name, false);
+            //Validate...
+            if (!Tools.contains(InstanceTypes.instanceTypes, instanceType)) return false;
+
+
+            //...and then create it (loading from disk if files exist, or generating otherwise)
+            Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.loadOrCreateInstance(null, instanceType, owner, name, save);
+            if (pair == null) return false;
+
             info = pair.getValue();
-            InstanceHandler.load(info);
+            dimension = pair.getValue().dimensionID;
+            InstanceHandler.load((InstanceWorldInfo) info);
         }
 
-        return teleport(entity, info.dimensionID, info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, entity.rotationYaw, entity.rotationPitch);
+        return teleport(entity, dimension, info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, entity.rotationYaw, entity.rotationPitch);
     }
 
     public static boolean escape(Entity entity)
@@ -93,6 +118,16 @@ public class Teleport
         Destination lastGoodPos = EscapePoint.getEscapePoint(entity);
         if (lastGoodPos != null) return teleport(entity, lastGoodPos);
 
+        return false;
+    }
+
+
+    public static boolean teleport(Entity entity, int dimension)
+    {
+        for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
+        {
+            if (world.provider.getDimension() == dimension) return teleport(entity, new Destination(world, entity.getRotationYawHead(), entity.rotationPitch));
+        }
         return false;
     }
 

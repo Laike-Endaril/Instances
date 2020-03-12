@@ -46,7 +46,7 @@ public class BlockVisitorPortal extends Block
         if (!(te instanceof TEVisitorPortal)) return false;
 
         UUID owner = ((TEVisitorPortal) te).owner;
-        return Teleport.joinPossiblyCreating((EntityPlayerMP) player, InstanceTypes.skyroomDimType, "" + owner, owner);
+        return Teleport.joinPossiblyCreating(player, "" + owner, InstanceTypes.skyroomDimType, owner, true);
     }
 
     @Override

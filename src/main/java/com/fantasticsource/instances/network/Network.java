@@ -153,14 +153,14 @@ public class Network
                         return;
 
                     case "Go Home":
-                        Teleport.joinPossiblyCreating(player, InstanceTypes.skyroomDimType, "" + player.getPersistentID(), player.getPersistentID());
+                        Teleport.joinPossiblyCreating(player, "" + player.getPersistentID(), InstanceTypes.skyroomDimType, player.getPersistentID(), true);
                         return;
 
                     default:
                         PlayerData data = PlayerData.get(s);
                         if (data == null || !SkyroomVisitors.canVisit(server, player.getPersistentID(), data.id)) return;
 
-                        Teleport.joinPossiblyCreating(player, InstanceTypes.skyroomDimType, "" + data.id, data.id);
+                        Teleport.joinPossiblyCreating(player, "" + data.id, InstanceTypes.skyroomDimType, data.id, true);
                 }
             });
             return null;

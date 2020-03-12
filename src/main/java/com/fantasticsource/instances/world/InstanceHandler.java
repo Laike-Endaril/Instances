@@ -137,7 +137,7 @@ public class InstanceHandler
         }
 
 
-        Pair<Integer, InstanceWorldInfo> result = createInstance(sender, instanceType, owner, newName, save);
+        Pair<Integer, InstanceWorldInfo> result = loadOrCreateInstance(sender, instanceType, owner, newName, save);
         if (result == null) return null;
 
         unload(result.getValue());
@@ -145,7 +145,7 @@ public class InstanceHandler
     }
 
 
-    public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType instanceType, UUID owner, String name, boolean save)
+    public static Pair<Integer, InstanceWorldInfo> loadOrCreateInstance(ICommandSender sender, DimensionType instanceType, UUID owner, String name, boolean save)
     {
         if (!Tools.contains(InstanceTypes.instanceTypes, instanceType)) return null;
 
@@ -162,8 +162,8 @@ public class InstanceHandler
 
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
 
-        System.out.println(TextFormatting.GREEN + "Created " + worldInfo.getWorldName() + " using id " + dimensionID);
-        if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Created " + worldInfo.getWorldName()));
+        System.out.println(TextFormatting.GREEN + "Created or loaded " + worldInfo.getWorldName() + " using id " + dimensionID);
+        if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Created or loaded " + worldInfo.getWorldName()));
 
         Network.WRAPPER.sendToAll(new SyncInstancesPacket());
 

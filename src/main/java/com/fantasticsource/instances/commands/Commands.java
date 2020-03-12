@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+//TODO Come through here and do proper errors and usages for everything sometime...maybe
 public class Commands extends CommandBase
 {
     public static ArrayList<String> playernames()
@@ -44,7 +45,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <hub:personal:template:list:delete:copy>";
+        return "Usage: /instances <hub:personal:template:list:delete:copy:join>";
     }
 
     @Override
@@ -62,13 +63,62 @@ public class Commands extends CommandBase
             return;
         }
 
+        EntityPlayerMP player = null;
         switch (args[0])
         {
+            case "join":
+                String instanceName = null;
+
+                if (args.length == 1)
+                {
+                    if (sender instanceof EntityPlayerMP)
+                    {
+                        player = (EntityPlayerMP) sender;
+                        Teleport.teleport(player, player.dimension);
+                    }
+                }
+                else
+                {
+                    instanceName = args[1];
+
+                    if (args.length == 2)
+                    {
+                        if (sender instanceof EntityPlayerMP)
+                        {
+                            player = (EntityPlayerMP) sender;
+                        }
+                    }
+                    else
+                    {
+                        PlayerData data = PlayerData.get(args[2]);
+                        if (data == null)
+                        {
+                            try
+                            {
+                                data = PlayerData.get(UUID.fromString(args[2]));
+                            }
+                            catch (IllegalArgumentException e)
+                            {
+                            }
+                        }
+                        if (data == null || !(data.player instanceof EntityPlayerMP)) break;
+
+                        player = (EntityPlayerMP) data.player;
+                    }
+                }
+
+                if (instanceName != null) instanceName = Tools.fixFileSeparators(instanceName);
+                if (player == null || instanceName == null || !Teleport.tryJoinWithoutCreating(player, instanceName))
+                {
+                    sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find instance: " + instanceName));
+                }
+                break;
+
             case "hub":
                 if (sender instanceof EntityPlayerMP)
                 {
-                    EntityPlayerMP player = (EntityPlayerMP) sender;
-                    Teleport.joinPossiblyCreating(player, InstanceTypes.libraryOfWorldsDimType, "" + player.getPersistentID(), player.getPersistentID());
+                    player = (EntityPlayerMP) sender;
+                    Teleport.joinPossiblyCreating(player, "" + player.getPersistentID(), InstanceTypes.libraryOfWorldsDimType, player.getPersistentID(), false);
                 }
                 break;
 
@@ -77,19 +127,18 @@ public class Commands extends CommandBase
                 {
                     if (args.length == 1)
                     {
-                        EntityPlayerMP player = (EntityPlayerMP) sender;
-                        Teleport.joinPossiblyCreating(player, InstanceTypes.skyroomDimType, "" + player.getPersistentID(), player.getPersistentID());
+                        player = (EntityPlayerMP) sender;
+                        Teleport.joinPossiblyCreating(player, "" + player.getPersistentID(), InstanceTypes.skyroomDimType, player.getPersistentID(), true);
                     }
                     else if (args.length == 2)
                     {
-                        EntityPlayerMP player = (EntityPlayerMP) sender;
+                        player = (EntityPlayerMP) sender;
                         PlayerData otherPlayerData = PlayerData.get(args[1]);
                         if (otherPlayerData == null) sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
-                        else Teleport.joinPossiblyCreating(player, InstanceTypes.skyroomDimType, "" + otherPlayerData.id, otherPlayerData.id);
+                        else Teleport.joinPossiblyCreating(player, "" + otherPlayerData.id, InstanceTypes.skyroomDimType, otherPlayerData.id, true);
                     }
                     else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 }
-                else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
 
             case "template":
@@ -98,7 +147,7 @@ public class Commands extends CommandBase
                     StringBuilder name = new StringBuilder(args[1]);
                     for (int i = 3; i < args.length; i++) name.append("_").append(args[i]);
 
-                    if (!name.toString().equals("")) Teleport.joinPossiblyCreating((EntityPlayerMP) sender, InstanceTypes.templateDimType, name.toString(), null);
+                    if (!name.toString().equals("")) Teleport.joinPossiblyCreating((EntityPlayerMP) sender, name.toString(), InstanceTypes.templateDimType, null, true);
                     else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
@@ -172,8 +221,8 @@ public class Commands extends CommandBase
                     break;
                 }
 
-                //Explicit instance type selection
                 DimensionType instanceType = null;
+                //Explicit instance type selection
                 if (args.length > 3)
                 {
                     for (DimensionType t : InstanceTypes.instanceTypes)
@@ -234,11 +283,11 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "hub", "personal", "template", "list", "delete", "copy");
+            return getListOfStringsMatchingLastWord(args, "hub", "personal", "template", "list", "delete", "copy", "join");
         }
         else if (args.length == 2)
         {
-            if (args[0].equals("delete") || args[0].equals("copy"))
+            if (args[0].equals("delete") || args[0].equals("copy") || args[0].equals("join"))
             {
                 return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true));
             }
@@ -249,6 +298,13 @@ public class Commands extends CommandBase
             else if (args[0].equals("template"))
             {
                 return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(InstanceTypes.templateDimType, false));
+            }
+        }
+        else if (args.length == 3)
+        {
+            if (args[0].equals("join"))
+            {
+                return getListOfStringsMatchingLastWord(args, playernames());
             }
         }
         else if (args.length == 4)
