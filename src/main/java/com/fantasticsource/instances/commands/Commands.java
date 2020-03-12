@@ -221,55 +221,39 @@ public class Commands extends CommandBase
                     break;
                 }
 
-                DimensionType instanceType = null;
-                //Explicit instance type selection
-                if (args.length > 3)
+                DimensionType oldInstanceType = null, newInstanceType = null;
+                String oldTypeName = oldName.substring(0, oldName.indexOf(File.separator)), newTypeName = newName.substring(0, newName.indexOf(File.separator));
+                for (DimensionType t : InstanceTypes.instanceTypes)
                 {
-                    for (DimensionType t : InstanceTypes.instanceTypes)
+                    if (t.getName().equals(oldTypeName))
                     {
-                        if (t.getName().equals(args[3]))
-                        {
-                            instanceType = t;
-                            break;
-                        }
+                        oldInstanceType = t;
+                        if (newInstanceType != null) break;
+                    }
+
+                    if (t.getName().equals(newTypeName))
+                    {
+                        newInstanceType = t;
+                        if (oldInstanceType != null) break;
                     }
                 }
 
-                //Instance type based on new world name
-                if (instanceType == null)
+                if (oldInstanceType == null)
                 {
-                    String newTypeName = newName.substring(0, newName.indexOf(File.separator));
-                    for (DimensionType t : InstanceTypes.instanceTypes)
-                    {
-                        if (t.getName().equals(newTypeName))
-                        {
-                            instanceType = t;
-                            break;
-                        }
-                    }
+                    sender.sendMessage(new TextComponentString(TextFormatting.RED + "Unrecognized instance type: " + oldTypeName));
+                    break;
                 }
 
-                //Instance type based on old world name
-                if (instanceType == null)
+                if (newInstanceType == null)
                 {
-                    String oldTypeName = oldName.substring(0, oldName.indexOf(File.separator));
-                    for (DimensionType t : InstanceTypes.instanceTypes)
-                    {
-                        if (t.getName().equals(oldTypeName))
-                        {
-                            instanceType = t;
-                            break;
-                        }
-                    }
+                    sender.sendMessage(new TextComponentString(TextFormatting.RED + "Unrecognized instance type: " + newTypeName));
+                    break;
                 }
-
-                //Default instance type
-                if (instanceType == null) instanceType = InstanceTypes.templateDimType;
 
                 boolean save = args.length <= 4 || Boolean.parseBoolean(args[4]);
                 UUID owner = args.length > 5 ? PlayerData.getID(args[5]) : null;
 
-                InstanceHandler.copyInstance(sender, oldName, newName, instanceType, owner, save);
+                InstanceHandler.copyInstance(sender, oldName, newName, newInstanceType, owner, save);
 
                 break;
 

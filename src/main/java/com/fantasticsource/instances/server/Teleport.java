@@ -49,12 +49,13 @@ public class Teleport
     {
         name = Tools.fixFileSeparators(name);
         String typeName = name.substring(0, name.indexOf(File.separator));
+        name = name.substring(name.indexOf(File.separator) + 1);
 
         for (DimensionType instanceType : InstanceTypes.instanceTypes)
         {
             if (instanceType.getName().equals(typeName))
             {
-                return joinPossiblyCreating(entity, name, instanceType, instanceType == InstanceTypes.skyroomDimType || instanceType == InstanceTypes.libraryOfWorldsDimType ? UUID.fromString(name.substring(name.indexOf(File.separator) + 1)) : null, instanceType != InstanceTypes.libraryOfWorldsDimType);
+                return joinPossiblyCreating(entity, name, instanceType, instanceType == InstanceTypes.skyroomDimType || instanceType == InstanceTypes.libraryOfWorldsDimType ? UUID.fromString(name) : null, instanceType != InstanceTypes.libraryOfWorldsDimType);
             }
         }
 

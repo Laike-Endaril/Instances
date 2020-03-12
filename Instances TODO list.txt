@@ -1,4 +1,5 @@
-Ability to copy templates
+Move instance-specific data (ownership, saving) to file-stored data instead of transient data
+Add spawn point to instance-specific data
 
 
 
