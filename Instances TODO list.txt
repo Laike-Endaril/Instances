@@ -1,6 +1,6 @@
-Make visitor data per-instance instead of per-owner
-
 Convert ownership to savefile tags
+
+Make visitor data per-instance instead of per-owner
 
 Convert saving to top-level instances directory
 instances/Saved/instanceType/instance

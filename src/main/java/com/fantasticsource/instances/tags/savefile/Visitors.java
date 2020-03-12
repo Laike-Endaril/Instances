@@ -1,4 +1,4 @@
-package com.fantasticsource.instances.tags.world;
+package com.fantasticsource.instances.tags.savefile;
 
 import com.fantasticsource.fantasticlib.api.FLibAPI;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import static com.fantasticsource.fantasticlib.FantasticLib.MODID;
 
-public class SkyroomVisitors
+public class Visitors
 {
     public static boolean setVisitable(MinecraftServer server, UUID visitor, UUID visitable, boolean canVisit)
     {

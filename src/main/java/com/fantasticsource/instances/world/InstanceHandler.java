@@ -4,6 +4,7 @@ import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
+import com.fantasticsource.instances.tags.savefile.Owners;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.ServerTickTimer;
@@ -281,6 +282,8 @@ public class InstanceHandler
                 }
             });
         }
+
+        Owners.setNoOwner(FMLCommonHandler.instance().getMinecraftServerInstance(), folderName);
     }
 
 

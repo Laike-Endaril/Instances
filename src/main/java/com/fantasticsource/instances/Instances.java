@@ -10,6 +10,7 @@ import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.CurrentWorldname;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
+import com.fantasticsource.instances.tags.savefile.Owners;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
@@ -150,6 +151,12 @@ public class Instances
         event.registerServerCommand(new CmdVisitors());
 
         InstanceHandler.init(event);
+    }
+
+    @EventHandler
+    public static void serverStarted(FMLServerStartedEvent event)
+    {
+        Owners.validateInstances(FMLCommonHandler.instance().getMinecraftServerInstance());
     }
 
     @EventHandler

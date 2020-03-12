@@ -5,7 +5,7 @@ import com.fantasticsource.instances.client.gui.PersonalPortalGUI;
 import com.fantasticsource.instances.network.handler.SyncInstancesPacketHandler;
 import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
-import com.fantasticsource.instances.tags.world.SkyroomVisitors;
+import com.fantasticsource.instances.tags.savefile.Visitors;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
@@ -72,7 +72,7 @@ public class Network
             buf.writeBoolean(info != null);
             buf.writeBoolean(info != null && info.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info.getOwner()));
 
-            namesIn = SkyroomVisitors.visitables(FMLCommonHandler.instance().getMinecraftServerInstance(), player.getPersistentID());
+            namesIn = Visitors.visitables(FMLCommonHandler.instance().getMinecraftServerInstance(), player.getPersistentID());
             buf.writeInt(namesIn.size());
             for (String id : namesIn) ByteBufUtils.writeUTF8String(buf, PlayerData.getName(UUID.fromString(id)));
         }
@@ -158,7 +158,7 @@ public class Network
 
                     default:
                         PlayerData data = PlayerData.get(s);
-                        if (data == null || !SkyroomVisitors.canVisit(server, player.getPersistentID(), data.id)) return;
+                        if (data == null || !Visitors.canVisit(server, player.getPersistentID(), data.id)) return;
 
                         Teleport.joinPossiblyCreating(player, "" + data.id, InstanceTypes.skyroomDimType, data.id, true);
                 }

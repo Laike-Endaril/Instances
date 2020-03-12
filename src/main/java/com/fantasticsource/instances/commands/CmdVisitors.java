@@ -1,6 +1,6 @@
 package com.fantasticsource.instances.commands;
 
-import com.fantasticsource.instances.tags.world.SkyroomVisitors;
+import com.fantasticsource.instances.tags.savefile.Visitors;
 import com.fantasticsource.mctools.PlayerData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -51,7 +51,7 @@ public class CmdVisitors extends CommandBase
         if (args.length == 0)
         {
             player.sendMessage(new TextComponentString("Allowed Visitors:"));
-            for (String id : SkyroomVisitors.visitables(server, player.getPersistentID())) player.sendMessage(new TextComponentString(PlayerData.getName(UUID.fromString(id))));
+            for (String id : Visitors.visitables(server, player.getPersistentID())) player.sendMessage(new TextComponentString(PlayerData.getName(UUID.fromString(id))));
             return;
         }
 
@@ -70,14 +70,14 @@ public class CmdVisitors extends CommandBase
 
         if (args.length == 1)
         {
-            if (!SkyroomVisitors.canBeVisitedBy(server, player.getPersistentID(), otherPlayerData.id)) player.sendMessage(new TextComponentString(args[0] + " is currently NOT allowed to visit you"));
+            if (!Visitors.canBeVisitedBy(server, player.getPersistentID(), otherPlayerData.id)) player.sendMessage(new TextComponentString(args[0] + " is currently NOT allowed to visit you"));
             else player.sendMessage(new TextComponentString(args[0] + " is currently allowed to visit you"));
         }
         else if (args.length == 2)
         {
             if (args[1].toLowerCase().equals("allow"))
             {
-                if (SkyroomVisitors.setVisitable(server, otherPlayerData.id, player.getPersistentID(), true))
+                if (Visitors.setVisitable(server, otherPlayerData.id, player.getPersistentID(), true))
                 {
                     player.sendMessage(new TextComponentString(args[0] + " can now visit you"));
                 }
@@ -88,7 +88,7 @@ public class CmdVisitors extends CommandBase
             }
             else if (args[1].toLowerCase().equals("deny"))
             {
-                if (SkyroomVisitors.setVisitable(server, otherPlayerData.id, player.getPersistentID(), false))
+                if (Visitors.setVisitable(server, otherPlayerData.id, player.getPersistentID(), false))
                 {
                     player.sendMessage(new TextComponentString(args[0] + " can no longer visit you"));
                 }
