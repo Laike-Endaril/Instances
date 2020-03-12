@@ -1,5 +1,3 @@
-Convert visitor data to savefile tags
-
 Make visitor data per-instance instead of per-owner
 
 Convert ownership to savefile tags
