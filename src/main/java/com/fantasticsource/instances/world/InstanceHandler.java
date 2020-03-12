@@ -109,6 +109,22 @@ public class InstanceHandler
 
 
         File newFile = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + newName);
+        if (newFile.exists())
+        {
+            if (!newFile.isDirectory())
+            {
+                System.err.println(TextFormatting.RED + "Failed to copy: " + newFile.getAbsolutePath() + " already exists as a non-folder");
+                if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Failed to copy to " + newName + " (already exists)"));
+                return null;
+            }
+
+            File[] files = newFile.listFiles();
+            if (files != null && files.length > 0)
+            {
+                System.err.println(TextFormatting.RED + "Failed to copy: " + newFile.getAbsolutePath() + " already exists as a non-empty folder");
+                if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Failed to copy to " + newName + " (already exists)"));
+            }
+        }
         try
         {
             FileUtils.copyDirectory(oldFile, newFile);
@@ -116,6 +132,7 @@ public class InstanceHandler
         catch (IOException e)
         {
             System.err.println(TextFormatting.RED + "Failed to copy to directory: " + newFile.getAbsolutePath());
+            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Failed to copy to " + newName));
             return null;
         }
 
