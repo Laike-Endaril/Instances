@@ -5,6 +5,7 @@ import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
+import com.fantasticsource.tools.Tools;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -12,10 +13,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldServer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Commands extends CommandBase
 {
@@ -40,7 +44,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <hub:personal:template:list:delete>";
+        return "Usage: /instances <hub:personal:template:list:delete:copy>";
     }
 
     @Override
@@ -101,7 +105,7 @@ public class Commands extends CommandBase
                 break;
 
             case "list":
-                for (String s : InstanceHandler.instanceFolderNames())
+                for (String s : InstanceHandler.instanceFolderNames(true))
                 {
                     sender.sendMessage(new TextComponentString(s));
                 }
@@ -124,6 +128,14 @@ public class Commands extends CommandBase
                     }
                     else
                     {
+                        if (args[1].contains(".."))
+                        {
+                            System.err.println(TextFormatting.RED + "WARNING! " + sender.getName() + " attempted to delete file with upwards directory access!  Check and make sure this is not a hostile action against the server!");
+                            System.err.println(TextFormatting.RED + "Prevented deletion: " + new File(InstanceHandler.getInstancesDir(server) + args[1]).getAbsolutePath());
+                            sender.sendMessage(new TextComponentString(TextFormatting.RED + "Upwards directory accessors (..) are not allowed"));
+                            break;
+                        }
+
                         //Delete by instance folder
                         boolean done = false;
                         for (WorldServer world : server.worlds)
@@ -136,11 +148,80 @@ public class Commands extends CommandBase
                             }
                         }
 
-                        //Delete by filename
+                        //Delete by folder name
                         if (!done) InstanceHandler.delete(sender, args[1]);
                     }
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
+                break;
+
+            case "copy":
+                if (args.length < 3)
+                {
+                    sender.sendMessage(new TextComponentString(getUsage(sender)));
+                    break;
+                }
+
+                String oldName = Tools.fixFileSeparators(args[1]), newName = Tools.fixFileSeparators(args[2]);
+
+                if (oldName.contains("..") || newName.contains(".."))
+                {
+                    System.err.println(TextFormatting.RED + "WARNING! " + sender.getName() + " attempted to copy to and/or from file with upwards directory access!  Check and make sure this is not a hostile action against the server!");
+                    System.err.println(TextFormatting.RED + "Prevented copy: " + new File(InstanceHandler.getInstancesDir(server) + oldName).getAbsolutePath() + " -> " + new File(InstanceHandler.getInstancesDir(server) + newName).getAbsolutePath());
+                    sender.sendMessage(new TextComponentString(TextFormatting.RED + "Upwards directory accessors (..) are not allowed"));
+                    break;
+                }
+
+                //Explicit instance type selection
+                DimensionType instanceType = null;
+                if (args.length > 3)
+                {
+                    for (DimensionType t : InstanceTypes.instanceTypes)
+                    {
+                        if (t.getName().equals(args[3]))
+                        {
+                            instanceType = t;
+                            break;
+                        }
+                    }
+                }
+
+                //Instance type based on new world name
+                if (instanceType == null)
+                {
+                    String newTypeName = newName.substring(0, newName.indexOf(File.separator));
+                    for (DimensionType t : InstanceTypes.instanceTypes)
+                    {
+                        if (t.getName().equals(newTypeName))
+                        {
+                            instanceType = t;
+                            break;
+                        }
+                    }
+                }
+
+                //Instance type based on old world name
+                if (instanceType == null)
+                {
+                    String oldTypeName = oldName.substring(0, oldName.indexOf(File.separator));
+                    for (DimensionType t : InstanceTypes.instanceTypes)
+                    {
+                        if (t.getName().equals(oldTypeName))
+                        {
+                            instanceType = t;
+                            break;
+                        }
+                    }
+                }
+
+                //Default instance type
+                if (instanceType == null) instanceType = InstanceTypes.templateDimType;
+
+                boolean save = args.length <= 4 || Boolean.parseBoolean(args[4]);
+                UUID owner = args.length > 5 ? PlayerData.getID(args[5]) : null;
+
+                InstanceHandler.copyInstance(sender, oldName, newName, instanceType, owner, save);
+
                 break;
 
             default:
@@ -153,13 +234,13 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "hub", "personal", "template", "list", "delete");
+            return getListOfStringsMatchingLastWord(args, "hub", "personal", "template", "list", "delete", "copy");
         }
         else if (args.length == 2)
         {
-            if (args[0].equals("delete"))
+            if (args[0].equals("delete") || args[0].equals("copy"))
             {
-                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames());
+                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true));
             }
             else if (args[0].equals("personal"))
             {
@@ -169,11 +250,22 @@ public class Commands extends CommandBase
             {
                 return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(InstanceTypes.templateDimType, false));
             }
-            else return new ArrayList<>();
         }
-        else
+        else if (args.length == 4)
         {
-            return new ArrayList<>();
+            if (args[0].equals("copy"))
+            {
+                return getListOfStringsMatchingLastWord(args, "true", "false");
+            }
         }
+        else if (args.length == 5)
+        {
+            if (args[0].equals("copy"))
+            {
+                return getListOfStringsMatchingLastWord(args, playernames());
+            }
+        }
+
+        return new ArrayList<>();
     }
 }

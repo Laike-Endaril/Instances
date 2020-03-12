@@ -12,7 +12,6 @@ import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.*;
@@ -22,6 +21,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,9 +48,13 @@ public class InstanceHandler
         }
 
         loadedInstances.remove(info.dimensionID);
-        if (DimensionManager.isDimensionRegistered(info.dimensionID)) DimensionManager.unregisterDimension(info.dimensionID);
+        if (DimensionManager.isDimensionRegistered(info.dimensionID))
+        {
+            DimensionManager.unregisterDimension(info.dimensionID);
+            System.out.println(TextFormatting.GREEN + "Unregistered dimension: " + info.dimensionID + " (" + info.getWorldName() + ")");
 
-        Network.WRAPPER.sendToAll(new SyncInstancesPacket());
+            Network.WRAPPER.sendToAll(new SyncInstancesPacket()); //TODO change this to use direct data from dimension manager
+        }
     }
 
     public static void trySave(InstanceWorldInfo info)
@@ -91,34 +95,58 @@ public class InstanceHandler
 
     public static void clear()
     {
-        loadedInstances.entrySet().removeIf(entry ->
+        for (InstanceWorldInfo info : loadedInstances.values()) unload(info);
+    }
+
+
+    public static Pair<Integer, InstanceWorldInfo> copyInstance(ICommandSender sender, String oldName, String newName, DimensionType instanceType, UUID owner, boolean save)
+    {
+        if (!Tools.contains(InstanceTypes.instanceTypes, instanceType)) return null;
+
+
+        File oldFile = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + oldName);
+        if (!oldFile.isDirectory()) return null;
+
+
+        File newFile = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + newName);
+        try
         {
-            unload(entry.getValue());
-            return true;
-        });
+            FileUtils.copyDirectory(oldFile, newFile);
+        }
+        catch (IOException e)
+        {
+            System.err.println(TextFormatting.RED + "Failed to copy to directory: " + newFile.getAbsolutePath());
+            return null;
+        }
+
+
+        Pair<Integer, InstanceWorldInfo> result = createInstance(sender, instanceType, owner, newName, save);
+        if (result == null) return null;
+
+        unload(result.getValue());
+        return result;
     }
 
 
-    public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType dimType, UUID owner, boolean save)
+    public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType instanceType, UUID owner, String name, boolean save)
     {
-        return createInstance(sender, dimType, owner, "" + owner, save);
-    }
+        if (!Tools.contains(InstanceTypes.instanceTypes, instanceType)) return null;
 
-    public static Pair<Integer, InstanceWorldInfo> createInstance(ICommandSender sender, DimensionType dimType, UUID owner, String name, boolean save)
-    {
+
         name = name.replaceAll(" ", "_");
 
         int dimensionID = Instances.nextFreeDimID();
 
         WorldType worldType = DimensionManager.getWorld(0).getWorldInfo().getTerrainType();
         WorldSettings settings = new WorldSettings(new Random().nextLong(), GameType.CREATIVE, true, false, worldType);
-        InstanceWorldInfo worldInfo = new InstanceWorldInfo(dimensionID, settings, owner, name, dimType, save);
+        InstanceWorldInfo worldInfo = new InstanceWorldInfo(dimensionID, settings, owner, name, instanceType, save);
 
         loadedInstances.put(dimensionID, worldInfo);
 
         DimensionManager.registerDimension(dimensionID, worldInfo.getDimensionType());
 
-        if (sender != null) sender.sendMessage(new TextComponentString(String.format("Created %s using id %s", worldInfo.getWorldName(), dimensionID)).setStyle(new Style().setColor(TextFormatting.GREEN)));
+        System.out.println(TextFormatting.GREEN + "Created " + worldInfo.getWorldName() + " using id " + dimensionID);
+        if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Created " + worldInfo.getWorldName()));
 
         Network.WRAPPER.sendToAll(new SyncInstancesPacket());
 
@@ -154,11 +182,11 @@ public class InstanceHandler
      */
     public static void delete(ICommandSender sender, String folderName)
     {
-        folderName = "instances" + File.separator + folderName;
+        String folderName2 = "instances" + File.separator + folderName;
 
         for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
         {
-            if (folderName.equals(world.provider.getSaveFolder()))
+            if (folderName2.equals(world.provider.getSaveFolder()))
             {
                 delete(sender, world);
                 return;
@@ -251,11 +279,25 @@ public class InstanceHandler
     }
 
 
-    public static ArrayList<String> instanceFolderNames()
+    public static ArrayList<String> instanceFolderNames(boolean withPath)
     {
         ArrayList<String> result = new ArrayList<>();
 
-        for (DimensionType instanceType : InstanceTypes.instanceTypes) result.addAll(instanceFolderNames(instanceType, true));
+        File instancesFolder = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()));
+        if (instancesFolder.isDirectory())
+        {
+            File[] instanceTypeFolders = instancesFolder.listFiles();
+            if (instanceTypeFolders != null)
+            {
+                for (File instanceTypeFolder : instanceTypeFolders)
+                {
+                    File[] instanceFolders = instanceTypeFolder.listFiles();
+                    if (instanceFolders == null) continue;
+
+                    for (File instanceFolder : instanceFolders) result.add(withPath ? instanceTypeFolder.getName() + File.separator + instanceFolder.getName() : instanceFolder.getName());
+                }
+            }
+        }
 
         return result;
     }

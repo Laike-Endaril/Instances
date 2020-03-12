@@ -21,10 +21,10 @@ public class InstanceTypes
 
     public static DimensionType[] instanceTypes = new DimensionType[]
             {
-                    voidDimType,
+                    templateDimType,
                     skyroomDimType,
                     libraryOfWorldsDimType,
-                    templateDimType
+                    voidDimType
             };
 
     public static void init()
