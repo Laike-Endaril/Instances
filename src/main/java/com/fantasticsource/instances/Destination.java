@@ -2,6 +2,7 @@ package com.fantasticsource.instances;
 
 import net.minecraft.nbt.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import java.util.List;
 
@@ -11,6 +12,11 @@ public class Destination
     public double x, y, z;
     public float yaw, pitch;
 
+
+    public Destination(World world, float yaw, float pitch)
+    {
+        this(world.provider.getDimension(), world.getWorldInfo().getSpawnX() + 0.5, world.getWorldInfo().getSpawnY(), world.getWorldInfo().getSpawnZ() + 0.5, yaw, pitch);
+    }
 
     public Destination(int dimension, double x, double y, double z, float yaw, float pitch)
     {
