@@ -46,7 +46,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner>";
+        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner:joinTempCopy>";
     }
 
     @Override
@@ -68,6 +68,32 @@ public class Commands extends CommandBase
         InstanceData data = null;
         switch (args[0])
         {
+            case "joinTempCopy":
+                if (args.length < 3) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                else
+                {
+                    data = InstanceData.get(args[1]);
+                    if (data == null)
+                    {
+                        sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find instance: " + args[1]));
+                        break;
+                    }
+
+                    player = (EntityPlayerMP) PlayerData.getEntity(args[2]);
+                    if (player == null)
+                    {
+                        sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find player: " + args[2]));
+                        break;
+                    }
+
+                    InstanceData newData = InstanceData.get(false, data.getDimensionType(), data.getShortName());
+                    while (newData.exists()) newData = InstanceData.get(false, data.getDimensionType(), "" + UUID.randomUUID());
+                    InstanceHandler.copyInstance(null, data.getFullName(), newData.getFullName());
+                    Teleport.joinPossiblyCreating(player, newData.getFullName());
+                }
+                break;
+
+
             case "join":
                 if (args.length == 1)
                 {
@@ -237,11 +263,11 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join", "setOwner");
+            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join", "setOwner", "joinTempCopy");
         }
         else if (args.length == 2)
         {
-            if (args[0].equals("delete") || args[0].equals("copy") || args[0].equals("join") || args[0].equals("setOwner"))
+            if (args[0].equals("delete") || args[0].equals("copy") || args[0].equals("join") || args[0].equals("setOwner") || args[0].equals("joinTempCopy"))
             {
                 return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true));
             }
@@ -256,7 +282,7 @@ public class Commands extends CommandBase
         }
         else if (args.length == 3)
         {
-            if (args[0].equals("join") || args[0].equals("setOwner"))
+            if (args[0].equals("join") || args[0].equals("setOwner") || args[0].equals("joinTempCopy"))
             {
                 return getListOfStringsMatchingLastWord(args, playernames());
             }

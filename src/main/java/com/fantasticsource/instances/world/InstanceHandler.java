@@ -91,11 +91,7 @@ public class InstanceHandler
         }
 
 
-        Pair<Integer, InstanceWorldInfo> result = loadOrCreateInstance(sender, newName);
-        if (result == null) return null;
-
-        unload(result.getValue());
-        return result;
+        return loadOrCreateInstance(sender, newName);
     }
 
 
