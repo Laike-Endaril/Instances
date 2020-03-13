@@ -1,13 +1,13 @@
 package com.fantasticsource.instances.server;
 
 import com.fantasticsource.instances.Destination;
+import com.fantasticsource.instances.InstanceData;
 import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
-import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.MCTools;
-import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -17,16 +17,13 @@ import net.minecraft.network.play.server.SPacketSetExperience;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import java.io.File;
 import java.lang.reflect.Method;
-import java.util.UUID;
 
 public class Teleport
 {
@@ -45,24 +42,20 @@ public class Teleport
         }
     }
 
-    public static boolean tryJoinWithoutCreating(Entity entity, String name)
+    public static boolean tryJoinWithoutCreating(Entity entity, String fullName)
     {
-        name = Tools.fixFileSeparators(name);
-        String typeName = name.substring(0, name.indexOf(File.separator));
-        name = name.substring(name.indexOf(File.separator) + 1);
+        InstanceData data = InstanceData.get(fullName);
+        if (data == null || !data.exists()) return false;
 
-        for (DimensionType instanceType : InstanceTypes.instanceTypes)
-        {
-            if (instanceType.getName().equals(typeName))
-            {
-                return joinPossiblyCreating(entity, name, instanceType, instanceType == InstanceTypes.skyroomDimType || instanceType == InstanceTypes.libraryOfWorldsDimType ? UUID.fromString(name) : null, instanceType != InstanceTypes.libraryOfWorldsDimType);
-            }
-        }
-
-        return false;
+        return joinPossiblyCreating(entity, fullName);
     }
 
-    public static boolean joinPossiblyCreating(Entity entity, String name, DimensionType instanceType, UUID owner, boolean save)
+    public static boolean joinPossiblyCreating(Entity entity, String fullName)
+    {
+        return joinPossiblyCreating(entity, fullName, null);
+    }
+
+    public static boolean joinPossiblyCreating(Entity entity, String fullName, String owner)
     {
         if (entity.world.isRemote) throw new IllegalArgumentException(TextFormatting.RED + "Attempted to call server-only method from client!!!");
 
@@ -70,7 +63,7 @@ public class Teleport
         //See if we're in the instance already
         WorldInfo info = null;
         Integer dimension = null;
-        if (entity.world.getWorldInfo().getWorldName().equals(name))
+        if (entity.world.getWorldInfo().getWorldName().equals(fullName))
         {
             info = entity.world.getWorldInfo();
             dimension = entity.dimension;
@@ -83,7 +76,7 @@ public class Teleport
             for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
             {
                 WorldInfo info2 = world.getWorldInfo();
-                if (info2.getWorldName().equals(name))
+                if (info2.getWorldName().equals(fullName))
                 {
                     info = info2;
                     dimension = world.provider.getDimension();
@@ -95,17 +88,10 @@ public class Teleport
         //Not yet found?
         if (info == null)
         {
-            //Validate...
-            if (!Tools.contains(InstanceTypes.instanceTypes, instanceType)) return false;
-
-
             //...and then create it (loading from disk if files exist, or generating otherwise)
-            Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.loadOrCreateInstance(null, instanceType, owner, name, save);
-            if (pair == null) return false;
-
+            Pair<Integer, InstanceWorldInfo> pair = InstanceHandler.loadOrCreateInstance(null, fullName);
             info = pair.getValue();
-            dimension = pair.getValue().dimensionID;
-            InstanceHandler.load((InstanceWorldInfo) info);
+            dimension = pair.getKey();
         }
 
         return teleport(entity, dimension, info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, entity.rotationYaw, entity.rotationPitch);
@@ -113,13 +99,17 @@ public class Teleport
 
     public static boolean escape(Entity entity)
     {
-        DimensionType type = entity.world.provider.getDimensionType();
-        if (!Tools.contains(InstanceTypes.instanceTypes, type)) return false;
+        InstanceData data = InstanceData.get(MCTools.getSaveFolder(entity.world.provider));
+        if (data == null) return false;
 
-        Destination lastGoodPos = EscapePoint.getEscapePoint(entity);
-        if (lastGoodPos != null) return teleport(entity, lastGoodPos);
+        if (data.exists() && data.saves()) return false;
 
-        return false;
+
+        Destination escapePoint = EscapePoint.getEscapePoint(entity);
+        if (escapePoint == null) return false;
+
+
+        return teleport(entity, escapePoint);
     }
 
 
@@ -145,7 +135,8 @@ public class Teleport
 
 
         //Save current position if we're not currently in an instance (for instance escaping)
-        if (!Tools.contains(InstanceTypes.instanceTypes, entity.world.provider.getDimensionType()))
+        InstanceData data = InstanceData.get(MCTools.getSaveFolder(entity.world.provider));
+        if (data == null || data.saves())
         {
             EscapePoint.setEscapePointToCurrentPosition(entity);
         }
@@ -197,48 +188,50 @@ public class Teleport
 
         if (entity instanceof EntityPlayerMP)
         {
-            EntityPlayerMP player = (EntityPlayerMP) entity;
-            int oldDim = player.dimension;
-
-            if (MCTools.isOP(player))
-            {
-                GameType gameType = player.interactionManager.getGameType();
-
-                server.getPlayerList().transferPlayerToDimension(player, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
-
-                //Preserve gamemode of OP players
-                player.setGameType(gameType);
-            }
-            else
-            {
-                server.getPlayerList().transferPlayerToDimension(player, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
-
-                //Set gamemode of non-OP players
-                Instances.setPlayerMode(player, InstanceHandler.get(dimension));
-            }
-
-
-            //After successful cross-dimensional player teleportation
-            InstanceWorldInfo oldInfo = InstanceHandler.get(oldDim);
-            if (oldInfo != null && oldInfo.getDimensionType() == InstanceTypes.libraryOfWorldsDimType)
-            {
-                InstanceHandler.delete(server, oldInfo);
-            }
-
-            //Fix exp desync
-            player.connection.sendPacket(new SPacketSetExperience(player.experience, player.experienceTotal, player.experienceLevel));
-
-
-            return player;
+            return teleportPlayerEntityToDimension(server, (EntityPlayerMP) entity, dimension);
         }
         else
         {
-            return travelEntity(server, entity, dimension);
+            return teleportNonPlayerEntityToDimension(server, entity, dimension);
         }
     }
 
 
-    protected static Entity travelEntity(MinecraftServer server, Entity entity, int dimensionId)
+    protected static EntityPlayerMP teleportPlayerEntityToDimension(MinecraftServer server, EntityPlayerMP player, int dimension)
+    {
+        //Before player teleport
+        int oldPlayerCount = player.world.playerEntities.size();
+        GameType gameType = MCTools.isOP(player) ? player.interactionManager.getGameType() : null;
+        Network.WRAPPER.sendTo(new Network.SyncDimensionTypePacket(dimension), player);
+
+
+        //Teleport player
+        server.getPlayerList().transferPlayerToDimension(player, dimension, new TeleporterSimple((WorldServer) server.getEntityWorld()));
+
+
+        //After player teleport
+        InstanceData data = InstanceData.get(MCTools.getSaveFolder(player.world.provider));
+
+        //Set gamemode
+        if (MCTools.isOP(player)) player.setGameType(gameType);
+        else Instances.setPlayerMode(player, data);
+
+
+        //After successful cross-dimensional player teleportation
+        if (data != null && data.exists() && oldPlayerCount == 1 && !data.saves())
+        {
+            InstanceHandler.delete(server, data.getFullName());
+        }
+
+        //Fix exp desync
+        player.connection.sendPacket(new SPacketSetExperience(player.experience, player.experienceTotal, player.experienceLevel));
+
+
+        return player;
+    }
+
+
+    protected static Entity teleportNonPlayerEntityToDimension(MinecraftServer server, Entity entity, int dimensionId)
     {
         if (!entity.world.isRemote && !entity.isDead)
         {

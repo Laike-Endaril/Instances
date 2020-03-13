@@ -29,7 +29,7 @@ public class ChunkGeneratorLibraryOfWorlds implements IChunkGenerator
             SIGN = Blocks.WALL_SIGN.getDefaultState(),
             PERSONAL_PORTAL = BlocksAndItems.blockPersonalPortal.getDefaultState(),
             RETURN_PORTAL = BlocksAndItems.blockReturnPortal.getDefaultState(),
-            VISITOR_PORTAL = BlocksAndItems.blockVisitorPortal.getDefaultState();
+            VISITOR_PORTAL = BlocksAndItems.blockEntryPortal.getDefaultState();
 
     private static final TextComponentString
             HOUSE_STRING = new TextComponentString("House"),

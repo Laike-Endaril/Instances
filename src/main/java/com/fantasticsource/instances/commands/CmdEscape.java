@@ -49,7 +49,7 @@ public class CmdEscape extends CommandBase
             }
 
             DimensionType type = entity.world.provider.getDimensionType();
-            if (type != InstanceTypes.skyroomDimType && type != InstanceTypes.libraryOfWorldsDimType)
+            if (type != InstanceTypes.SKYROOM && type != InstanceTypes.LIBRARY_OF_WORLDS)
             {
                 sender.sendMessage(new TextComponentString("This command can only be used when in a skyroom or Library of Worlds instance"));
                 return;

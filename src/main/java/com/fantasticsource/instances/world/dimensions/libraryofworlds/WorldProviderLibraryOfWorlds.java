@@ -1,12 +1,11 @@
 package com.fantasticsource.instances.world.dimensions.libraryofworlds;
 
+import com.fantasticsource.instances.InstanceData;
 import com.fantasticsource.instances.world.InstanceWorldProvider;
 import com.fantasticsource.instances.world.boimes.BiomeProviders;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
-import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.IChunkGenerator;
@@ -18,6 +17,11 @@ public class WorldProviderLibraryOfWorlds extends InstanceWorldProvider
 {
     private static final Vec3d FOG_COLOR = new Vec3d(0, 0, 0);
 
+    public WorldProviderLibraryOfWorlds(InstanceData data)
+    {
+        super(data);
+    }
+
 
     @Override
     protected void init()
@@ -25,12 +29,6 @@ public class WorldProviderLibraryOfWorlds extends InstanceWorldProvider
         hasSkyLight = false;
         biomeProvider = BiomeProviders.VOID;
         setSpawnPoint(new BlockPos(8, 2, 8));
-    }
-
-    @Override
-    public DimensionType getDimensionType()
-    {
-        return InstanceTypes.libraryOfWorldsDimType;
     }
 
     @Override

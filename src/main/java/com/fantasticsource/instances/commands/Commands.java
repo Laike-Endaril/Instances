@@ -1,9 +1,11 @@
 package com.fantasticsource.instances.commands;
 
+import com.fantasticsource.instances.InstanceData;
 import com.fantasticsource.instances.server.Teleport;
+import com.fantasticsource.instances.tags.savefile.Owners;
 import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.command.CommandBase;
@@ -13,8 +15,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <hub:personal:template:list:delete:copy:join>";
+        return "Usage: /instances <library:skyroom:template:list:delete:copy:join>";
     }
 
     @Override
@@ -64,11 +65,10 @@ public class Commands extends CommandBase
         }
 
         EntityPlayerMP player = null;
+        InstanceData data = null;
         switch (args[0])
         {
             case "join":
-                String instanceName = null;
-
                 if (args.length == 1)
                 {
                     if (sender instanceof EntityPlayerMP)
@@ -79,75 +79,67 @@ public class Commands extends CommandBase
                 }
                 else
                 {
-                    instanceName = args[1];
-
-                    if (args.length == 2)
-                    {
-                        if (sender instanceof EntityPlayerMP)
-                        {
-                            player = (EntityPlayerMP) sender;
-                        }
-                    }
+                    data = InstanceData.get(args[1]);
+                    if (data == null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find or create instance: " + args[1]));
                     else
                     {
-                        PlayerData data = PlayerData.get(args[2]);
-                        if (data == null)
+                        if (args.length > 2)
                         {
-                            try
-                            {
-                                data = PlayerData.get(UUID.fromString(args[2]));
-                            }
-                            catch (IllegalArgumentException e)
-                            {
-                            }
+                            player = (EntityPlayerMP) PlayerData.getEntity(args[2]);
+                            if (player == null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find player: " + args[2]));
+                            else Teleport.joinPossiblyCreating(player, data.getFullName());
                         }
-                        if (data == null || !(data.player instanceof EntityPlayerMP)) break;
-
-                        player = (EntityPlayerMP) data.player;
+                        else
+                        {
+                            if (sender instanceof EntityPlayerMP)
+                            {
+                                Teleport.joinPossiblyCreating((EntityPlayerMP) sender, data.getFullName());
+                            }
+                            else sender.sendMessage(new TextComponentString(TextFormatting.RED + "No player name specified!"));
+                        }
                     }
-                }
-
-                if (instanceName != null) instanceName = Tools.fixFileSeparators(instanceName);
-                if (player == null || instanceName == null || !Teleport.tryJoinWithoutCreating(player, instanceName))
-                {
-                    sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find instance: " + instanceName));
                 }
                 break;
 
-            case "hub":
+            case "library":
                 if (sender instanceof EntityPlayerMP)
                 {
                     player = (EntityPlayerMP) sender;
-                    Teleport.joinPossiblyCreating(player, "" + player.getPersistentID(), InstanceTypes.libraryOfWorldsDimType, player.getPersistentID(), false);
+
+                    data = InstanceData.get(false, InstanceTypes.LIBRARY_OF_WORLDS, "" + player.getPersistentID());
+                    Teleport.joinPossiblyCreating(player, data.getFullName(), "" + player.getPersistentID());
                 }
                 break;
 
-            case "personal":
+            case "skyroom":
                 if (sender instanceof EntityPlayerMP)
                 {
+                    player = (EntityPlayerMP) sender;
                     if (args.length == 1)
                     {
-                        player = (EntityPlayerMP) sender;
-                        Teleport.joinPossiblyCreating(player, "" + player.getPersistentID(), InstanceTypes.skyroomDimType, player.getPersistentID(), true);
+                        data = InstanceData.get(false, InstanceTypes.SKYROOM, "" + player.getPersistentID());
                     }
-                    else if (args.length == 2)
+                    else
                     {
-                        player = (EntityPlayerMP) sender;
                         PlayerData otherPlayerData = PlayerData.get(args[1]);
-                        if (otherPlayerData == null) sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
-                        else Teleport.joinPossiblyCreating(player, "" + otherPlayerData.id, InstanceTypes.skyroomDimType, otherPlayerData.id, true);
+                        if (otherPlayerData == null)
+                        {
+                            sender.sendMessage(new TextComponentString("Player " + args[1] + " not found"));
+                            break;
+                        }
+
+                        data = InstanceData.get(false, InstanceTypes.SKYROOM, "" + otherPlayerData.id);
                     }
-                    else sender.sendMessage(new TextComponentString(getUsage(sender)));
+
+                    Teleport.joinPossiblyCreating(player, data.getFullName());
                 }
                 break;
 
             case "template":
                 if (sender instanceof EntityPlayerMP && args.length > 1)
                 {
-                    StringBuilder name = new StringBuilder(args[1]);
-                    for (int i = 3; i < args.length; i++) name.append("_").append(args[i]);
-
-                    if (!name.toString().equals("")) Teleport.joinPossiblyCreating((EntityPlayerMP) sender, name.toString(), InstanceTypes.templateDimType, null, true);
+                    data = InstanceData.get(true, InstanceTypes.TEMPLATE, args[1]);
+                    if (data != null) Teleport.joinPossiblyCreating((EntityPlayerMP) sender, data.getFullName());
                     else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 }
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
@@ -161,48 +153,34 @@ public class Commands extends CommandBase
                 break;
 
             case "delete":
-                if (args.length <= 2)
+                if (args.length == 1)
                 {
-                    InstanceWorldInfo info = null; //This null is necessary!
-                    if (args.length == 1)
+                    //Delete from within instance
+                    if (sender instanceof EntityPlayerMP)
                     {
-                        //Delete from within instance
-                        if (sender instanceof EntityPlayerMP)
-                        {
-                            info = InstanceHandler.get(((EntityPlayerMP) sender).dimension);
-                            if (info == null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleting the 'current instance' only works while inside an instance"));
-                            else InstanceHandler.delete(sender, info);
-                        }
-                        else System.err.println("Deleting the 'current instance' is only usable when logged in as a player (and inside an instance)");
+                        player = (EntityPlayerMP) sender;
+                        data = InstanceData.get(MCTools.getSaveFolder(player.world.provider));
+                        if (data == null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleting the 'current instance' only works while inside an instance"));
+                        else InstanceHandler.delete(sender, data.getFullName());
                     }
-                    else
-                    {
-                        if (args[1].contains(".."))
-                        {
-                            System.err.println(TextFormatting.RED + "WARNING! " + sender.getName() + " attempted to delete file with upwards directory access!  Check and make sure this is not a hostile action against the server!");
-                            System.err.println(TextFormatting.RED + "Prevented deletion: " + new File(InstanceHandler.getInstancesDir(server) + args[1]).getAbsolutePath());
-                            sender.sendMessage(new TextComponentString(TextFormatting.RED + "Upwards directory accessors (..) are not allowed"));
-                            break;
-                        }
-
-                        //Delete by instance folder
-                        boolean done = false;
-                        for (WorldServer world : server.worlds)
-                        {
-                            if (world.getWorldInfo() instanceof InstanceWorldInfo && world.provider.getSaveFolder().equals(args[1]))
-                            {
-                                InstanceHandler.delete(sender, world);
-                                done = true;
-                                break;
-                            }
-                        }
-
-                        //Delete by folder name
-                        if (!done) InstanceHandler.delete(sender, args[1]);
-                    }
+                    else System.err.println("Deleting the 'current instance' is only usable when logged in as a player (and inside an instance)");
                 }
-                else sender.sendMessage(new TextComponentString(getUsage(sender)));
+                else
+                {
+                    if (args[1].contains(".."))
+                    {
+                        System.err.println(TextFormatting.RED + "WARNING! " + sender.getName() + " attempted to delete file with upwards directory access!  Check and make sure this is not a hostile action against the server!");
+                        System.err.println(TextFormatting.RED + "Prevented deletion: " + new File(InstanceHandler.getInstancesDir(server) + args[1]).getAbsolutePath());
+                        sender.sendMessage(new TextComponentString(TextFormatting.RED + "Upwards directory accessors (..) are not allowed"));
+                        break;
+                    }
+
+                    data = InstanceData.get(args[1]);
+                    if (data == null || !data.exists()) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find instance to delete: " + args[1]));
+                    else InstanceHandler.delete(sender, data.getFullName());
+                }
                 break;
+
 
             case "copy":
                 if (args.length < 3)
@@ -211,8 +189,8 @@ public class Commands extends CommandBase
                     break;
                 }
 
-                String oldName = Tools.fixFileSeparators(args[1]), newName = Tools.fixFileSeparators(args[2]);
 
+                String oldName = Tools.fixFileSeparators(args[1]), newName = Tools.fixFileSeparators(args[2]);
                 if (oldName.contains("..") || newName.contains(".."))
                 {
                     System.err.println(TextFormatting.RED + "WARNING! " + sender.getName() + " attempted to copy to and/or from file with upwards directory access!  Check and make sure this is not a hostile action against the server!");
@@ -221,39 +199,17 @@ public class Commands extends CommandBase
                     break;
                 }
 
-                DimensionType oldInstanceType = null, newInstanceType = null;
-                String oldTypeName = oldName.substring(0, oldName.indexOf(File.separator)), newTypeName = newName.substring(0, newName.indexOf(File.separator));
-                for (DimensionType t : InstanceTypes.instanceTypes)
+
+                InstanceData oldData = InstanceData.get(oldName), newData = InstanceData.get(newName);
+                if (oldData == null || newData == null || !oldData.exists()) break;
+
+
+                InstanceHandler.copyInstance(sender, oldName, newName);
+                if (args.length > 3)
                 {
-                    if (t.getName().equals(oldTypeName))
-                    {
-                        oldInstanceType = t;
-                        if (newInstanceType != null) break;
-                    }
-
-                    if (t.getName().equals(newTypeName))
-                    {
-                        newInstanceType = t;
-                        if (oldInstanceType != null) break;
-                    }
+                    UUID playerID = PlayerData.getID(args[3]);
+                    Owners.setOwner(FMLCommonHandler.instance().getMinecraftServerInstance(), newName, playerID != null ? "" + playerID : args[3]);
                 }
-
-                if (oldInstanceType == null)
-                {
-                    sender.sendMessage(new TextComponentString(TextFormatting.RED + "Unrecognized instance type: " + oldTypeName));
-                    break;
-                }
-
-                if (newInstanceType == null)
-                {
-                    sender.sendMessage(new TextComponentString(TextFormatting.RED + "Unrecognized instance type: " + newTypeName));
-                    break;
-                }
-
-                boolean save = args.length <= 4 || Boolean.parseBoolean(args[4]);
-                UUID owner = args.length > 5 ? PlayerData.getID(args[5]) : null;
-
-                InstanceHandler.copyInstance(sender, oldName, newName, newInstanceType, owner, save);
 
                 break;
 
@@ -267,7 +223,7 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "hub", "personal", "template", "list", "delete", "copy", "join");
+            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join");
         }
         else if (args.length == 2)
         {
@@ -275,13 +231,13 @@ public class Commands extends CommandBase
             {
                 return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true));
             }
-            else if (args[0].equals("personal"))
+            else if (args[0].equals("skyroom"))
             {
                 return getListOfStringsMatchingLastWord(args, playernames());
             }
             else if (args[0].equals("template"))
             {
-                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(InstanceTypes.templateDimType, false));
+                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(InstanceTypes.TEMPLATE, false));
             }
         }
         else if (args.length == 3)
@@ -292,13 +248,6 @@ public class Commands extends CommandBase
             }
         }
         else if (args.length == 4)
-        {
-            if (args[0].equals("copy"))
-            {
-                return getListOfStringsMatchingLastWord(args, "true", "false");
-            }
-        }
-        else if (args.length == 5)
         {
             if (args[0].equals("copy"))
             {

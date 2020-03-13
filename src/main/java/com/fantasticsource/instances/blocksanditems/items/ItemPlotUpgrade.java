@@ -1,10 +1,11 @@
 package com.fantasticsource.instances.blocksanditems.items;
 
+import com.fantasticsource.instances.InstanceData;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
-import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.instances.world.dimensions.skyroom.ChunkGeneratorSkyroom;
+import com.fantasticsource.mctools.MCTools;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -17,7 +18,6 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldInfo;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -69,8 +69,8 @@ public class ItemPlotUpgrade extends Item
 
         boolean creative = player.capabilities.isCreativeMode;
 
-        WorldInfo worldInfo = player.world.getWorldInfo();
-        if (!(worldInfo instanceof InstanceWorldInfo) || ((InstanceWorldInfo) worldInfo).getDimensionType() != InstanceTypes.skyroomDimType)
+        InstanceData data = InstanceData.get(MCTools.getSaveFolder(player.world.provider));
+        if (data == null || data.getDimensionType() != InstanceTypes.SKYROOM)
         {
             if (!world.isRemote)
             {
@@ -81,7 +81,7 @@ public class ItemPlotUpgrade extends Item
         }
 
 
-        if (!creative && !player.getPersistentID().equals(((InstanceWorldInfo) worldInfo).getOwner()))
+        if (!creative && !("" + player.getPersistentID()).equals(data.getOwner()))
         {
             if (!world.isRemote) player.sendMessage(new TextComponentString("Plot changing items can only be used in your own skyroom instance!"));
             return new ActionResult<>(EnumActionResult.FAIL, itemstack);

@@ -1,10 +1,6 @@
-Convert ownership to savefile tags
+Fix bugs
 
-Make visitor data per-instance instead of per-owner
 
-Convert saving to top-level instances directory
-instances/Saved/instanceType/instance
-instances/Temp/instanceType/instance
 
 Add spawn point to instance-specific data
 

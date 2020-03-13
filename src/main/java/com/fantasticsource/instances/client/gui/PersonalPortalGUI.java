@@ -55,7 +55,7 @@ public class PersonalPortalGUI extends GUIScreen
             scrollView.add(new GUIText(GUI, "  Go Home\n", TEAL, TEAL_2, WHITE_3));
         }
 
-        for (String name : packet.namesOut)
+        for (String name : packet.names)
         {
             scrollView.add(new GUIText(GUI, "\n"));
             scrollView.add(new GUIText(GUI, "  Visit " + name + "\n", TEAL, TEAL_2, WHITE_3));

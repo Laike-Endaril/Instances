@@ -1,21 +1,19 @@
 package com.fantasticsource.instances.world.dimensions.voided;
 
+import com.fantasticsource.instances.InstanceData;
 import com.fantasticsource.instances.world.InstanceWorldProvider;
 import com.fantasticsource.instances.world.boimes.BiomeProviders;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
-import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 
 public class WorldProviderVoid extends InstanceWorldProvider
 {
-    @Override
-    public DimensionType getDimensionType()
+    public WorldProviderVoid(InstanceData data)
     {
-        return InstanceTypes.voidDimType;
+        super(data);
     }
 
     @Override

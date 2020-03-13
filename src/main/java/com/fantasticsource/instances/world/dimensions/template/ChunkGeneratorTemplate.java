@@ -42,7 +42,7 @@ public class ChunkGeneratorTemplate implements IChunkGenerator
 
         if (chunkX == 0 && chunkZ == 0)
         {
-            chunk.setBlockState(new BlockPos(0, 0, 0), Blocks.DIRT.getDefaultState());
+            chunk.setBlockState(new BlockPos(0, 63, 0), Blocks.DIRT.getDefaultState());
         }
 
 

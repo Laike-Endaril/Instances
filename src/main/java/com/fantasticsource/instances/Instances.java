@@ -2,11 +2,10 @@ package com.fantasticsource.instances;
 
 import com.fantasticsource.fantasticlib.api.FLibAPI;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
-import com.fantasticsource.instances.client.ClientHandler;
 import com.fantasticsource.instances.client.LightFixer;
+import com.fantasticsource.instances.client.LocalDimensions;
 import com.fantasticsource.instances.commands.*;
 import com.fantasticsource.instances.network.Network;
-import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.CurrentWorldname;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
@@ -89,19 +88,19 @@ public class Instances
         return null;
     }
 
-    public static void setPlayerMode(EntityPlayerMP player, InstanceWorldInfo info)
+    public static void setPlayerMode(EntityPlayerMP player, InstanceData data)
     {
         //Preserve gamemode for OP players
         if (MCTools.isOP(player)) return;
 
-        if (info == null)
+        if (data == null)
         {
             //Not an instance dimension; use the dimension gametype
             player.setGameType(player.world.getWorldInfo().getGameType());
             return;
         }
 
-        if (info.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info.getOwner())) player.setGameType(GameType.SURVIVAL);
+        if (data.getOwner().equals("" + player.getPersistentID())) player.setGameType(GameType.SURVIVAL);
         else player.setGameType(GameType.ADVENTURE);
     }
 
@@ -149,8 +148,6 @@ public class Instances
         event.registerServerCommand(new CmdDimTime());
         event.registerServerCommand(new CmdEscape());
         event.registerServerCommand(new CmdVisitors());
-
-        InstanceHandler.init(event);
     }
 
     @EventHandler
@@ -166,20 +163,12 @@ public class Instances
         {
             Teleport.escape(player);
         }
-
-        InstanceHandler.clear();
-    }
-
-    @SubscribeEvent
-    public static void clientConnect(FMLNetworkEvent.ServerConnectionFromClientEvent event)
-    {
-        event.getManager().sendPacket(Network.WRAPPER.getPacketFrom(new SyncInstancesPacket()));
     }
 
     @SubscribeEvent
     public static void clientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
     {
-        if (!event.getManager().isLocalChannel()) ClientHandler.cleanUp();
+        if (!event.getManager().isLocalChannel()) LocalDimensions.resetDimensionManager();
     }
 
     @SubscribeEvent
@@ -188,6 +177,7 @@ public class Instances
         NetHandlerPlayServer netHandler = (NetHandlerPlayServer) event.getManager().getNetHandler();
         EntityPlayerMP player = netHandler.player;
         int dim = player.dimension;
+        event.getManager().sendPacket(Network.WRAPPER.getPacketFrom(new Network.SyncDimensionTypePacket(dim)));
 
 
         //Check world name for match, and if it doesn't, set player dimension to an invalid one
@@ -222,7 +212,7 @@ public class Instances
     {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         Teleport.escape(player);
-        setPlayerMode(player, InstanceHandler.get(player.world.provider.getDimension()));
+        setPlayerMode(player, InstanceData.get(MCTools.getSaveFolder(player.world.provider)));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
@@ -231,7 +221,7 @@ public class Instances
         World world = event.getWorld();
 
         DimensionType dimType = world.provider.getDimensionType();
-        if (dimType == InstanceTypes.skyroomDimType)
+        if (dimType == InstanceTypes.SKYROOM)
         {
             GameType gameType = world.isRemote ? Minecraft.getMinecraft().playerController.getCurrentGameType() : ((EntityPlayerMP) event.getEntityPlayer()).interactionManager.getGameType();
             if (gameType == GameType.ADVENTURE)
@@ -262,7 +252,7 @@ public class Instances
         Entity entity = event.getEntity();
         World world = entity.world;
         DimensionType dimType = world.provider.getDimensionType();
-        if (dimType == InstanceTypes.libraryOfWorldsDimType || dimType == InstanceTypes.skyroomDimType)
+        if (dimType == InstanceTypes.LIBRARY_OF_WORLDS || dimType == InstanceTypes.SKYROOM)
         {
             //Cancel damage
             event.setAmount(0);
@@ -299,7 +289,7 @@ public class Instances
     {
         if (event.side == Side.CLIENT || event.phase != TickEvent.Phase.END || event.world.provider.getDimension() != 0) return;
 
-        File file = new File(InstanceTypes.getInstanceTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), InstanceTypes.libraryOfWorldsDimType));
+        File file = new File(InstanceHandler.getDimensionTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), InstanceTypes.LIBRARY_OF_WORLDS));
         Tools.deleteFilesRecursively(file);
     }
 }

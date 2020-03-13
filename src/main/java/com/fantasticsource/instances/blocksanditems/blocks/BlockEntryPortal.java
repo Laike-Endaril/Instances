@@ -2,7 +2,7 @@ package com.fantasticsource.instances.blocksanditems.blocks;
 
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
-import com.fantasticsource.instances.blocksanditems.tileentities.TEVisitorPortal;
+import com.fantasticsource.instances.blocksanditems.tileentities.TEEntryPortal;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.block.Block;
@@ -10,7 +10,6 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -20,9 +19,9 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class BlockVisitorPortal extends Block
+public class BlockEntryPortal extends Block
 {
-    public BlockVisitorPortal()
+    public BlockEntryPortal()
     {
         super(Material.ROCK);
         setSoundType(SoundType.STONE);
@@ -32,8 +31,8 @@ public class BlockVisitorPortal extends Block
 
         setCreativeTab(BlocksAndItems.creativeTab);
 
-        setUnlocalizedName(Instances.MODID + ":visitorportal");
-        setRegistryName("visitorportal");
+        setUnlocalizedName(Instances.MODID + ":entryportal");
+        setRegistryName("entryportal");
     }
 
 
@@ -43,10 +42,10 @@ public class BlockVisitorPortal extends Block
         if (worldIn.isRemote) return true;
 
         TileEntity te = worldIn.getTileEntity(pos);
-        if (!(te instanceof TEVisitorPortal)) return false;
+        if (!(te instanceof TEEntryPortal)) return false;
 
-        UUID owner = ((TEVisitorPortal) te).owner;
-        return Teleport.joinPossiblyCreating(player, "" + owner, InstanceTypes.skyroomDimType, owner, true);
+        String instanceName = ((TEEntryPortal) te).instanceName;
+        return Teleport.joinPossiblyCreating(player, instanceName);
     }
 
     @Override
@@ -59,6 +58,6 @@ public class BlockVisitorPortal extends Block
     @Override
     public TileEntity createTileEntity(World world, IBlockState state)
     {
-        return new TEVisitorPortal();
+        return new TEEntryPortal();
     }
 }

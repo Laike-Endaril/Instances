@@ -2,123 +2,110 @@ package com.fantasticsource.instances.tags.savefile;
 
 import com.fantasticsource.fantasticlib.api.FLibAPI;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.util.Constants;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import static com.fantasticsource.fantasticlib.FantasticLib.MODID;
 
 public class Visitors
 {
-    public static boolean setVisitable(MinecraftServer server, UUID visitor, UUID visitable, boolean canVisit)
+    public static boolean setVisitable(MinecraftServer server, String instanceName, UUID playerID, boolean canVisit)
     {
         NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
 
-        if (!compound.hasKey("visitableToVisitors"))
+        if (!compound.hasKey("instanceToVisitors"))
         {
-            if (canVisit)
-            {
-                compound.setTag("visitorToVisitables", new NBTTagCompound());
-                compound.setTag("visitableToVisitors", new NBTTagCompound());
-            }
-            else return false;
+            if (!canVisit) return false;
+
+            compound.setTag("visitorToInstances", new NBTTagCompound());
+            compound.setTag("instanceToVisitors", new NBTTagCompound());
         }
 
-        NBTTagCompound compound2 = compound.getCompoundTag("visitableToVisitors");
-        compound = compound.getCompoundTag("visitorToVisitables");
+        NBTTagCompound instanceToVisitors = compound.getCompoundTag("instanceToVisitors");
+        NBTTagCompound visitorToInstances = compound.getCompoundTag("visitorToInstances");
+        String visitor = "" + playerID;
 
-        if (!compound.hasKey("" + visitor))
+        if (!visitorToInstances.hasKey(visitor))
         {
-            if (canVisit)
-            {
-                compound.setTag("" + visitor, new NBTTagList());
-                if (!compound2.hasKey("" + visitable)) compound2.setTag("" + visitable, new NBTTagList());
-            }
-            else return false;
+            if (!canVisit) return false;
+
+            visitorToInstances.setTag(visitor, new NBTTagCompound());
+            if (!instanceToVisitors.hasKey(instanceName)) instanceToVisitors.setTag(instanceName, new NBTTagCompound());
         }
 
-        NBTTagList list = compound.getTagList("" + visitor, Constants.NBT.TAG_STRING), list2 = compound2.getTagList("" + visitable, Constants.NBT.TAG_STRING);
-
-        boolean actionTaken = false;
-        for (int i = 0; i < list.tagCount(); i++)
+        NBTTagCompound instanceNames = visitorToInstances.getCompoundTag(visitor);
+        if (!instanceNames.hasKey(instanceName))
         {
-            if (list.getStringTagAt(i).equals("" + visitable))
-            {
-                list.removeTag(i);
-                actionTaken = true;
-                break;
-            }
-        }
+            if (!canVisit) return false;
 
-        for (int i = 0; i < list2.tagCount(); i++)
+            //Add
+            instanceNames.setInteger(instanceName, 1);
+            instanceToVisitors.getCompoundTag(instanceName).setInteger(visitor, 1);
+            return true;
+        }
+        else
         {
-            if (list.getStringTagAt(i).equals("" + visitor))
-            {
-                list.removeTag(i);
-                actionTaken = true;
-                break;
-            }
+            if (canVisit) return false;
+
+            //Remove
+            instanceNames.removeTag(instanceName);
+            if (instanceNames.hasNoTags()) visitorToInstances.removeTag(visitor);
+
+            NBTTagCompound visitors = instanceToVisitors.getCompoundTag(instanceName);
+            visitors.removeTag(visitor);
+            if (visitors.hasNoTags()) instanceToVisitors.removeTag(instanceName);
+
+            return true;
         }
-
-        if (!canVisit) return actionTaken;
-
-
-        list.appendTag(new NBTTagString("" + visitable));
-        list2.appendTag(new NBTTagString("" + visitor));
-        return !actionTaken; //This is reversed in this case; if true, then we removed the thing before re-adding it
     }
 
 
-    public static ArrayList<String> visitables(MinecraftServer server, UUID visitor)
+    public static String[] visitableInstances(MinecraftServer server, UUID playerID)
     {
-        ArrayList<String> result = new ArrayList<>();
-
         NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
 
-        if (!compound.hasKey("visitorToVisitables")) return result;
-        compound = compound.getCompoundTag("visitorToVisitables");
+        if (!compound.hasKey("visitorToInstances")) return new String[0];
+        compound = compound.getCompoundTag("visitorToInstances");
 
-        if (!compound.hasKey("" + visitor)) return result;
-        NBTTagList list = compound.getTagList("" + visitor, Constants.NBT.TAG_STRING);
+        String visitor = "" + playerID;
+        if (!compound.hasKey(visitor)) return new String[0];
 
-        for (int i = 0; i < list.tagCount(); i++)
+        return compound.getCompoundTag(visitor).getKeySet().toArray(new String[0]);
+    }
+
+    public static boolean canVisit(MinecraftServer server, UUID playerID, String instanceName)
+    {
+        for (String name : visitableInstances(server, playerID))
         {
-            result.add(list.getStringTagAt(i));
+            if (name.equals(instanceName)) return true;
         }
+        return false;
+    }
+
+
+    public static UUID[] validVisitors(MinecraftServer server, String instanceName)
+    {
+        NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
+
+        if (!compound.hasKey("instanceToVisitors")) return new UUID[0];
+        compound = compound.getCompoundTag("instanceToVisitors");
+
+        if (!compound.hasKey(instanceName)) return new UUID[0];
+
+        String[] strings = compound.getCompoundTag(instanceName).getKeySet().toArray(new String[0]);
+        UUID[] result = new UUID[strings.length];
+        int i = 0;
+        for (String s : strings) result[i++] = UUID.fromString(s);
         return result;
     }
 
-    public static boolean canVisit(MinecraftServer server, UUID visitor, UUID visitable)
+    public static boolean canBeVisitedBy(MinecraftServer server, String instanceName, UUID playerID)
     {
-        return visitables(server, visitor).contains("" + visitable);
-    }
-
-
-    public static ArrayList<String> visitors(MinecraftServer server, UUID visitable)
-    {
-        ArrayList<String> result = new ArrayList<>();
-
-        NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
-
-        if (!compound.hasKey("visitableToVisitors")) return result;
-        compound = compound.getCompoundTag("visitableToVisitors");
-
-        if (!compound.hasKey("" + visitable)) return result;
-        NBTTagList list = compound.getTagList("" + visitable, Constants.NBT.TAG_STRING);
-
-        for (int i = 0; i < list.tagCount(); i++)
+        for (UUID id : validVisitors(server, instanceName))
         {
-            result.add(list.getStringTagAt(i));
+            if (id.equals(playerID)) return true;
         }
-        return result;
-    }
-
-    public static boolean canBeVisitedBy(MinecraftServer server, UUID visitable, UUID visitor)
-    {
-        return visitors(server, visitable).contains("" + visitor);
+        return false;
     }
 }

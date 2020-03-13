@@ -1,12 +1,12 @@
 package com.fantasticsource.instances.network;
 
+import com.fantasticsource.instances.InstanceData;
 import com.fantasticsource.instances.Instances;
+import com.fantasticsource.instances.client.LocalDimensions;
 import com.fantasticsource.instances.client.gui.PersonalPortalGUI;
-import com.fantasticsource.instances.network.handler.SyncInstancesPacketHandler;
-import com.fantasticsource.instances.network.messages.SyncInstancesPacket;
 import com.fantasticsource.instances.server.Teleport;
+import com.fantasticsource.instances.tags.savefile.Owners;
 import com.fantasticsource.instances.tags.savefile.Visitors;
-import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
@@ -16,6 +16,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -25,7 +27,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -38,19 +39,59 @@ public class Network
 
     public static void init()
     {
-        WRAPPER.registerMessage(SyncInstancesPacketHandler.class, SyncInstancesPacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(SyncInstancesPacketHandler.class, SyncDimensionTypePacket.class, discriminator++, Side.CLIENT);
 
         WRAPPER.registerMessage(PersonalPortalGUIPacketHandler.class, PersonalPortalGUIPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(PersonalPortalPacketHandler.class, PersonalPortalPacket.class, discriminator++, Side.SERVER);
     }
 
 
+    public static class SyncDimensionTypePacket implements IMessage
+    {
+        public int dimension;
+        public String dimensionTypeName;
+
+        public SyncDimensionTypePacket()
+        {
+        }
+
+        public SyncDimensionTypePacket(int dimension)
+        {
+            this.dimension = dimension;
+            this.dimensionTypeName = DimensionManager.getProviderType(dimension).getName();
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeInt(dimension);
+            ByteBufUtils.writeUTF8String(buf, dimensionTypeName);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            dimension = buf.readInt();
+            dimensionTypeName = ByteBufUtils.readUTF8String(buf);
+        }
+    }
+
+    public static class SyncInstancesPacketHandler implements IMessageHandler<SyncDimensionTypePacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(SyncDimensionTypePacket message, MessageContext ctx)
+        {
+            Minecraft.getMinecraft().addScheduledTask(() -> LocalDimensions.sync(message));
+            return null;
+        }
+    }
+
+
     public static class PersonalPortalGUIPacket implements IMessage
     {
-        public String[] namesOut;
+        public String[] names;
         public boolean isInInstance, isInOwnedSkyroom;
         EntityPlayerMP player;
-        ArrayList<String> namesIn;
 
         public PersonalPortalGUIPacket()
         {
@@ -67,14 +108,14 @@ public class Network
         @Override
         public void toBytes(ByteBuf buf)
         {
-            InstanceWorldInfo info = InstanceHandler.get(player.dimension);
+            WorldInfo info = player.world.getWorldInfo();
 
-            buf.writeBoolean(info != null);
-            buf.writeBoolean(info != null && info.getDimensionType() == InstanceTypes.skyroomDimType && player.getPersistentID().equals(info.getOwner()));
+            buf.writeBoolean(info instanceof InstanceWorldInfo);
+            buf.writeBoolean(info instanceof InstanceWorldInfo && ("" + player.getPersistentID()).equals(Owners.getOwner(FMLCommonHandler.instance().getMinecraftServerInstance(), info.getWorldName())));
 
-            namesIn = Visitors.visitables(FMLCommonHandler.instance().getMinecraftServerInstance(), player.getPersistentID());
-            buf.writeInt(namesIn.size());
-            for (String id : namesIn) ByteBufUtils.writeUTF8String(buf, PlayerData.getName(UUID.fromString(id)));
+            names = Visitors.visitableInstances(FMLCommonHandler.instance().getMinecraftServerInstance(), player.getPersistentID());
+            buf.writeInt(names.length);
+            for (String id : names) ByteBufUtils.writeUTF8String(buf, PlayerData.getName(UUID.fromString(id)));
         }
 
         @Override
@@ -84,10 +125,10 @@ public class Network
             isInOwnedSkyroom = buf.readBoolean();
 
             int size = buf.readInt();
-            namesOut = new String[size];
+            names = new String[size];
             for (int i = 0; i < size; i++)
             {
-                namesOut[i] = ByteBufUtils.readUTF8String(buf);
+                names[i] = ByteBufUtils.readUTF8String(buf);
             }
         }
     }
@@ -146,6 +187,7 @@ public class Network
                 String s = message.selection;
                 if (s == null) return;
 
+                InstanceData data;
                 switch (s)
                 {
                     case "Leave Instance":
@@ -153,14 +195,15 @@ public class Network
                         return;
 
                     case "Go Home":
-                        Teleport.joinPossiblyCreating(player, "" + player.getPersistentID(), InstanceTypes.skyroomDimType, player.getPersistentID(), true);
+                        data = InstanceData.get(true, InstanceTypes.SKYROOM, "" + player.getPersistentID());
+                        Teleport.joinPossiblyCreating(player, data.getFullName(), "" + player.getPersistentID());
                         return;
 
                     default:
-                        PlayerData data = PlayerData.get(s);
-                        if (data == null || !Visitors.canVisit(server, player.getPersistentID(), data.id)) return;
+                        data = InstanceData.get(true, InstanceTypes.SKYROOM, s);
+                        if (data == null || !data.canVisit(player.getPersistentID())) return;
 
-                        Teleport.joinPossiblyCreating(player, "" + data.id, InstanceTypes.skyroomDimType, data.id, true);
+                        Teleport.joinPossiblyCreating(player, data.getFullName(), s);
                 }
             });
             return null;
