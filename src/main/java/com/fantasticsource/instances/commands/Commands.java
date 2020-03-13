@@ -106,7 +106,7 @@ public class Commands extends CommandBase
                 {
                     player = (EntityPlayerMP) sender;
 
-                    data = InstanceData.get(false, InstanceTypes.LIBRARY_OF_WORLDS, player + "'s_Library_of_Worlds");
+                    data = InstanceData.get(false, InstanceTypes.LIBRARY_OF_WORLDS, player.getName() + "'s_Library_of_Worlds");
                     Teleport.joinPossiblyCreating(player, data.getFullName());
                 }
                 break;
