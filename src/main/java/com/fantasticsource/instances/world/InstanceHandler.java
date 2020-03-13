@@ -42,11 +42,7 @@ public class InstanceHandler
 
             int dim = world.provider.getDimension();
 
-            if (DimensionManager.isDimensionRegistered(dim))
-            {
-                DimensionManager.unregisterDimension(dim);
-                System.out.println(TextFormatting.GREEN + "Unregistered dimension: " + dim + " (" + info.getWorldName() + ")");
-            }
+            if (DimensionManager.isDimensionRegistered(dim)) DimensionManager.unregisterDimension(dim);
 
             info.world = null;
         }
