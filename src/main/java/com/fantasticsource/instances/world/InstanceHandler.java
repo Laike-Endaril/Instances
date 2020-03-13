@@ -29,16 +29,29 @@ public class InstanceHandler
 {
     public static void unload(InstanceWorldInfo info)
     {
-        int dim = info.world.provider.getDimension();
-        info.world = null;
+        WorldServer world = info.world;
+        InstanceData data = InstanceData.get(info.getWorldName());
 
-        if (DimensionManager.isDimensionRegistered(dim))
+
+        if (world != null)
         {
-            DimensionManager.unregisterDimension(dim);
-            System.out.println(TextFormatting.GREEN + "Unregistered dimension: " + dim + " (" + info.getWorldName() + ")");
+            for (Entity entity : world.loadedEntityList.toArray(new Entity[0])) Teleport.escape(entity);
+
+            world.flush();
+            DimensionManager.setWorld(world.provider.getDimension(), null, FMLCommonHandler.instance().getMinecraftServerInstance());
+
+            int dim = world.provider.getDimension();
+
+            if (DimensionManager.isDimensionRegistered(dim))
+            {
+                DimensionManager.unregisterDimension(dim);
+                System.out.println(TextFormatting.GREEN + "Unregistered dimension: " + dim + " (" + info.getWorldName() + ")");
+            }
+
+            info.world = null;
         }
 
-        InstanceData data = InstanceData.get(info.getWorldName());
+
         if (data != null && !data.saves()) delete(null, info.getWorldName(), true);
     }
 
@@ -158,17 +171,6 @@ public class InstanceHandler
      */
     public static void delete(ICommandSender sender, InstanceWorldInfo info)
     {
-        WorldServer world = info.world;
-        if (world != null)
-        {
-            for (Entity entity : world.loadedEntityList.toArray(new Entity[0])) Teleport.escape(entity);
-
-            world.flush();
-            DimensionManager.setWorld(world.provider.getDimension(), null, FMLCommonHandler.instance().getMinecraftServerInstance());
-        }
-
-
-        Tools.printStackTrace();
         unload(info);
 
 
