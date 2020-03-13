@@ -100,7 +100,7 @@ public class Instances
             return;
         }
 
-        if (data.getOwner().equals("" + player.getPersistentID())) player.setGameType(GameType.SURVIVAL);
+        if (("" + player.getPersistentID()).equals(data.getOwner())) player.setGameType(GameType.SURVIVAL);
         else player.setGameType(GameType.ADVENTURE);
     }
 

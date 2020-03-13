@@ -43,20 +43,7 @@ public class Teleport
         }
     }
 
-    public static boolean tryJoinWithoutCreating(Entity entity, String fullName)
-    {
-        InstanceData data = InstanceData.get(fullName);
-        if (data == null || !data.exists()) return false;
-
-        return joinPossiblyCreating(entity, fullName);
-    }
-
     public static boolean joinPossiblyCreating(Entity entity, String fullName)
-    {
-        return joinPossiblyCreating(entity, fullName, null);
-    }
-
-    public static boolean joinPossiblyCreating(Entity entity, String fullName, String owner)
     {
         if (entity.world.isRemote) throw new IllegalArgumentException(TextFormatting.RED + "Attempted to call server-only method from client!!!");
 

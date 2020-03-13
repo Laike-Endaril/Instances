@@ -5,8 +5,10 @@ import com.fantasticsource.instances.tags.savefile.Visitors;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tools.Tools;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.entity.Entity;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.io.File;
@@ -30,6 +32,21 @@ public class InstanceData
     public static InstanceData get(boolean saves, DimensionType instanceType, String shortName)
     {
         return get((saves ? "Saved" : "Temporary") + File.separator + instanceType.getName() + File.separator + shortName);
+    }
+
+    public static InstanceData get(Entity entity)
+    {
+        return get(entity.world);
+    }
+
+    public static InstanceData get(World world)
+    {
+        return get(world.provider);
+    }
+
+    public static InstanceData get(WorldProvider worldProvider)
+    {
+        return get(MCTools.getSaveFolder(worldProvider).replace("Instances" + File.separator, ""));
     }
 
     public static InstanceData get(String fullName)

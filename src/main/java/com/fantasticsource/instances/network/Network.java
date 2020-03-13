@@ -7,7 +7,6 @@ import com.fantasticsource.instances.client.gui.PersonalPortalGUI;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.savefile.Owners;
 import com.fantasticsource.instances.tags.savefile.Visitors;
-import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
 import io.netty.buffer.ByteBuf;
@@ -16,7 +15,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -108,10 +106,10 @@ public class Network
         @Override
         public void toBytes(ByteBuf buf)
         {
-            WorldInfo info = player.world.getWorldInfo();
+            InstanceData data = InstanceData.get(player);
 
-            buf.writeBoolean(info instanceof InstanceWorldInfo);
-            buf.writeBoolean(info instanceof InstanceWorldInfo && ("" + player.getPersistentID()).equals(Owners.getOwner(FMLCommonHandler.instance().getMinecraftServerInstance(), info.getWorldName())));
+            buf.writeBoolean(data != null);
+            buf.writeBoolean(data != null && data.getDimensionType() == InstanceTypes.SKYROOM && ("" + player.getPersistentID()).equals(data.getOwner()));
 
             names = Visitors.visitableInstances(FMLCommonHandler.instance().getMinecraftServerInstance(), player.getPersistentID());
             buf.writeInt(names.length);
@@ -196,14 +194,17 @@ public class Network
 
                     case "Go Home":
                         data = InstanceData.get(true, InstanceTypes.SKYROOM, "" + player.getPersistentID());
-                        Teleport.joinPossiblyCreating(player, data.getFullName(), "" + player.getPersistentID());
+
+                        Owners.setOwner(server, data.getFullName(), "" + player.getPersistentID());
+                        Teleport.joinPossiblyCreating(player, data.getFullName());
                         return;
 
                     default:
                         data = InstanceData.get(true, InstanceTypes.SKYROOM, s);
                         if (data == null || !data.canVisit(player.getPersistentID())) return;
 
-                        Teleport.joinPossiblyCreating(player, data.getFullName(), s);
+                        Owners.setOwner(server, data.getFullName(), s);
+                        Teleport.joinPossiblyCreating(player, data.getFullName());
                 }
             });
             return null;
