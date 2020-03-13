@@ -19,14 +19,11 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Random;
 
 public class InstanceHandler
 {
@@ -40,6 +37,9 @@ public class InstanceHandler
             DimensionManager.unregisterDimension(dim);
             System.out.println(TextFormatting.GREEN + "Unregistered dimension: " + dim + " (" + info.getWorldName() + ")");
         }
+
+        InstanceData data = InstanceData.get(info.getWorldName());
+        if (data != null && !data.saves()) delete(null, info.getWorldName(), true);
     }
 
 
@@ -118,15 +118,9 @@ public class InstanceHandler
             world.getWorldInfo().setGameType(server.getGameType());
         }
 
-        System.out.println(TextFormatting.GREEN + "Created or loaded " + worldInfo.getWorldName() + " using id " + dimensionID);
         if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Created or loaded " + worldInfo.getWorldName()));
 
         return new Pair<>(dimensionID, worldInfo);
-    }
-
-
-    public static void load(InstanceWorldInfo info)
-    {
     }
 
 
@@ -139,7 +133,7 @@ public class InstanceHandler
 
         for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
         {
-            if (folderName2.equals(MCTools.getSaveFolder(world.provider).replace("Instances" + File.separator, "")))
+            if (folderName2.equals(MCTools.getSaveFolder(world.provider)))
             {
                 delete(sender, world);
                 return;
@@ -174,6 +168,7 @@ public class InstanceHandler
         }
 
 
+        Tools.printStackTrace();
         unload(info);
 
 
@@ -186,16 +181,10 @@ public class InstanceHandler
     protected static void delete(ICommandSender sender, String fullName, boolean internal)
     {
         File file = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + fullName);
-        if (!file.exists())
-        {
-            System.err.println(TextFormatting.RED + "Could not find file: " + fullName);
-            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find instance to delete: " + fullName));
-            return;
-        }
+        if (!file.exists()) return;
 
         if (Tools.deleteFilesRecursively(file))
         {
-            System.err.println(TextFormatting.GREEN + "Deleted file: " + file.getAbsolutePath());
             if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Completely deleted dimension " + fullName));
         }
         else
@@ -204,7 +193,6 @@ public class InstanceHandler
             {
                 if (Tools.deleteFilesRecursively(file))
                 {
-                    System.err.println(TextFormatting.GREEN + "Deleted file: " + file.getAbsolutePath());
                     if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Completely deleted dimension " + fullName));
                 }
                 else
@@ -223,7 +211,7 @@ public class InstanceHandler
 
     public static String getInstancesDir(MinecraftServer server)
     {
-        return MCTools.getWorldSaveDir(server) + "instances" + File.separator;
+        return MCTools.getWorldSaveDir(server) + "Instances" + File.separator;
     }
 
 

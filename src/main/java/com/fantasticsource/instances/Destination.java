@@ -57,4 +57,10 @@ public class Destination
     {
         return setPosition(pos.getX(), pos.getY(), pos.getZ());
     }
+
+    @Override
+    public String toString()
+    {
+        return dimension + ", (" + x + ", " + y + ", " + z + "), (" + yaw + ", " + pitch + ")";
+    }
 }
