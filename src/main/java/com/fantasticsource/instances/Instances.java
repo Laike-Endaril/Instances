@@ -20,6 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
@@ -38,7 +39,6 @@ import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -137,12 +137,17 @@ public class Instances
     @EventHandler
     public static void serverStartingPre(FMLServerAboutToStartEvent event)
     {
-        if (!event.getServer().getAllowNether()) throw new IllegalStateException("The Instances mod cannot run with allow-nether set to false in server.properties! (MC bug: https://bugs.mojang.com/browse/MC-85267)");
+        MinecraftServer server = event.getServer();
+
+        if (!server.getAllowNether()) throw new IllegalStateException("The Instances mod cannot run with allow-nether set to false in server.properties! (MC bug: https://bugs.mojang.com/browse/MC-85267)");
     }
 
     @EventHandler
     public static void serverStarting(FMLServerStartingEvent event)
     {
+        File file = new File(InstanceHandler.getInstancesDir(event.getServer()) + "Temporary");
+        Tools.deleteFilesRecursively(file);
+
         event.registerServerCommand(new Commands());
         event.registerServerCommand(new CmdDimWeather());
         event.registerServerCommand(new CmdDimTime());
@@ -282,14 +287,5 @@ public class Instances
         if (!(info instanceof InstanceWorldInfo)) return;
 
         InstanceHandler.unload((InstanceWorldInfo) info);
-    }
-
-    @SubscribeEvent
-    public static void worldTick(TickEvent.WorldTickEvent event)
-    {
-        if (event.side == Side.CLIENT || event.phase != TickEvent.Phase.END || event.world.provider.getDimension() != 0) return;
-
-        File file = new File(InstanceHandler.getDimensionTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), InstanceTypes.LIBRARY_OF_WORLDS));
-        Tools.deleteFilesRecursively(file);
     }
 }

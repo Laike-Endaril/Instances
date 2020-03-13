@@ -215,46 +215,47 @@ public class InstanceHandler
     }
 
 
-    public static String getDimensionTypeDir(MinecraftServer server, DimensionType instanceType)
-    {
-        return getInstancesDir(server) + instanceType.getName().replaceAll(" ", "_") + File.separator;
-    }
-
-
     public static ArrayList<String> instanceFolderNames(boolean withPath)
     {
         ArrayList<String> result = new ArrayList<>();
 
-        File instancesFolder = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()));
-        if (instancesFolder.isDirectory())
-        {
-            File[] instanceTypeFolders = instancesFolder.listFiles();
-            if (instanceTypeFolders != null)
-            {
-                for (File dimensionTypeFolder : instanceTypeFolders)
-                {
-                    File[] instanceFolders = dimensionTypeFolder.listFiles();
-                    if (instanceFolders == null) continue;
+        result.addAll(instanceFolderNames(true, withPath));
+        result.addAll(instanceFolderNames(false, withPath));
 
-                    for (File instanceFolder : instanceFolders) result.add(withPath ? dimensionTypeFolder.getName() + File.separator + instanceFolder.getName() : instanceFolder.getName());
-                }
-            }
+        return result;
+    }
+
+    public static ArrayList<String> instanceFolderNames(boolean saves, boolean withPath)
+    {
+        ArrayList<String> result = new ArrayList<>();
+
+        File saveTypeFolder = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + (saves ? "Saved" : "Temporary"));
+        if (!saveTypeFolder.isDirectory()) return result;
+
+        File[] instanceTypeFolders = saveTypeFolder.listFiles();
+        if (instanceTypeFolders == null) return result;
+
+        for (File instanceTypeFolder : instanceTypeFolders)
+        {
+            DimensionType dimensionType = MCTools.getDimensionType(instanceTypeFolder.getName());
+            if (dimensionType != null) result.addAll(instanceFolderNames(saves, dimensionType, withPath));
         }
 
         return result;
     }
 
-    public static ArrayList<String> instanceFolderNames(DimensionType dimensionType, boolean withPath)
+    public static ArrayList<String> instanceFolderNames(boolean saves, DimensionType dimensionType, boolean withPath)
     {
         ArrayList<String> result = new ArrayList<>();
 
-        File dimensionTypeFolder = new File(getDimensionTypeDir(FMLCommonHandler.instance().getMinecraftServerInstance(), dimensionType));
+        String saveString = saves ? "Saved" : "Temporary";
+        File dimensionTypeFolder = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + saveString + File.separator + dimensionType.getName());
         if (!dimensionTypeFolder.isDirectory()) return result;
 
         File[] instanceFolders = dimensionTypeFolder.listFiles();
         if (instanceFolders == null) return result;
 
-        if (withPath) for (File instanceFolder : instanceFolders) result.add(dimensionTypeFolder.getName() + File.separator + instanceFolder.getName());
+        if (withPath) for (File instanceFolder : instanceFolders) result.add(saveString + File.separator + dimensionTypeFolder.getName() + File.separator + instanceFolder.getName());
         else for (File instanceFolder : instanceFolders) result.add(instanceFolder.getName());
 
         return result;

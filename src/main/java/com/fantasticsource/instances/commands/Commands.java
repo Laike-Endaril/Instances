@@ -237,7 +237,7 @@ public class Commands extends CommandBase
             }
             else if (args[0].equals("template"))
             {
-                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(InstanceTypes.TEMPLATE, false));
+                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true, InstanceTypes.TEMPLATE, false));
             }
         }
         else if (args.length == 3)
