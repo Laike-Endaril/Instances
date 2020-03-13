@@ -23,6 +23,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import java.io.File;
 import java.lang.reflect.Method;
 
 public class Teleport
@@ -99,7 +100,7 @@ public class Teleport
 
     public static boolean escape(Entity entity)
     {
-        InstanceData data = InstanceData.get(MCTools.getSaveFolder(entity.world.provider));
+        InstanceData data = InstanceData.get(MCTools.getSaveFolder(entity.world.provider).replace("Instances" + File.separator, ""));
         if (data == null) return false;
 
         if (data.exists() && data.saves()) return false;
@@ -135,7 +136,7 @@ public class Teleport
 
 
         //Save current position if we're not currently in an instance (for instance escaping)
-        InstanceData data = InstanceData.get(MCTools.getSaveFolder(entity.world.provider));
+        InstanceData data = InstanceData.get(MCTools.getSaveFolder(entity.world.provider).replace("Instances" + File.separator, ""));
         if (data == null || data.saves())
         {
             EscapePoint.setEscapePointToCurrentPosition(entity);
@@ -210,7 +211,7 @@ public class Teleport
 
 
         //After player teleport
-        InstanceData data = InstanceData.get(MCTools.getSaveFolder(player.world.provider));
+        InstanceData data = InstanceData.get(MCTools.getSaveFolder(player.world.provider).replace("Instances" + File.separator, ""));
 
         //Set gamemode
         if (MCTools.isOP(player)) player.setGameType(gameType);

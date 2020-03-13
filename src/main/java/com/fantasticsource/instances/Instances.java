@@ -212,7 +212,7 @@ public class Instances
     {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         Teleport.escape(player);
-        setPlayerMode(player, InstanceData.get(MCTools.getSaveFolder(player.world.provider)));
+        setPlayerMode(player, InstanceData.get(MCTools.getSaveFolder(player.world.provider).replace("Instances" + File.separator, "")));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)

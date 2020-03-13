@@ -135,11 +135,11 @@ public class InstanceHandler
      */
     public static void delete(ICommandSender sender, String folderName)
     {
-        String folderName2 = "instances" + File.separator + folderName;
+        String folderName2 = "Instances" + File.separator + folderName;
 
         for (WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
         {
-            if (folderName2.equals(world.provider.getSaveFolder()))
+            if (folderName2.equals(MCTools.getSaveFolder(world.provider).replace("Instances" + File.separator, "")))
             {
                 delete(sender, world);
                 return;

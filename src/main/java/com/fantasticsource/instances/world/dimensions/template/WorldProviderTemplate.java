@@ -1,6 +1,5 @@
 package com.fantasticsource.instances.world.dimensions.template;
 
-import com.fantasticsource.instances.InstanceData;
 import com.fantasticsource.instances.world.InstanceWorldProvider;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.IChunkGenerator;
@@ -10,11 +9,6 @@ import net.minecraft.world.gen.IChunkGenerator;
  */
 public class WorldProviderTemplate extends InstanceWorldProvider
 {
-    public WorldProviderTemplate(InstanceData data)
-    {
-        super(data);
-    }
-
     @Override
     protected void init()
     {

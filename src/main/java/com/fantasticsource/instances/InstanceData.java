@@ -5,6 +5,7 @@ import com.fantasticsource.instances.tags.savefile.Visitors;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tools.Tools;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 

@@ -20,6 +20,7 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.List;
 
 public class ItemPlotUpgrade extends Item
@@ -69,7 +70,7 @@ public class ItemPlotUpgrade extends Item
 
         boolean creative = player.capabilities.isCreativeMode;
 
-        InstanceData data = InstanceData.get(MCTools.getSaveFolder(player.world.provider));
+        InstanceData data = InstanceData.get(MCTools.getSaveFolder(player.world.provider).replace("Instances" + File.separator, ""));
         if (data == null || data.getDimensionType() != InstanceTypes.SKYROOM)
         {
             if (!world.isRemote)

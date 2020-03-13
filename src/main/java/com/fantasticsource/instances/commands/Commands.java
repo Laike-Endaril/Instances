@@ -117,7 +117,7 @@ public class Commands extends CommandBase
                     player = (EntityPlayerMP) sender;
                     if (args.length == 1)
                     {
-                        data = InstanceData.get(false, InstanceTypes.SKYROOM, "" + player.getPersistentID());
+                        data = InstanceData.get(true, InstanceTypes.SKYROOM, "" + player.getPersistentID());
                     }
                     else
                     {
@@ -128,7 +128,7 @@ public class Commands extends CommandBase
                             break;
                         }
 
-                        data = InstanceData.get(false, InstanceTypes.SKYROOM, "" + otherPlayerData.id);
+                        data = InstanceData.get(true, InstanceTypes.SKYROOM, "" + otherPlayerData.id);
                     }
 
                     Teleport.joinPossiblyCreating(player, data.getFullName());
@@ -159,7 +159,7 @@ public class Commands extends CommandBase
                     if (sender instanceof EntityPlayerMP)
                     {
                         player = (EntityPlayerMP) sender;
-                        data = InstanceData.get(MCTools.getSaveFolder(player.world.provider));
+                        data = InstanceData.get(MCTools.getSaveFolder(player.world.provider).replace("Instances" + File.separator, ""));
                         if (data == null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleting the 'current instance' only works while inside an instance"));
                         else InstanceHandler.delete(sender, data.getFullName());
                     }

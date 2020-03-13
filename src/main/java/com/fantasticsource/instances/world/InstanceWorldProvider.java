@@ -1,24 +1,21 @@
 package com.fantasticsource.instances.world;
 
-import com.fantasticsource.instances.InstanceData;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.Loader;
 
 import javax.annotation.Nullable;
+import java.io.File;
 
 public abstract class InstanceWorldProvider extends WorldProvider
 {
     protected static boolean XAEROS;
 
-    public final InstanceData data;
-
-    public InstanceWorldProvider(InstanceData data)
+    public InstanceWorldProvider()
     {
         XAEROS = Loader.isModLoaded("xaeroworldmap");
-
-        this.data = data;
     }
 
     @Nullable
@@ -29,12 +26,12 @@ public abstract class InstanceWorldProvider extends WorldProvider
 
         if (XAEROS && world.isRemote && Tools.stackContainsSubstring("xaero")) return "instancesInstance";
 
-        return data.getFullName();
+        return "Instances" + File.separator + world.getWorldInfo().getWorldName();
     }
 
     @Override
     public final DimensionType getDimensionType()
     {
-        return data.getDimensionType();
+        return DimensionManager.getProviderType(getDimension());
     }
 }

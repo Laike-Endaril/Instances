@@ -1,6 +1,5 @@
 package com.fantasticsource.instances.world.dimensions.voided;
 
-import com.fantasticsource.instances.InstanceData;
 import com.fantasticsource.instances.world.InstanceWorldProvider;
 import com.fantasticsource.instances.world.boimes.BiomeProviders;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
@@ -11,11 +10,6 @@ import net.minecraft.world.gen.IChunkGenerator;
 
 public class WorldProviderVoid extends InstanceWorldProvider
 {
-    public WorldProviderVoid(InstanceData data)
-    {
-        super(data);
-    }
-
     @Override
     public IChunkGenerator createChunkGenerator()
     {
