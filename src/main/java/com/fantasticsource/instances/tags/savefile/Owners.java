@@ -1,11 +1,17 @@
 package com.fantasticsource.instances.tags.savefile;
 
 import com.fantasticsource.fantasticlib.api.FLibAPI;
+import com.fantasticsource.instances.InstanceData;
+import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.world.InstanceHandler;
+import com.fantasticsource.mctools.PlayerData;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextFormatting;
 
 import java.io.File;
+import java.util.UUID;
 
 import static com.fantasticsource.fantasticlib.FantasticLib.MODID;
 
@@ -16,6 +22,14 @@ public class Owners
         if (owner == null)
         {
             return setNoOwner(server, instanceName);
+        }
+
+
+        InstanceData data = InstanceData.get(instanceName);
+        if (data == null)
+        {
+            System.err.println(TextFormatting.RED + "Bad instance name to set owner of: " + instanceName);
+            return false;
         }
 
 
@@ -45,6 +59,22 @@ public class Owners
             compound = ownersToInstances.getCompoundTag(oldOwner);
             compound.removeTag(instanceName);
             if (compound.hasNoTags()) ownersToInstances.removeTag(oldOwner);
+
+
+            //Update gamemode of old owner if they're inside
+            UUID id = null;
+            try
+            {
+                id = UUID.fromString(oldOwner);
+            }
+            catch (IllegalArgumentException e)
+            {
+            }
+            if (id != null)
+            {
+                EntityPlayerMP oldPlayer = (EntityPlayerMP) PlayerData.getEntity(id);
+                if (oldPlayer != null) Instances.setPlayerMode(oldPlayer, data);
+            }
         }
 
         //Add instance to owned instances of new owner
@@ -52,11 +82,35 @@ public class Owners
         compound = ownersToInstances.getCompoundTag(owner);
         compound.setInteger(instanceName, 1);
 
+
+        //Update gamemode of new owner if they're inside
+        UUID id = null;
+        try
+        {
+            id = UUID.fromString(owner);
+        }
+        catch (IllegalArgumentException e)
+        {
+        }
+        if (id != null)
+        {
+            EntityPlayerMP oldPlayer = (EntityPlayerMP) PlayerData.getEntity(id);
+            if (oldPlayer != null) Instances.setPlayerMode(oldPlayer, data);
+        }
+
         return true;
     }
 
     public static boolean setNoOwner(MinecraftServer server, String instanceName)
     {
+        InstanceData data = InstanceData.get(instanceName);
+        if (data == null)
+        {
+            System.err.println(TextFormatting.RED + "Bad instance name to set owner of: " + instanceName);
+            return false;
+        }
+
+
         NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
 
         if (!compound.hasKey("instancesToOwners")) return false;
@@ -79,6 +133,22 @@ public class Owners
             compound = ownersToInstances.getCompoundTag(oldOwner);
             compound.removeTag(instanceName);
             if (compound.hasNoTags()) ownersToInstances.removeTag(oldOwner);
+
+
+            //Update gamemode of old owner if they're inside
+            UUID id = null;
+            try
+            {
+                id = UUID.fromString(oldOwner);
+            }
+            catch (IllegalArgumentException e)
+            {
+            }
+            if (id != null)
+            {
+                EntityPlayerMP oldPlayer = (EntityPlayerMP) PlayerData.getEntity(id);
+                if (oldPlayer != null) Instances.setPlayerMode(oldPlayer, data);
+            }
         }
 
         return true;

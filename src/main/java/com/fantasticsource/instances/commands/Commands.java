@@ -46,7 +46,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <library:skyroom:template:list:delete:copy:join>";
+        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner>";
     }
 
     @Override
@@ -208,9 +208,23 @@ public class Commands extends CommandBase
                 if (args.length > 3)
                 {
                     UUID playerID = PlayerData.getID(args[3]);
-                    Owners.setOwner(FMLCommonHandler.instance().getMinecraftServerInstance(), newName, playerID != null ? "" + playerID : args[3]);
+                    Owners.setOwner(FMLCommonHandler.instance().getMinecraftServerInstance(), newData.getFullName(), playerID != null ? "" + playerID : args[3]);
                 }
 
+                break;
+
+            case "setOwner":
+                if (args.length < 3) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                else
+                {
+                    data = InstanceData.get(args[1]);
+                    if (data == null) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                    else
+                    {
+                        UUID playerID = PlayerData.getID(args[2]);
+                        Owners.setOwner(FMLCommonHandler.instance().getMinecraftServerInstance(), data.getFullName(), playerID != null ? "" + playerID : args[2]);
+                    }
+                }
                 break;
 
             default:
@@ -223,11 +237,11 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join");
+            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join", "setOwner");
         }
         else if (args.length == 2)
         {
-            if (args[0].equals("delete") || args[0].equals("copy") || args[0].equals("join"))
+            if (args[0].equals("delete") || args[0].equals("copy") || args[0].equals("join") || args[0].equals("setOwner"))
             {
                 return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true));
             }
@@ -242,7 +256,7 @@ public class Commands extends CommandBase
         }
         else if (args.length == 3)
         {
-            if (args[0].equals("join"))
+            if (args[0].equals("join") || args[0].equals("setOwner"))
             {
                 return getListOfStringsMatchingLastWord(args, playernames());
             }
