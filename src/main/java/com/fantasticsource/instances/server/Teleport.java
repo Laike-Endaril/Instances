@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.UUID;
 
 public class Teleport
 {
@@ -41,6 +42,19 @@ public class Teleport
         {
             e.printStackTrace();
         }
+    }
+
+    public static boolean joinTempCopy(EntityPlayerMP player, String oldFullName)
+    {
+        if (player == null) return false;
+
+        InstanceData oldData = InstanceData.get(oldFullName);
+        if (oldData == null || !oldData.exists()) return false;
+
+        InstanceData newData = InstanceData.get(false, oldData.getDimensionType(), oldData.getShortName() + UUID.randomUUID());
+        while (newData.exists()) newData = InstanceData.get(false, oldData.getDimensionType(), oldData.getShortName() + UUID.randomUUID());
+        InstanceHandler.copyInstance(null, oldData.getFullName(), newData.getFullName());
+        return Teleport.joinPossiblyCreating(player, newData.getFullName());
     }
 
     public static boolean joinPossiblyCreating(Entity entity, String fullName)

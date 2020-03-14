@@ -73,7 +73,7 @@ public class Commands extends CommandBase
                 else
                 {
                     data = InstanceData.get(args[1]);
-                    if (data == null)
+                    if (data == null || !data.exists())
                     {
                         sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find instance: " + args[1]));
                         break;
@@ -86,10 +86,7 @@ public class Commands extends CommandBase
                         break;
                     }
 
-                    InstanceData newData = InstanceData.get(false, data.getDimensionType(), data.getShortName());
-                    while (newData.exists()) newData = InstanceData.get(false, data.getDimensionType(), "" + UUID.randomUUID());
-                    InstanceHandler.copyInstance(null, data.getFullName(), newData.getFullName());
-                    Teleport.joinPossiblyCreating(player, newData.getFullName());
+                    Teleport.joinTempCopy(player, data.getFullName());
                 }
                 break;
 
