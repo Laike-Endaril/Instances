@@ -115,6 +115,7 @@ public class InstanceHandler
         InstanceWorldInfo worldInfo = new InstanceWorldInfo(fullName, new WorldSettings(overworld.getWorldInfo()));
         WorldInstance world = new WorldInstance(worldInfo, server, savehandler, dimensionID, overworld, server.profiler).init();
         worldInfo.world = world;
+        worldInfo.init();
         world.addEventListener(new ServerWorldEventHandler(server, world));
         MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
 

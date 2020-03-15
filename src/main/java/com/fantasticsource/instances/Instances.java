@@ -107,7 +107,7 @@ public class Instances
     @EventHandler
     public static void preInit(FMLPreInitializationEvent event)
     {
-        FLibAPI.attachNBTCapToWorldIf(MODID, world -> world.provider.getDimension() == 0);
+        FLibAPI.attachNBTCapToWorldIf(MODID, world -> true);
         FLibAPI.attachNBTCapToEntityIf(MODID, entity -> true);
 
         MinecraftForge.EVENT_BUS.register(Instances.class);
