@@ -1,7 +1,3 @@
-Add spawn point to instance-specific data
-
-
-
 Low priority
 
 Get the client F3 to show the biome correctly
