@@ -77,6 +77,7 @@ public class Network
     public static class SyncInstancesPacketHandler implements IMessageHandler<SyncDimensionTypePacket, IMessage>
     {
         @Override
+        @SideOnly(Side.CLIENT)
         public IMessage onMessage(SyncDimensionTypePacket message, MessageContext ctx)
         {
             Minecraft.getMinecraft().addScheduledTask(() -> LocalDimensions.sync(message));
