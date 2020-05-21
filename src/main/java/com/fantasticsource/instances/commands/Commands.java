@@ -69,7 +69,15 @@ public class Commands extends CommandBase
         switch (args[0])
         {
             case "joinTempCopy":
-                if (args.length < 3) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                if (args.length == 2)
+                {
+                    if (sender instanceof EntityPlayerMP)
+                    {
+                        player = (EntityPlayerMP) sender;
+                    }
+                }
+
+                if (args.length < 3 && player == null) sender.sendMessage(new TextComponentString(getUsage(sender)));
                 else
                 {
                     data = InstanceData.get(args[1]);
@@ -79,11 +87,14 @@ public class Commands extends CommandBase
                         break;
                     }
 
-                    player = (EntityPlayerMP) PlayerData.getEntity(args[2]);
                     if (player == null)
                     {
-                        sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find player: " + args[2]));
-                        break;
+                        player = (EntityPlayerMP) PlayerData.getEntity(args[2]);
+                        if (player == null)
+                        {
+                            sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find player: " + args[2]));
+                            break;
+                        }
                     }
 
                     Teleport.joinTempCopy(player, data.getFullName());
