@@ -32,6 +32,17 @@ public abstract class InstanceWorldProvider extends WorldProvider
     @Override
     public final DimensionType getDimensionType()
     {
-        return DimensionManager.getProviderType(getDimension());
+        DimensionType type = DimensionType.OVERWORLD;
+
+        try
+        {
+            type = DimensionManager.getProviderType(getDimension());
+        }
+        catch (IllegalArgumentException e)
+        {
+            e.printStackTrace();
+        }
+
+        return type;
     }
 }
