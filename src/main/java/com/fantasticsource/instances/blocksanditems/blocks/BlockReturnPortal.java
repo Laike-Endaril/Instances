@@ -8,10 +8,13 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockReturnPortal extends Block
 {
@@ -27,6 +30,18 @@ public class BlockReturnPortal extends Block
 
         setUnlocalizedName(Instances.MODID + ":returnportal");
         setRegistryName("returnportal");
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state)
+    {
+        return false;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getBlockLayer()
+    {
+        return BlockRenderLayer.TRANSLUCENT;
     }
 
 
