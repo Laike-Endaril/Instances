@@ -6,6 +6,7 @@ import net.minecraft.world.gen.IChunkGenerator;
 
 /**
  * Note that "template" is a valid instance type.  This is not an explicit template for creating similar classes
+ * Also note that temporary copies of a template instance have this type as well
  */
 public class WorldProviderTemplate extends InstanceWorldProvider
 {
