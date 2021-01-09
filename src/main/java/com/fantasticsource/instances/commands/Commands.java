@@ -13,6 +13,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -97,7 +98,12 @@ public class Commands extends CommandBase
                         }
                     }
 
-                    Teleport.joinTempCopy(player, data.getFullName());
+                    if (args.length < 6) Teleport.joinTempCopy(player, data.getFullName());
+                    else
+                    {
+                        Vec3d position = new Vec3d(Double.parseDouble(args[3].trim()), Double.parseDouble(args[4].trim()), Double.parseDouble(args[5].trim()));
+                        Teleport.joinTempCopy(player, data.getFullName(), position);
+                    }
                 }
                 break;
 
@@ -121,7 +127,15 @@ public class Commands extends CommandBase
                         {
                             player = (EntityPlayerMP) PlayerData.getEntity(args[2]);
                             if (player == null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find player: " + args[2]));
-                            else Teleport.joinPossiblyCreating(player, data.getFullName());
+                            else
+                            {
+                                if (args.length < 6) Teleport.joinPossiblyCreating(player, data.getFullName());
+                                else
+                                {
+                                    Vec3d position = new Vec3d(Double.parseDouble(args[3].trim()), Double.parseDouble(args[4].trim()), Double.parseDouble(args[5].trim()));
+                                    Teleport.joinPossiblyCreating(player, data.getFullName(), position);
+                                }
+                            }
                         }
                         else
                         {
@@ -134,6 +148,7 @@ public class Commands extends CommandBase
                     }
                 }
                 break;
+
 
             case "library":
                 if (sender instanceof EntityPlayerMP)

@@ -16,6 +16,7 @@ import net.minecraft.launchwrapper.Launch;
 import net.minecraft.network.play.server.SPacketSetExperience;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
@@ -46,6 +47,11 @@ public class Teleport
 
     public static boolean joinTempCopy(EntityPlayerMP player, String oldFullName)
     {
+        return joinTempCopy(player, oldFullName, null);
+    }
+
+    public static boolean joinTempCopy(EntityPlayerMP player, String oldFullName, Vec3d position)
+    {
         if (player == null) return false;
 
         InstanceData oldData = InstanceData.get(oldFullName);
@@ -54,10 +60,16 @@ public class Teleport
         InstanceData newData = InstanceData.get(false, oldData.getDimensionType(), oldData.getShortName() + UUID.randomUUID());
         while (newData.exists()) newData = InstanceData.get(false, oldData.getDimensionType(), oldData.getShortName() + UUID.randomUUID());
         InstanceHandler.copyInstance(null, oldData.getFullName(), newData.getFullName());
-        return Teleport.joinPossiblyCreating(player, newData.getFullName());
+        return Teleport.joinPossiblyCreating(player, newData.getFullName(), position);
     }
 
+
     public static boolean joinPossiblyCreating(Entity entity, String fullName)
+    {
+        return joinPossiblyCreating(entity, fullName, null);
+    }
+
+    public static boolean joinPossiblyCreating(Entity entity, String fullName, Vec3d position)
     {
         if (entity.world.isRemote) throw new IllegalArgumentException(TextFormatting.RED + "Attempted to call server-only method from client!!!");
 
@@ -96,7 +108,8 @@ public class Teleport
             dimension = pair.getKey();
         }
 
-        return teleport(entity, dimension, info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, entity.rotationYaw, entity.rotationPitch);
+        if (position == null) return teleport(entity, dimension, info.getSpawnX() + 0.5, info.getSpawnY(), info.getSpawnZ() + 0.5, entity.rotationYaw, entity.rotationPitch);
+        return teleport(entity, dimension, position.x, position.y, position.z, entity.rotationYaw, entity.rotationPitch);
     }
 
     public static boolean escape(Entity entity)
