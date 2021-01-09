@@ -4,7 +4,6 @@ import com.fantasticsource.tools.Tools;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 
 import javax.annotation.Nullable;
@@ -33,7 +32,6 @@ public abstract class InstanceWorldProvider extends WorldProvider
     @Override
     public final DimensionType getDimensionType()
     {
-        if (Tools.contains(FMLCommonHandler.instance().getMinecraftServerInstance().worlds, world)) return DimensionManager.getProviderType(getDimension());
-        return null;
+        return DimensionManager.getProviderType(getDimension());
     }
 }
