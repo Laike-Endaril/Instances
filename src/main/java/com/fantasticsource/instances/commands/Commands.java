@@ -65,7 +65,7 @@ public class Commands extends CommandBase
         }
 
         EntityPlayerMP player = null;
-        InstanceData data = null;
+        InstanceData data;
         switch (args[0])
         {
             case "joinTempCopy":
