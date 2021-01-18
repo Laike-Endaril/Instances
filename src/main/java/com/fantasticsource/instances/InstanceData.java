@@ -101,18 +101,18 @@ public class InstanceData
         return new File(InstanceHandler.getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + fullName).isDirectory();
     }
 
-    public String getOwner()
+    public UUID getOwner()
     {
-        return Owners.getOwner(FMLCommonHandler.instance().getMinecraftServerInstance(), fullName);
+        return Owners.getOwner(fullName);
     }
 
     public UUID[] validVisitors()
     {
-        return Visitors.validVisitors(FMLCommonHandler.instance().getMinecraftServerInstance(), fullName);
+        return Visitors.validVisitors(fullName);
     }
 
     public boolean canVisit(UUID playerID)
     {
-        return Visitors.canVisit(FMLCommonHandler.instance().getMinecraftServerInstance(), playerID, fullName);
+        return Visitors.canVisit(playerID, fullName);
     }
 }

@@ -9,7 +9,6 @@ import com.fantasticsource.instances.network.Network;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.CurrentWorldname;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
-import com.fantasticsource.instances.tags.savefile.Owners;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
@@ -44,7 +43,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.File;
 
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.034a,)")
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044q,)")
 public class Instances
 {
     public static final String MODID = "instances";
@@ -100,14 +99,14 @@ public class Instances
             return;
         }
 
-        if (("" + player.getPersistentID()).equals(data.getOwner())) player.setGameType(GameType.SURVIVAL);
+        if ((player.getPersistentID()).equals(data.getOwner())) player.setGameType(GameType.SURVIVAL);
         else player.setGameType(GameType.ADVENTURE);
     }
 
     @EventHandler
     public static void preInit(FMLPreInitializationEvent event)
     {
-        FLibAPI.attachNBTCapToWorldIf(MODID, world -> true);
+        FLibAPI.attachNBTCapToWorldIf(MODID, world -> world.getWorldInfo() instanceof InstanceWorldInfo);
         FLibAPI.attachNBTCapToEntityIf(MODID, entity -> true);
 
         MinecraftForge.EVENT_BUS.register(Instances.class);
@@ -153,12 +152,6 @@ public class Instances
         event.registerServerCommand(new CmdDimTime());
         event.registerServerCommand(new CmdEscape());
         event.registerServerCommand(new CmdVisitors());
-    }
-
-    @EventHandler
-    public static void serverStarted(FMLServerStartedEvent event)
-    {
-        Owners.validateInstances(FMLCommonHandler.instance().getMinecraftServerInstance());
     }
 
     @EventHandler

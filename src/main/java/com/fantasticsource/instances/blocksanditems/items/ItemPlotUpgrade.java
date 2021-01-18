@@ -82,7 +82,7 @@ public class ItemPlotUpgrade extends Item
         }
 
 
-        if (!creative && !("" + player.getPersistentID()).equals(data.getOwner()))
+        if (!creative && !(player.getPersistentID()).equals(data.getOwner()))
         {
             if (!world.isRemote) player.sendMessage(new TextComponentString("Plot changing items can only be used in your own skyroom instance!"));
             return new ActionResult<>(EnumActionResult.FAIL, itemstack);

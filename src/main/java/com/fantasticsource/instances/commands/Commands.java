@@ -16,12 +16,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 //TODO Come through here and do proper errors and usages for everything sometime...maybe
 public class Commands extends CommandBase
@@ -47,7 +45,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner:joinTempCopy>";
+        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner:removeOwner:joinTempCopy>";
     }
 
     @Override
@@ -160,6 +158,7 @@ public class Commands extends CommandBase
                 }
                 break;
 
+
             case "skyroom":
                 if (sender instanceof EntityPlayerMP)
                 {
@@ -184,6 +183,7 @@ public class Commands extends CommandBase
                 }
                 break;
 
+
             case "template":
                 if (sender instanceof EntityPlayerMP && args.length > 1)
                 {
@@ -194,12 +194,14 @@ public class Commands extends CommandBase
                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
                 break;
 
+
             case "list":
                 for (String s : InstanceHandler.instanceFolderNames(true))
                 {
                     sender.sendMessage(new TextComponentString(s));
                 }
                 break;
+
 
             case "delete":
                 if (args.length == 1)
@@ -238,7 +240,6 @@ public class Commands extends CommandBase
                     break;
                 }
 
-
                 String oldName = Tools.fixFileSeparators(args[1]), newName = Tools.fixFileSeparators(args[2]);
                 if (oldName.contains("..") || newName.contains(".."))
                 {
@@ -248,19 +249,15 @@ public class Commands extends CommandBase
                     break;
                 }
 
-
                 InstanceData oldData = InstanceData.get(oldName), newData = InstanceData.get(newName);
                 if (oldData == null || newData == null || !oldData.exists()) break;
 
-
                 InstanceHandler.copyInstance(sender, oldName, newName);
-                if (args.length > 3)
-                {
-                    UUID playerID = PlayerData.getID(args[3]);
-                    Owners.setOwner(FMLCommonHandler.instance().getMinecraftServerInstance(), newData.getFullName(), playerID != null ? "" + playerID : args[3]);
-                }
 
+                if (args.length > 3) Owners.setOwner(newData.getFullName(), PlayerData.getID(args[3]));
+                else Owners.setOwner(newData.getFullName(), oldData.getOwner());
                 break;
+
 
             case "setOwner":
                 if (args.length < 3) sender.sendMessage(new TextComponentString(getUsage(sender)));
@@ -268,13 +265,21 @@ public class Commands extends CommandBase
                 {
                     data = InstanceData.get(args[1]);
                     if (data == null) sender.sendMessage(new TextComponentString(getUsage(sender)));
-                    else
-                    {
-                        UUID playerID = PlayerData.getID(args[2]);
-                        Owners.setOwner(FMLCommonHandler.instance().getMinecraftServerInstance(), data.getFullName(), playerID != null ? "" + playerID : args[2]);
-                    }
+                    else Owners.setOwner(data.getFullName(), PlayerData.getID(args[2]));
                 }
                 break;
+
+
+            case "removeOwner":
+                if (args.length < 2) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                else
+                {
+                    data = InstanceData.get(args[1]);
+                    if (data == null) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                    else Owners.setOwner(data.getFullName(), null);
+                }
+                break;
+
 
             default:
                 sender.sendMessage(new TextComponentString(getUsage(sender)));

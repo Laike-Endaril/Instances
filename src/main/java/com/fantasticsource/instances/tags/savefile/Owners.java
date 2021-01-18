@@ -1,198 +1,130 @@
 package com.fantasticsource.instances.tags.savefile;
 
-import com.fantasticsource.fantasticlib.api.FLibAPI;
-import com.fantasticsource.instances.InstanceData;
-import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.world.InstanceHandler;
-import com.fantasticsource.mctools.PlayerData;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import java.io.File;
+import java.io.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
-
-import static com.fantasticsource.fantasticlib.FantasticLib.MODID;
 
 public class Owners
 {
-    public static boolean setOwner(MinecraftServer server, String instanceName, String owner)
+    protected static MinecraftServer server = null;
+    public static File DIR = null, FILE = null;
+    public static final HashMap<UUID, HashSet<String>> ownerToInstances = new HashMap<>();
+    public static final HashMap<String, UUID> instanceToOwner = new HashMap<>();
+
+    public static boolean setOwner(String instanceName, UUID owner)
     {
-        if (owner == null)
+        ensureLoaded();
+
+        UUID oldOwner = instanceToOwner.get(instanceName);
+        if (oldOwner == owner) return false;
+
+
+        HashSet<String> set = ownerToInstances.get(oldOwner);
+        if (set != null)
         {
-            return setNoOwner(server, instanceName);
+            set.remove(instanceName);
+            if (set.size() == 0) ownerToInstances.remove(oldOwner);
         }
 
-
-        InstanceData data = InstanceData.get(instanceName);
-        if (data == null)
+        if (owner == null) instanceToOwner.remove(instanceName);
+        else
         {
-            System.err.println(TextFormatting.RED + "Bad instance name to set owner of: " + instanceName);
-            return false;
+            instanceToOwner.put(instanceName, owner);
+            ownerToInstances.computeIfAbsent(owner, o -> new HashSet<>()).add(instanceName);
         }
 
-
-        NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
-
-        if (!compound.hasKey("instancesToOwners"))
-        {
-            compound.setTag("ownersToInstances", new NBTTagCompound());
-            compound.setTag("instancesToOwners", new NBTTagCompound());
-        }
-
-
-        NBTTagCompound ownersToInstances = compound.getCompoundTag("ownersToInstances");
-        compound = compound.getCompoundTag("instancesToOwners");
-
-        String oldOwner = compound.hasKey(instanceName) ? compound.getString(instanceName) : null;
-        if (compound.getString(instanceName).equals(owner)) return false;
-
-
-        //Set owner of instance
-        compound.setString(instanceName, owner);
-
-
-        //Remove instance from owned instances of old owner
-        if (oldOwner != null && ownersToInstances.hasKey(oldOwner))
-        {
-            compound = ownersToInstances.getCompoundTag(oldOwner);
-            compound.removeTag(instanceName);
-            if (compound.hasNoTags()) ownersToInstances.removeTag(oldOwner);
-
-
-            //Update gamemode of old owner if they're inside
-            UUID id = null;
-            try
-            {
-                id = UUID.fromString(oldOwner);
-            }
-            catch (IllegalArgumentException e)
-            {
-            }
-            if (id != null)
-            {
-                EntityPlayerMP oldPlayer = (EntityPlayerMP) PlayerData.getEntity(id);
-                if (oldPlayer != null) Instances.setPlayerMode(oldPlayer, data);
-            }
-        }
-
-        //Add instance to owned instances of new owner
-        if (!ownersToInstances.hasKey(owner)) ownersToInstances.setTag(owner, new NBTTagCompound());
-        compound = ownersToInstances.getCompoundTag(owner);
-        compound.setInteger(instanceName, 1);
-
-
-        //Update gamemode of new owner if they're inside
-        UUID id = null;
-        try
-        {
-            id = UUID.fromString(owner);
-        }
-        catch (IllegalArgumentException e)
-        {
-        }
-        if (id != null)
-        {
-            EntityPlayerMP oldPlayer = (EntityPlayerMP) PlayerData.getEntity(id);
-            if (oldPlayer != null) Instances.setPlayerMode(oldPlayer, data);
-        }
-
+        save();
         return true;
     }
 
-    public static boolean setNoOwner(MinecraftServer server, String instanceName)
+    public static UUID getOwner(String instanceName)
     {
-        InstanceData data = InstanceData.get(instanceName);
-        if (data == null)
+        return instanceToOwner.get(instanceName);
+    }
+
+    public static String[] getOwnedInstances(UUID owner)
+    {
+        return ownerToInstances.containsKey(owner) ? ownerToInstances.get(owner).toArray(new String[0]) : new String[0];
+    }
+
+
+    protected static void ensureLoaded()
+    {
+        MinecraftServer currentServer = FMLCommonHandler.instance().getMinecraftServerInstance();
+        if (server != currentServer)
         {
-            System.err.println(TextFormatting.RED + "Bad instance name to set owner of: " + instanceName);
-            return false;
+            ownerToInstances.clear();
+            instanceToOwner.clear();
+
+            server = currentServer;
+            DIR = new File(InstanceHandler.getInstancesDir(currentServer));
+            DIR.mkdirs();
+
+            FILE = new File(DIR, "Owners.txt");
+            if (FILE.exists())
+            {
+                try
+                {
+                    BufferedReader reader = new BufferedReader(new FileReader(FILE));
+                    String line = reader.readLine();
+                    UUID owner = null;
+                    HashSet<String> instances = new HashSet<>();
+                    while (line != null)
+                    {
+                        line = line.trim();
+                        if (!line.equals(""))
+                        {
+                            if (line.charAt(0) != '*')
+                            {
+                                owner = UUID.fromString(line);
+                                instances = new HashSet<>();
+                                ownerToInstances.put(owner, instances);
+                            }
+                            else
+                            {
+                                line = line.replace("*", "");
+                                instances.add(line);
+                                instanceToOwner.put(line, owner);
+                            }
+                        }
+
+                        line = reader.readLine();
+                    }
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
         }
+    }
 
-
-        NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
-
-        if (!compound.hasKey("instancesToOwners")) return false;
-
-
-        NBTTagCompound ownersToInstances = compound.getCompoundTag("ownersToInstances");
-        compound = compound.getCompoundTag("instancesToOwners");
-
-        String oldOwner = compound.hasKey(instanceName) ? compound.getString(instanceName) : null;
-        if (oldOwner == null) return false;
-
-
-        //Set owner of instance to none
-        compound.removeTag(instanceName);
-
-
-        //Remove instance from owned instances of old owner
-        if (ownersToInstances.hasKey(oldOwner))
+    protected static void save()
+    {
+        if (FILE.exists()) FILE.delete();
+        if (ownerToInstances.size() > 0)
         {
-            compound = ownersToInstances.getCompoundTag(oldOwner);
-            compound.removeTag(instanceName);
-            if (compound.hasNoTags()) ownersToInstances.removeTag(oldOwner);
-
-
-            //Update gamemode of old owner if they're inside
-            UUID id = null;
             try
             {
-                id = UUID.fromString(oldOwner);
+                BufferedWriter writer = new BufferedWriter(new FileWriter(FILE));
+                for (Map.Entry<UUID, HashSet<String>> entry : ownerToInstances.entrySet())
+                {
+                    writer.write(entry.getKey() + "\r\n");
+                    for (String instance : entry.getValue()) writer.write("*" + instance + "\r\n");
+                    writer.write("\r\n");
+                }
+                writer.close();
             }
-            catch (IllegalArgumentException e)
+            catch (IOException e)
             {
+                e.printStackTrace();
             }
-            if (id != null)
-            {
-                EntityPlayerMP oldPlayer = (EntityPlayerMP) PlayerData.getEntity(id);
-                if (oldPlayer != null) Instances.setPlayerMode(oldPlayer, data);
-            }
-        }
-
-        return true;
-    }
-
-
-    public static String getOwner(MinecraftServer server, String instanceName)
-    {
-        NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
-
-        if (!compound.hasKey("instancesToOwners")) return null;
-
-
-        compound = compound.getCompoundTag("instancesToOwners");
-        return compound.hasKey(instanceName) ? compound.getString(instanceName) : null;
-    }
-
-    public static String[] getOwnedInstances(MinecraftServer server, String owner)
-    {
-        NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
-
-        if (!compound.hasKey("ownersToInstances")) return new String[0];
-
-
-        compound = compound.getCompoundTag("ownersToInstances");
-        return compound.hasKey(owner) ? compound.getCompoundTag(owner).getKeySet().toArray(new String[0]) : new String[0];
-    }
-
-
-    //Methods below this point are for backend use only
-
-
-    public static void validateInstances(MinecraftServer server)
-    {
-        NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
-
-        if (!compound.hasKey("instancesToOwners")) return;
-
-        compound = compound.getCompoundTag("instancesToOwners");
-        File file;
-        for (String instanceName : compound.getKeySet().toArray(new String[0]))
-        {
-            file = new File(InstanceHandler.getInstancesDir(server) + instanceName);
-            if (!file.isDirectory()) setNoOwner(server, instanceName);
         }
     }
 }

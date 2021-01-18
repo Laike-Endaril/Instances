@@ -1,111 +1,154 @@
 package com.fantasticsource.instances.tags.savefile;
 
-import com.fantasticsource.fantasticlib.api.FLibAPI;
-import net.minecraft.nbt.NBTTagCompound;
+import com.fantasticsource.instances.world.InstanceHandler;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import java.io.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
-
-import static com.fantasticsource.fantasticlib.FantasticLib.MODID;
 
 public class Visitors
 {
-    public static boolean setVisitable(MinecraftServer server, String instanceName, UUID playerID, boolean canVisit)
+    protected static MinecraftServer server = null;
+    public static File DIR = null, FILE = null;
+    public static final HashMap<UUID, HashSet<String>> visitorToInstances = new HashMap<>();
+    public static final HashMap<String, HashSet<UUID>> instanceToVisitors = new HashMap<>();
+
+    public static boolean setVisitable(String instanceName, UUID playerID, boolean canVisit)
     {
-        NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
+        ensureLoaded();
 
-        if (!compound.hasKey("instanceToVisitors"))
+        if (canVisit)
         {
-            if (!canVisit) return false;
+            if (!visitorToInstances.computeIfAbsent(playerID, o -> new HashSet<>()).add(instanceName)) return false;
 
-            compound.setTag("visitorToInstances", new NBTTagCompound());
-            compound.setTag("instanceToVisitors", new NBTTagCompound());
-        }
-
-        NBTTagCompound instanceToVisitors = compound.getCompoundTag("instanceToVisitors");
-        NBTTagCompound visitorToInstances = compound.getCompoundTag("visitorToInstances");
-        String visitor = "" + playerID;
-
-        if (!visitorToInstances.hasKey(visitor))
-        {
-            if (!canVisit) return false;
-
-            visitorToInstances.setTag(visitor, new NBTTagCompound());
-            if (!instanceToVisitors.hasKey(instanceName)) instanceToVisitors.setTag(instanceName, new NBTTagCompound());
-        }
-
-        NBTTagCompound instanceNames = visitorToInstances.getCompoundTag(visitor);
-        if (!instanceNames.hasKey(instanceName))
-        {
-            if (!canVisit) return false;
-
-            //Add
-            instanceNames.setInteger(instanceName, 1);
-            instanceToVisitors.getCompoundTag(instanceName).setInteger(visitor, 1);
+            instanceToVisitors.computeIfAbsent(instanceName, o -> new HashSet<>()).add(playerID);
+            save();
             return true;
         }
         else
         {
-            if (canVisit) return false;
+            HashSet<String> set = visitorToInstances.get(playerID);
+            if (set == null || !set.contains(instanceName)) return false;
 
-            //Remove
-            instanceNames.removeTag(instanceName);
-            if (instanceNames.hasNoTags()) visitorToInstances.removeTag(visitor);
-
-            NBTTagCompound visitors = instanceToVisitors.getCompoundTag(instanceName);
-            visitors.removeTag(visitor);
-            if (visitors.hasNoTags()) instanceToVisitors.removeTag(instanceName);
-
+            set.remove(instanceName);
+            if (set.size() == 0) visitorToInstances.remove(playerID);
+            save();
             return true;
         }
     }
 
-
-    public static String[] visitableInstances(MinecraftServer server, UUID playerID)
+    public static void clearValidVisitors(String instanceName)
     {
-        NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
-
-        if (!compound.hasKey("visitorToInstances")) return new String[0];
-        compound = compound.getCompoundTag("visitorToInstances");
-
-        String visitor = "" + playerID;
-        if (!compound.hasKey(visitor)) return new String[0];
-
-        return compound.getCompoundTag(visitor).getKeySet().toArray(new String[0]);
-    }
-
-    public static boolean canVisit(MinecraftServer server, UUID playerID, String instanceName)
-    {
-        for (String name : visitableInstances(server, playerID))
+        HashSet<UUID> visitors = instanceToVisitors.get(instanceName);
+        if (visitors != null)
         {
-            if (name.equals(instanceName)) return true;
+            for (UUID id : visitors) setVisitable(instanceName, id, false);
         }
-        return false;
     }
 
 
-    public static UUID[] validVisitors(MinecraftServer server, String instanceName)
+    public static String[] visitableInstances(UUID playerID)
     {
-        NBTTagCompound compound = FLibAPI.getNBTCap(server.worlds[0]).getCompound(MODID);
-
-        if (!compound.hasKey("instanceToVisitors")) return new UUID[0];
-        compound = compound.getCompoundTag("instanceToVisitors");
-
-        if (!compound.hasKey(instanceName)) return new UUID[0];
-
-        String[] strings = compound.getCompoundTag(instanceName).getKeySet().toArray(new String[0]);
-        UUID[] result = new UUID[strings.length];
-        int i = 0;
-        for (String s : strings) result[i++] = UUID.fromString(s);
-        return result;
+        ensureLoaded();
+        return visitorToInstances.containsKey(playerID) ? visitorToInstances.get(playerID).toArray(new String[0]) : new String[0];
     }
 
-    public static boolean canBeVisitedBy(MinecraftServer server, String instanceName, UUID playerID)
+    public static boolean canVisit(UUID playerID, String instanceName)
     {
-        for (UUID id : validVisitors(server, instanceName))
+        ensureLoaded();
+        return visitorToInstances.containsKey(playerID) && visitorToInstances.get(playerID).contains(instanceName);
+    }
+
+
+    public static UUID[] validVisitors(String instanceName)
+    {
+        ensureLoaded();
+        return instanceToVisitors.containsKey(instanceName) ? instanceToVisitors.get(instanceName).toArray(new UUID[0]) : new UUID[0];
+    }
+
+    public static boolean canBeVisitedBy(String instanceName, UUID playerID)
+    {
+        ensureLoaded();
+        return instanceToVisitors.containsKey(instanceName) && instanceToVisitors.get(instanceName).contains(playerID);
+    }
+
+
+    protected static void ensureLoaded()
+    {
+        MinecraftServer currentServer = FMLCommonHandler.instance().getMinecraftServerInstance();
+        if (server != currentServer)
         {
-            if (id.equals(playerID)) return true;
+            visitorToInstances.clear();
+            instanceToVisitors.clear();
+
+            server = currentServer;
+            DIR = new File(InstanceHandler.getInstancesDir(currentServer));
+            DIR.mkdirs();
+
+            FILE = new File(DIR, "Visitors.txt");
+            if (FILE.exists())
+            {
+                try
+                {
+                    BufferedReader reader = new BufferedReader(new FileReader(FILE));
+                    String line = reader.readLine();
+                    HashSet<UUID> visitorList = null;
+                    String instance = null;
+                    UUID visitor;
+                    while (line != null)
+                    {
+                        line = line.trim();
+                        if (!line.equals(""))
+                        {
+                            if (line.charAt(0) != '*')
+                            {
+                                instance = line;
+                                visitorList = new HashSet<>();
+                                instanceToVisitors.put(instance, visitorList);
+                            }
+                            else
+                            {
+                                visitor = UUID.fromString(line.replace("*", ""));
+                                visitorList.add(visitor);
+                                visitorToInstances.computeIfAbsent(visitor, o -> new HashSet<>()).add(instance);
+                            }
+                        }
+
+                        line = reader.readLine();
+                    }
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
         }
-        return false;
+    }
+
+    protected static void save()
+    {
+        if (FILE.exists()) FILE.delete();
+        if (instanceToVisitors.size() > 0)
+        {
+            try
+            {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(FILE));
+                for (Map.Entry<String, HashSet<UUID>> entry : instanceToVisitors.entrySet())
+                {
+                    writer.write(entry.getKey() + "\r\n");
+                    for (UUID id : entry.getValue()) writer.write("*" + id + "\r\n");
+                    writer.write("\r\n");
+                }
+                writer.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -110,11 +110,11 @@ public class Network
             InstanceData data = InstanceData.get(player);
 
             buf.writeBoolean(data != null);
-            buf.writeBoolean(data != null && data.getDimensionType() == InstanceTypes.SKYROOM && ("" + player.getPersistentID()).equals(data.getOwner()));
+            buf.writeBoolean(data != null && data.getDimensionType() == InstanceTypes.SKYROOM && player.getPersistentID().equals(data.getOwner()));
 
-            names = Visitors.visitableInstances(FMLCommonHandler.instance().getMinecraftServerInstance(), player.getPersistentID());
+            names = Visitors.visitableInstances(player.getPersistentID());
             buf.writeInt(names.length);
-            for (String id : names) ByteBufUtils.writeUTF8String(buf, PlayerData.getName(UUID.fromString(id)));
+            for (String instance : names) ByteBufUtils.writeUTF8String(buf, PlayerData.getName(UUID.fromString(InstanceData.get(instance).getShortName())));
         }
 
         @Override
@@ -183,11 +183,11 @@ public class Network
                 if (player.world != personalPortalWorlds.get(player)) return;
                 if (personalPortalPositions.get(player).distanceSq(player.getPosition()) > 9) return;
 
-                String s = message.selection;
-                if (s == null) return;
+                String selection = message.selection;
+                if (selection == null) return;
 
                 InstanceData data;
-                switch (s)
+                switch (selection)
                 {
                     case "Leave Instance":
                         Teleport.escape(player);
@@ -196,15 +196,16 @@ public class Network
                     case "Go Home":
                         data = InstanceData.get(true, InstanceTypes.SKYROOM, "" + player.getPersistentID());
 
-                        Owners.setOwner(server, data.getFullName(), "" + player.getPersistentID());
+                        Owners.setOwner(data.getFullName(), player.getPersistentID());
                         Teleport.joinPossiblyCreating(player, data.getFullName());
                         return;
 
                     default:
-                        data = InstanceData.get(true, InstanceTypes.SKYROOM, s);
+                        UUID owner = PlayerData.getID(selection);
+                        data = InstanceData.get(true, InstanceTypes.SKYROOM, owner.toString());
                         if (data == null || !data.canVisit(player.getPersistentID())) return;
 
-                        Owners.setOwner(server, data.getFullName(), s);
+                        Owners.setOwner(data.getFullName(), owner);
                         Teleport.joinPossiblyCreating(player, data.getFullName());
                 }
             });
