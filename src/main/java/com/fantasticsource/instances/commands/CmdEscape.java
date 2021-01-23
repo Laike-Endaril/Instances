@@ -51,7 +51,7 @@ public class CmdEscape extends CommandBase
             if (sender instanceof EntityPlayerMP)
             {
                 EntityPlayerMP player = (EntityPlayerMP) sender;
-                if (player.isCreative())
+                if (MCTools.isOP(player))
                 {
                     Teleport.escape(player);
                     return;
