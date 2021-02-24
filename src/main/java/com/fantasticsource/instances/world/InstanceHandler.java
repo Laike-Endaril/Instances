@@ -11,6 +11,7 @@ import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -55,12 +56,23 @@ public class InstanceHandler
 
     public static Pair<Integer, InstanceWorldInfo> copyInstance(ICommandSender sender, String oldName, String newName)
     {
+        Profiler profiler = FMLCommonHandler.instance().getMinecraftServerInstance().profiler;
+        profiler.startSection("copyInstance");
+
         InstanceData data = InstanceData.get(newName);
-        if (data == null) return null;
+        if (data == null)
+        {
+            profiler.endSection();
+            return null;
+        }
 
 
         File oldFile = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + oldName);
-        if (!oldFile.isDirectory()) return null;
+        if (!oldFile.isDirectory())
+        {
+            profiler.endSection();
+            return null;
+        }
 
 
         File newFile = new File(getInstancesDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + newName);
@@ -70,6 +82,8 @@ public class InstanceHandler
             {
                 System.err.println(TextFormatting.RED + "Failed to copy: " + newFile.getAbsolutePath() + " already exists as a non-folder");
                 if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Failed to copy to " + newName + " (already exists)"));
+
+                profiler.endSection();
                 return null;
             }
 
@@ -88,11 +102,15 @@ public class InstanceHandler
         {
             System.err.println(TextFormatting.RED + "Failed to copy to directory: " + newFile.getAbsolutePath());
             if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Failed to copy to " + newName));
+
+            profiler.endSection();
             return null;
         }
 
 
-        return loadOrCreateInstance(sender, newName);
+        Pair<Integer, InstanceWorldInfo> result = loadOrCreateInstance(sender, newName);
+        profiler.endSection();
+        return result;
     }
 
 
@@ -106,6 +124,10 @@ public class InstanceHandler
 
         InstanceData data = InstanceData.get(fullName);
         if (data == null) throw new RuntimeException("Cannot Hotload Dim: Invalid name: " + fullName);
+
+
+        Profiler profiler = server.profiler;
+        profiler.startSection("loadOrCreateInstance");
 
 
         ISaveHandler savehandler = overworld.getSaveHandler();
@@ -127,6 +149,8 @@ public class InstanceHandler
 
         if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Created or loaded " + worldInfo.getWorldName()));
 
+
+        profiler.endSection();
         return new Pair<>(dimensionID, worldInfo);
     }
 

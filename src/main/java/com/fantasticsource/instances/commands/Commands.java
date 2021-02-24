@@ -68,6 +68,8 @@ public class Commands extends CommandBase
         switch (args[0])
         {
             case "joinTempCopy":
+                server.profiler.startSection("joinTempCopy");
+
                 if (args.length == 2)
                 {
                     if (sender instanceof EntityPlayerMP)
@@ -83,6 +85,8 @@ public class Commands extends CommandBase
                     if (data == null || !data.exists())
                     {
                         sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find instance: " + args[1]));
+
+                        server.profiler.endSection();
                         break;
                     }
 
@@ -92,6 +96,8 @@ public class Commands extends CommandBase
                         if (player == null)
                         {
                             sender.sendMessage(new TextComponentString(TextFormatting.RED + "Could not find player: " + args[2]));
+
+                            server.profiler.endSection();
                             break;
                         }
                     }
@@ -103,6 +109,8 @@ public class Commands extends CommandBase
                         Teleport.joinTempCopy(player, data.getFullName(), position);
                     }
                 }
+
+                server.profiler.endSection();
                 break;
 
 
