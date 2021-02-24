@@ -7,8 +7,11 @@ import com.fantasticsource.instances.client.gui.PersonalPortalGUI;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.savefile.Owners;
 import com.fantasticsource.instances.tags.savefile.Visitors;
+import com.fantasticsource.instances.world.InstanceWorldProvider;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.PlayerData;
+import com.fantasticsource.tools.component.Component;
+import com.fantasticsource.tools.component.path.CPath;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -41,6 +44,8 @@ public class Network
 
         WRAPPER.registerMessage(PersonalPortalGUIPacketHandler.class, PersonalPortalGUIPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(PersonalPortalPacketHandler.class, PersonalPortalPacket.class, discriminator++, Side.SERVER);
+
+        WRAPPER.registerMessage(CelestialAnglePathPacketHandler.class, CelestialAnglePathPacket.class, discriminator++, Side.CLIENT);
     }
 
 
@@ -209,6 +214,49 @@ public class Network
                         Teleport.joinPossiblyCreating(player, data.getFullName());
                 }
             });
+            return null;
+        }
+    }
+
+
+    public static class CelestialAnglePathPacket implements IMessage
+    {
+        public CPath path = null;
+
+        public CelestialAnglePathPacket()
+        {
+            //Required
+        }
+
+        public CelestialAnglePathPacket(CPath path)
+        {
+            this.path = path;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeBoolean(path != null);
+            if (path != null) Component.writeMarked(buf, path);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            if (buf.readBoolean())
+            {
+                path = (CPath) Component.readMarked(buf);
+            }
+        }
+    }
+
+    public static class CelestialAnglePathPacketHandler implements IMessageHandler<CelestialAnglePathPacket, IMessage>
+    {
+        @Override
+        @SideOnly(Side.CLIENT)
+        public IMessage onMessage(CelestialAnglePathPacket packet, MessageContext ctx)
+        {
+            Minecraft.getMinecraft().addScheduledTask(() -> InstanceWorldProvider.celestialAnglePath = packet.path);
             return null;
         }
     }

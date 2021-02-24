@@ -1,5 +1,10 @@
 package com.fantasticsource.instances.world;
 
+import com.fantasticsource.fantasticlib.api.FLibAPI;
+import com.fantasticsource.fantasticlib.api.INBTCap;
+import com.fantasticsource.mctools.component.NBTSerializableComponent;
+import com.fantasticsource.tools.component.path.CPath;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.server.MinecraftServer;
@@ -10,10 +15,13 @@ import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 
+import static com.fantasticsource.instances.Instances.MODID;
+
 public class WorldInstance extends WorldServer
 {
-    private WorldServer delegate;
-    private IBorderListener borderListener;
+    protected WorldServer delegate;
+    protected IBorderListener borderListener;
+    protected CPath celestialAnglePath = null;
 
     public WorldInstance(WorldInfo worldInfo, MinecraftServer server, ISaveHandler saveHandlerIn, int dimensionId, WorldServer delegate, Profiler profilerIn)
     {
@@ -84,6 +92,16 @@ public class WorldInstance extends WorldServer
             villageCollection.setWorldsForAll(this);
         }
 
+        INBTCap nbtCap = FLibAPI.getNBTCap(this);
+        if (nbtCap != null)
+        {
+            NBTTagCompound compound = nbtCap.getCompound(MODID);
+            if (compound != null)
+            {
+                if (compound.hasKey("celestialAnglePath")) celestialAnglePath = (CPath) NBTSerializableComponent.deserializeMarked(compound.getCompoundTag("celestialAnglePath"));
+            }
+        }
+
         return this;
     }
 
@@ -95,5 +113,27 @@ public class WorldInstance extends WorldServer
     {
         super.flush();
         delegate.getWorldBorder().removeListener(borderListener); // Unlink ourselves, to prevent world leak.
+    }
+
+    @Override
+    public float getCelestialAngle(float partialTicks)
+    {
+        return celestialAnglePath != null ? (float) celestialAnglePath.getRelativePosition(worldInfo.getWorldTime()).values[0] : super.getCelestialAngle(partialTicks);
+    }
+
+    public void setCelestialAnglePath(CPath celestialAnglePath)
+    {
+        this.celestialAnglePath = celestialAnglePath;
+
+        INBTCap nbtCap = FLibAPI.getNBTCap(this);
+        if (nbtCap != null)
+        {
+            NBTTagCompound compound = nbtCap.getCompound(MODID);
+            if (compound != null)
+            {
+                if (celestialAnglePath == null) compound.removeTag("celestialAnglePath");
+                else compound.setTag("celestialAnglePath", NBTSerializableComponent.serializeMarked(celestialAnglePath));
+            }
+        }
     }
 }

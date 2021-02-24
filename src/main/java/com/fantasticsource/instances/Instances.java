@@ -11,6 +11,8 @@ import com.fantasticsource.instances.tags.entity.CurrentWorldname;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.InstanceWorldInfo;
+import com.fantasticsource.instances.world.InstanceWorldProvider;
+import com.fantasticsource.instances.world.WorldInstance;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.MCTools;
@@ -43,7 +45,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.File;
 
-@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044q,)")
+@Mod(modid = Instances.MODID, name = Instances.NAME, version = Instances.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044zh,)")
 public class Instances
 {
     public static final String MODID = "instances";
@@ -106,12 +108,13 @@ public class Instances
     @EventHandler
     public static void preInit(FMLPreInitializationEvent event)
     {
-        FLibAPI.attachNBTCapToWorldIf(MODID, world -> world.getWorldInfo() instanceof InstanceWorldInfo);
+        FLibAPI.attachNBTCapToWorldIf(MODID, world -> world instanceof WorldInstance);
         FLibAPI.attachNBTCapToEntityIf(MODID, entity -> true);
 
         MinecraftForge.EVENT_BUS.register(Instances.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
         MinecraftForge.EVENT_BUS.register(CurrentWorldname.class);
+        MinecraftForge.EVENT_BUS.register(InstanceWorldProvider.class);
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
