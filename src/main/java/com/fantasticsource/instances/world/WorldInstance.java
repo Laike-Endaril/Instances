@@ -2,8 +2,13 @@ package com.fantasticsource.instances.world;
 
 import com.fantasticsource.fantasticlib.api.FLibAPI;
 import com.fantasticsource.fantasticlib.api.INBTCap;
+import com.fantasticsource.instances.InstanceData;
+import com.fantasticsource.instances.InstancesConfig;
 import com.fantasticsource.mctools.component.NBTSerializableComponent;
+import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.component.path.CPath;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.scoreboard.ServerScoreboard;
@@ -14,6 +19,8 @@ import net.minecraft.world.border.IBorderListener;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
+
+import java.util.regex.Pattern;
 
 import static com.fantasticsource.instances.Instances.MODID;
 
@@ -92,13 +99,33 @@ public class WorldInstance extends WorldServer
             villageCollection.setWorldsForAll(this);
         }
 
-        INBTCap nbtCap = FLibAPI.getNBTCap(this);
-        if (nbtCap != null)
+        celestialAnglePath = null;
+        for (String s2 : InstancesConfig.celestialAnglePaths)
         {
-            NBTTagCompound compound = nbtCap.getCompound(MODID);
-            if (compound != null)
+            String[] tokens = Tools.fixedSplit(s2, ";");
+            if (Pattern.matches(tokens[0].trim(), InstanceData.get(this).getFullName()))
             {
-                if (compound.hasKey("celestialAnglePath")) celestialAnglePath = (CPath) NBTSerializableComponent.deserializeMarked(compound.getCompoundTag("celestialAnglePath"));
+                try
+                {
+                    celestialAnglePath = (CPath) NBTSerializableComponent.deserializeMarked(JsonToNBT.getTagFromJson(tokens[1].trim()));
+                }
+                catch (NBTException e)
+                {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+        if (celestialAnglePath == null)
+        {
+            INBTCap nbtCap = FLibAPI.getNBTCap(this);
+            if (nbtCap != null)
+            {
+                NBTTagCompound compound = nbtCap.getCompound(MODID);
+                if (compound != null)
+                {
+                    if (compound.hasKey("celestialAnglePath")) celestialAnglePath = (CPath) NBTSerializableComponent.deserializeMarked(compound.getCompoundTag("celestialAnglePath"));
+                }
             }
         }
 

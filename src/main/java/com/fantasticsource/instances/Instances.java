@@ -30,9 +30,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -103,6 +106,12 @@ public class Instances
 
         if ((player.getPersistentID()).equals(data.getOwner())) player.setGameType(GameType.SURVIVAL);
         else player.setGameType(GameType.ADVENTURE);
+    }
+
+    @SubscribeEvent
+    public static void saveConfig(ConfigChangedEvent.OnConfigChangedEvent event)
+    {
+        if (event.getModID().equals(MODID)) ConfigManager.sync(MODID, Config.Type.INSTANCE);
     }
 
     @EventHandler

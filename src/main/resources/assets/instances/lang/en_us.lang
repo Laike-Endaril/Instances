@@ -14,3 +14,8 @@ instances.commands.dimtp.usage=/dimtp [dimensionID] [target player] <x> <y> <z> 
 
 instances.worldType.void=Void Instance
 instances.worldType.skyroom=Skyroom Instance
+
+
+
+instances.config.celestialAnglePaths=Celestial Angle Paths
+instances.config.celestialAnglePaths.tooltip=FILLSCREEN FIXNEWLINES Paths used for movement of the sky in instances\nSyntax is...\nInstanceNameRegexFilter, PathNBTString\n \n
