@@ -16,6 +16,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.*;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 
 public class InstanceHandler
 {
+    protected static boolean deleting = false;
+
     public static void unload(InstanceWorldInfo info)
     {
         WorldServer world = info.world;
@@ -40,10 +43,9 @@ public class InstanceHandler
             for (Entity entity : world.loadedEntityList.toArray(new Entity[0])) Teleport.escape(entity);
 
             world.flush();
-            DimensionManager.setWorld(world.provider.getDimension(), null, FMLCommonHandler.instance().getMinecraftServerInstance());
 
             int dim = world.provider.getDimension();
-
+            DimensionManager.setWorld(world.provider.getDimension(), null, FMLCommonHandler.instance().getMinecraftServerInstance());
             if (DimensionManager.isDimensionRegistered(dim)) DimensionManager.unregisterDimension(dim);
 
             info.world = null;
@@ -189,10 +191,13 @@ public class InstanceHandler
      */
     public static void delete(ICommandSender sender, InstanceWorldInfo info)
     {
-        unload(info);
+        if (deleting) return;
 
-
+        deleting = true;
+        for (Chunk chunk : info.world.getChunkProvider().getLoadedChunks()) chunk.onUnload();
+        MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(info.world));
         delete(sender, info.getWorldName(), true);
+        deleting = false;
     }
 
     /**
