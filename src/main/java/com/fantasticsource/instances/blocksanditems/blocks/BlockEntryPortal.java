@@ -4,8 +4,8 @@ import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.blocksanditems.tileentities.TEEntryPortal;
 import com.fantasticsource.instances.server.Teleport;
-import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -15,14 +15,15 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
-import java.util.UUID;
 
-public class BlockEntryPortal extends Block
+public class BlockEntryPortal extends Block implements ITileEntityProvider
 {
     public BlockEntryPortal()
     {
@@ -58,19 +59,19 @@ public class BlockEntryPortal extends Block
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof TEEntryPortal)) return false;
 
-        String instanceName = ((TEEntryPortal) te).instanceName;
-        return Teleport.joinPossiblyCreating(player, instanceName);
-    }
+        String instanceName = ((TEEntryPortal) te).getInstanceName();
+        if (instanceName.equals(""))
+        {
+            player.sendMessage(new TextComponentString(TextFormatting.RED + "No destination set!"));
+            return true;
+        }
 
-    @Override
-    public boolean hasTileEntity(IBlockState state)
-    {
-        return true;
+        return Teleport.joinPossiblyCreating(player, instanceName);
     }
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
+    public TileEntity createNewTileEntity(World worldIn, int meta)
     {
         return new TEEntryPortal();
     }

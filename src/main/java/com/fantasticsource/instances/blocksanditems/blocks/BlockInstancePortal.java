@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.blocksanditems.blocks;
 
+import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.Instances;
 import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.blocksanditems.tileentities.TEInstancePortal;
@@ -15,11 +16,14 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 
 public class BlockInstancePortal extends Block implements ITileEntityProvider
 {
@@ -50,32 +54,33 @@ public class BlockInstancePortal extends Block implements ITileEntityProvider
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
         if (worldIn.isRemote) return true;
 
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof TEInstancePortal)) return false;
 
+        if (player.isSneaking()) return false;
+
         TEInstancePortal portal = (TEInstancePortal) te;
-        if (playerIn.isSneaking()) return false;
+        ArrayList<Destination> destinations = portal.getPossibleDestinations();
+        if (destinations.size() == 1) return Teleport.teleport(player, destinations.get(0));
 
-        if (portal.destinations.size() == 1) return Teleport.teleport(playerIn, portal.destinations.get(0));
-
-        if (portal.destinations.size() == 0)
+        if (destinations.size() == 0)
         {
-            System.err.println("Behavior for no destination is not yet implemented (" + pos + ")");
-            return false;
+            player.sendMessage(new TextComponentString(TextFormatting.RED + "Behavior for no destination is not yet implemented (" + pos + ")"));
+            return true;
         }
 
-        System.err.println("Behavior for more than one destination is not yet implemented (" + pos + ")");
-        return false;
+        player.sendMessage(new TextComponentString(TextFormatting.RED + "Behavior for more than one destination is not yet implemented (" + pos + ")"));
+        return true;
     }
 
     @Nullable
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta)
     {
-        return new TEInstancePortal();
+        return new TEInstancePortal(worldIn.provider.getDimension());
     }
 }

@@ -1,28 +1,17 @@
 package com.fantasticsource.instances.blocksanditems.tileentities;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 
 public class TEEntryPortal extends TileEntity
 {
-    public String instanceName;
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
+    public TEEntryPortal()
     {
-        compound = super.writeToNBT(compound);
-
-        compound.setTag("instanceName", new NBTTagString(instanceName));
-
-        return compound;
+        getTileData().setTag("instanceName", new NBTTagString(""));
     }
 
-    @Override
-    public void readFromNBT(NBTTagCompound compound)
+    public String getInstanceName()
     {
-        super.readFromNBT(compound);
-
-        instanceName = compound.getString("instanceName");
+        return getTileData().getString("instanceName");
     }
 }
