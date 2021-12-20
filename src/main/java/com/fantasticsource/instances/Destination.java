@@ -31,12 +31,12 @@ public class Destination
     public void addNBTTo(NBTTagList list)
     {
         List<NBTBase> tags = list.tagList;
-        tags.add(new NBTTagInt(dimension));
+        tags.add(new NBTTagDouble(dimension));
         tags.add(new NBTTagDouble(x));
         tags.add(new NBTTagDouble(y));
         tags.add(new NBTTagDouble(z));
-        tags.add(new NBTTagFloat(yaw));
-        tags.add(new NBTTagFloat(pitch));
+        tags.add(new NBTTagDouble(yaw));
+        tags.add(new NBTTagDouble(pitch));
     }
 
     public Destination setDimension(int dimension)

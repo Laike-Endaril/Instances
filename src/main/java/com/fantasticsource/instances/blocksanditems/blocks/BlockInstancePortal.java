@@ -5,6 +5,7 @@ import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.blocksanditems.tileentities.TEInstancePortal;
 import com.fantasticsource.instances.server.Teleport;
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -20,7 +21,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
-public class BlockInstancePortal extends Block
+public class BlockInstancePortal extends Block implements ITileEntityProvider
 {
     public BlockInstancePortal()
     {
@@ -71,15 +72,9 @@ public class BlockInstancePortal extends Block
         return false;
     }
 
-    @Override
-    public boolean hasTileEntity(IBlockState state)
-    {
-        return true;
-    }
-
     @Nullable
     @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
+    public TileEntity createNewTileEntity(World worldIn, int meta)
     {
         return new TEInstancePortal();
     }
