@@ -21,7 +21,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO Come through here and do proper errors and usages for everything sometime...maybe
 public class Commands extends CommandBase
 {
     public static ArrayList<String> playernames()
@@ -45,13 +44,57 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner:removeOwner:joinTempCopy>";
+        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner:removeOwner:joinTempCopy:roomTile>";
     }
 
     @Override
     public int getRequiredPermissionLevel()
     {
         return 3;
+    }
+
+    @Override
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+    {
+        if (args.length == 1)
+        {
+            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join", "setOwner", "joinTempCopy", "roomTile");
+        }
+        else if (args.length == 2)
+        {
+            if (args[0].equals("delete") || args[0].equals("copy") || args[0].equals("join") || args[0].equals("setOwner") || args[0].equals("joinTempCopy") || args[0].equals("roomTile"))
+            {
+                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true));
+            }
+            else if (args[0].equals("skyroom"))
+            {
+                return getListOfStringsMatchingLastWord(args, playernames());
+            }
+            else if (args[0].equals("template"))
+            {
+                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true, InstanceTypes.TEMPLATE, false));
+            }
+            else if (args[0].equals("connection"))
+            {
+                return getListOfStringsMatchingLastWord(args, "add", "remove");
+            }
+        }
+        else if (args.length == 3)
+        {
+            if (args[0].equals("join") || args[0].equals("setOwner") || args[0].equals("joinTempCopy") || args[0].equals("roomTile"))
+            {
+                return getListOfStringsMatchingLastWord(args, playernames());
+            }
+        }
+        else if (args.length == 4)
+        {
+            if (args[0].equals("copy"))
+            {
+                return getListOfStringsMatchingLastWord(args, playernames());
+            }
+        }
+
+        return new ArrayList<>();
     }
 
     @Override
@@ -67,6 +110,17 @@ public class Commands extends CommandBase
         InstanceData data;
         switch (args[0])
         {
+            case "roomTile":
+                if (sender instanceof EntityPlayerMP && args.length > 1)
+                {
+                    data = InstanceData.get(true, InstanceTypes.ROOM_TILE, args[1]);
+                    if (data != null) Teleport.joinPossiblyCreating((EntityPlayerMP) sender, data.getFullName());
+                    else sender.sendMessage(new TextComponentString(getUsage(sender)));
+                }
+                else sender.sendMessage(new TextComponentString(getUsage(sender)));
+                break;
+
+
             case "joinTempCopy":
                 server.profiler.startSection("joinTempCopy");
 
@@ -292,45 +346,5 @@ public class Commands extends CommandBase
             default:
                 sender.sendMessage(new TextComponentString(getUsage(sender)));
         }
-    }
-
-    @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
-    {
-        if (args.length == 1)
-        {
-            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join", "setOwner", "joinTempCopy");
-        }
-        else if (args.length == 2)
-        {
-            if (args[0].equals("delete") || args[0].equals("copy") || args[0].equals("join") || args[0].equals("setOwner") || args[0].equals("joinTempCopy"))
-            {
-                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true));
-            }
-            else if (args[0].equals("skyroom"))
-            {
-                return getListOfStringsMatchingLastWord(args, playernames());
-            }
-            else if (args[0].equals("template"))
-            {
-                return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true, InstanceTypes.TEMPLATE, false));
-            }
-        }
-        else if (args.length == 3)
-        {
-            if (args[0].equals("join") || args[0].equals("setOwner") || args[0].equals("joinTempCopy"))
-            {
-                return getListOfStringsMatchingLastWord(args, playernames());
-            }
-        }
-        else if (args.length == 4)
-        {
-            if (args[0].equals("copy"))
-            {
-                return getListOfStringsMatchingLastWord(args, playernames());
-            }
-        }
-
-        return new ArrayList<>();
     }
 }

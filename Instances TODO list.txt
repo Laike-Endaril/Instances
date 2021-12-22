@@ -1,3 +1,96 @@
+Add commands for editing room type tags
+Add commands for editing room connection points
+
+
+
+Add systems for modularized random dungeon generation
+All dungeons have an entrance and an exit (Once inside, either can be used to leave, with some exceptions)
+All dungeons are in adventure mode
+
+Themes (prefix)
+* Hellish
+* Heavenly
+* Fiery
+* Frozen
+* Aquatic
+* Toxic
+* Verdant
+* Autumnal
+* Summery
+* Wintery
+* Thundering
+* Lofty
+* Volatile
+* Subterranean
+* Stone
+* Skittering
+* Ghostly
+* Arcane
+
+Dungeon Types
+* Puzzle
+* Maze
+* Obstacle Course (just parkour, safe, only loot at end)
+* Gauntlet (straight, no side paths, has a boss and/or other combat, may have traps and parkour, has loot at the end only)
+* Tower (start at the bottom and go up)
+* Shaft (start at the top and go down)
+* Arena (combat focused)
+* Vault (complex puzzle with loot, possibly with traps)
+* Labyrinth (large maze with combat)
+* Haven (peaceful mode, no puzzles or traps, only minor loot if any, may contain peaceful mobs)
+
+Modifiers (suffixes; can have multiple, eg. "of Danger and Fortune")
+* Danger (increased mob difficulty)
+* Lesions (increased mob spawns)
+* Fortune (increased loot)
+* Artifacts (increased loot quality)
+* Pondering (increased puzzle difficulty)
+* Forgiveness (players have their health set to 1 and are teleported to their spawn point instead of dying
+* Transience (once entered, the dungeon will delete itself the next time no players are in it)
+* Night (always nighttime)
+* Day (always daytime)
+* Twilight (always dusk)
+* Clear skies (always sunny)
+* Drizzling (always lightly raining)
+* Rain (always raining)
+* Snow (always snowing)
+* Storms (always lightning storm)
+* Darkness (all light-emitting blocks are replaced with non-light-emitting blocks)
+* Impending Doom (the dungeon slowly disappears, one room at a time, starting with the entrance room)
+* No Return (cannot leave through the entrance; must reach the exit)
+
+
+Layouts have...
+* A blacklist for themes
+* A blacklist for modifiers
+* Possible entrance rooms with weighted chances (only 1 appears normally)
+* Possible rooms with weighted chances
+* Possible exit rooms with weighted chances (only 1 appears normally)
+
+Themes have...
+* Block category definitions (each category has a name and 1 or more blocks; dungeon generation references theme block categories to see which rooms can be used and what blocks to use for them)
+* Enemy category definitions (work similar to block category definitions)
+
+Modifiers have...
+* Unique behaviors that need to be hard-coded
+
+Rooms have...
+* Type tags (puzzle, maze, parkour, melee, ranged combat, boss, traps, shop, animals)
+* There is no "safe" tag; a room is "safe" if it does not have any dangerous tags (traps, boss, melee, etc.)
+* Eg. a room with parkour where you can take fall damage should have the parkour and traps tags
+* The general layout of the room, which is used as a base and has blocks replaced according to theme when generated
+* Connection points, where they are to attach themselves to other rooms
+* Enemy placements with spawn chances and enemy categories
+* Chest placements with loot pools
+
+Connection points have...
+* A block position
+* A direction
+* A possible connecting room list
+* A toggle for whether the connecting room list is whitelist / blacklist
+
+
+
 Low priority
 
 Get the client F3 to show the biome correctly

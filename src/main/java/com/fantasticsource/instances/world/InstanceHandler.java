@@ -83,7 +83,7 @@ public class InstanceHandler
             if (!newFile.isDirectory())
             {
                 System.err.println(TextFormatting.RED + "Failed to copy: " + newFile.getAbsolutePath() + " already exists as a non-folder");
-                if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Failed to copy to " + newName + " (already exists)"));
+                if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to copy to " + newName + " (already exists)"));
 
                 profiler.endSection();
                 return null;
@@ -93,7 +93,7 @@ public class InstanceHandler
             if (files != null && files.length > 0)
             {
                 System.err.println(TextFormatting.RED + "Failed to copy: " + newFile.getAbsolutePath() + " already exists as a non-empty folder");
-                if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Failed to copy to " + newName + " (already exists)"));
+                if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to copy to " + newName + " (already exists)"));
             }
         }
         try
@@ -103,7 +103,7 @@ public class InstanceHandler
         catch (IOException e)
         {
             System.err.println(TextFormatting.RED + "Failed to copy to directory: " + newFile.getAbsolutePath());
-            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Failed to copy to " + newName));
+            if (sender != null) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to copy to " + newName));
 
             profiler.endSection();
             return null;
