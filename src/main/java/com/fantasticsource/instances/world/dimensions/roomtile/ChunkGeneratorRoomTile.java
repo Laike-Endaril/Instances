@@ -18,11 +18,13 @@ import java.util.List;
 
 public class ChunkGeneratorRoomTile implements IChunkGenerator
 {
+    public static final int BOTTOM = 64, TOP = 79;
+
     public static final IBlockState
             STONE = Blocks.STONE.getDefaultState(),
             STONE_BRICK = Blocks.STONEBRICK.getDefaultState(),
             ESCAPE_PORTAL = BlocksAndItems.blockReturnPortal.getDefaultState(),
-            GLOWSTONE = Blocks.GLOWSTONE.getDefaultState();
+            GROUND_TORCH = Blocks.TORCH.getDefaultState();
 
     protected World world;
     private ChunkPrimer chunkPrimer = new ChunkPrimer();
@@ -47,16 +49,13 @@ public class ChunkGeneratorRoomTile implements IChunkGenerator
 
         if (chunkX == 0 && chunkZ == 0)
         {
-            int bottom = 64, top = 79;
-
-
             //Floor and ceiling
             for (int x = 0; x < 16; x++)
             {
                 for (int z = 0; z < 16; z++)
                 {
-                    chunk.setBlockState(new BlockPos(x, bottom, z), STONE);
-                    chunk.setBlockState(new BlockPos(x, top, z), STONE);
+                    chunk.setBlockState(new BlockPos(x, BOTTOM, z), STONE);
+                    chunk.setBlockState(new BlockPos(x, TOP, z), STONE);
                 }
             }
 
@@ -64,28 +63,21 @@ public class ChunkGeneratorRoomTile implements IChunkGenerator
             //Walls
             for (int x = 0; x < 16; x++)
             {
-                for (int y = bottom + 1; y < top; y++)
+                for (int y = BOTTOM + 1; y < TOP; y++)
                 {
                     chunk.setBlockState(new BlockPos(x, y, 0), STONE_BRICK);
-                    if (y > bottom + 3 || x < 7 || x > 8) chunk.setBlockState(new BlockPos(x, y, 15), STONE_BRICK);
+                    if (y > BOTTOM + 3 || x < 7 || x > 8) chunk.setBlockState(new BlockPos(x, y, 15), STONE_BRICK);
                     else chunk.setBlockState(new BlockPos(x, y, 1), ESCAPE_PORTAL);
                 }
             }
             for (int z = 0; z < 16; z++)
             {
-                for (int y = bottom + 1; y < top; y++)
+                for (int y = BOTTOM + 1; y < TOP; y++)
                 {
                     chunk.setBlockState(new BlockPos(0, y, z), STONE_BRICK);
                     chunk.setBlockState(new BlockPos(15, y, z), STONE_BRICK);
                 }
             }
-
-
-            //Torches
-            chunk.setBlockState(new BlockPos(5, bottom, 5), GLOWSTONE);
-            chunk.setBlockState(new BlockPos(5, bottom, 10), GLOWSTONE);
-            chunk.setBlockState(new BlockPos(10, bottom, 5), GLOWSTONE);
-            chunk.setBlockState(new BlockPos(10, bottom, 10), GLOWSTONE);
         }
 
 
@@ -94,8 +86,17 @@ public class ChunkGeneratorRoomTile implements IChunkGenerator
     }
 
     @Override
-    public void populate(int parChunkX, int parChunkZ)
+    public void populate(int chunkX, int chunkZ)
     {
+        //Lights
+        if (chunkX == 0 && chunkZ == 0)
+        {
+            Chunk chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
+            chunk.setBlockState(new BlockPos(5, BOTTOM + 1, 5), GROUND_TORCH);
+            chunk.setBlockState(new BlockPos(5, BOTTOM + 1, 10), GROUND_TORCH);
+            chunk.setBlockState(new BlockPos(10, BOTTOM + 1, 5), GROUND_TORCH);
+            chunk.setBlockState(new BlockPos(10, BOTTOM + 1, 10), GROUND_TORCH);
+        }
     }
 
     @Override
