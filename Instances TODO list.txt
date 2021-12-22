@@ -27,13 +27,16 @@ Themes (prefix)
 * Arcane
 
 Dungeon Types
-* Puzzle
-* Maze
+* Puzzle (One puzzle room)
+* Arena (One combat room)
+* Maze (One or more maze rooms)
+* Dungeon (allows all room types and ways of connecting them, fairly balanced)
+* Lair (like dungeon, but combat focused)
 * Obstacle Course (just parkour, safe, only loot at end)
+* Trial (parkour and traps, no combat)
 * Gauntlet (straight, no side paths, has a boss and/or other combat, may have traps and parkour, has loot at the end only)
 * Tower (start at the bottom and go up)
 * Shaft (start at the top and go down)
-* Arena (combat focused)
 * Vault (complex puzzle with loot, possibly with traps)
 * Labyrinth (large maze with combat)
 * Haven (peaceful mode, no puzzles or traps, only minor loot if any, may contain peaceful mobs)

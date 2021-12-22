@@ -1,5 +1,6 @@
 package com.fantasticsource.instances.world.dimensions.roomtile;
 
+import com.fantasticsource.instances.blocksanditems.BlocksAndItems;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
@@ -19,7 +20,9 @@ public class ChunkGeneratorRoomTile implements IChunkGenerator
 {
     public static final IBlockState
             STONE = Blocks.STONE.getDefaultState(),
-            STONE_BRICK = Blocks.STONEBRICK.getDefaultState();
+            STONE_BRICK = Blocks.STONEBRICK.getDefaultState(),
+            ESCAPE_PORTAL = BlocksAndItems.blockReturnPortal.getDefaultState(),
+            GLOWSTONE = Blocks.GLOWSTONE.getDefaultState();
 
     protected World world;
     private ChunkPrimer chunkPrimer = new ChunkPrimer();
@@ -63,8 +66,9 @@ public class ChunkGeneratorRoomTile implements IChunkGenerator
             {
                 for (int y = bottom + 1; y < top; y++)
                 {
-                    if (y > bottom + 3 || x < 7 || x > 8) chunk.setBlockState(new BlockPos(x, y, 0), STONE_BRICK);
-                    chunk.setBlockState(new BlockPos(x, y, 15), STONE_BRICK);
+                    chunk.setBlockState(new BlockPos(x, y, 0), STONE_BRICK);
+                    if (y > bottom + 3 || x < 7 || x > 8) chunk.setBlockState(new BlockPos(x, y, 15), STONE_BRICK);
+                    else chunk.setBlockState(new BlockPos(x, y, 1), ESCAPE_PORTAL);
                 }
             }
             for (int z = 0; z < 16; z++)
@@ -75,6 +79,13 @@ public class ChunkGeneratorRoomTile implements IChunkGenerator
                     chunk.setBlockState(new BlockPos(15, y, z), STONE_BRICK);
                 }
             }
+
+
+            //Torches
+            chunk.setBlockState(new BlockPos(5, bottom, 5), GLOWSTONE);
+            chunk.setBlockState(new BlockPos(5, bottom, 10), GLOWSTONE);
+            chunk.setBlockState(new BlockPos(10, bottom, 5), GLOWSTONE);
+            chunk.setBlockState(new BlockPos(10, bottom, 10), GLOWSTONE);
         }
 
 

@@ -10,7 +10,7 @@ public class WorldProviderRoomTile extends InstanceWorldProvider
     protected void init()
     {
         super.init();
-        setSpawnPoint(new BlockPos(8, 65, 0));
+        setSpawnPoint(new BlockPos(8, 65, 2));
     }
 
     @Override
