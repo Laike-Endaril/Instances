@@ -16,9 +16,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.DimensionType;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class Commands extends CommandBase
@@ -44,7 +46,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner:removeOwner:joinTempCopy:roomTile>";
+        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner:removeOwner:joinTempCopy:roomTile:roomTags>";
     }
 
     @Override
@@ -58,7 +60,7 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join", "setOwner", "joinTempCopy", "roomTile");
+            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join", "setOwner", "joinTempCopy", "roomTile", "roomTags");
         }
         else if (args.length == 2)
         {
@@ -74,7 +76,7 @@ public class Commands extends CommandBase
             {
                 return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true, InstanceTypes.TEMPLATE, false));
             }
-            else if (args[0].equals("connection"))
+            else if (args[0].equals("roomTags"))
             {
                 return getListOfStringsMatchingLastWord(args, "add", "remove");
             }
@@ -110,6 +112,47 @@ public class Commands extends CommandBase
         InstanceData data;
         switch (args[0])
         {
+            case "roomTags":
+                if (!(sender instanceof EntityPlayerMP)) sender.sendMessage(new TextComponentString(TextFormatting.RED + "This command is only usable by players"));
+                else if (args.length < 3 || !(args[1].equals("add") || args[1].equals("remove"))) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                else
+                {
+                    player = (EntityPlayerMP) sender;
+                    DimensionType type = player.world.provider.getDimensionType();
+                    if (type != InstanceTypes.ROOM_TILE) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Room tag command is only available in room tiles"));
+                    else
+                    {
+                        File file = new File(MCTools.getWorldSaveDir(server) + MCTools.getSaveFolder(player.world.provider) + File.separator + "Tags.txt");
+                        try
+                        {
+                            HashSet<String> tags = new HashSet<>();
+                            if (file.exists())
+                            {
+                                BufferedReader reader = new BufferedReader(new FileReader(file));
+                                String line = reader.readLine();
+                                while (line != null)
+                                {
+                                    tags.add(line);
+                                    line = reader.readLine();
+                                }
+                            }
+
+                            if (args[1].equals("add")) tags.add(args[2]);
+                            else tags.remove(args[2]);
+
+                            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                            for (String tag : tags) writer.write(tag + "\r\n");
+                            writer.close();
+                        }
+                        catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                break;
+
+
             case "roomTile":
                 if (sender instanceof EntityPlayerMP && args.length > 1)
                 {
