@@ -91,7 +91,7 @@ public class Commands extends CommandBase
             }
             else if (args[0].equals("roomConnections"))
             {
-                return getListOfStringsMatchingLastWord(args, "add", "remove", "cancel", "mode");
+                return getListOfStringsMatchingLastWord(args, "add", "remove", "cancel", "mode", "blacklist", "whitelist", "roomList");
             }
         }
         else if (args.length == 3)
@@ -100,9 +100,10 @@ public class Commands extends CommandBase
             {
                 return getListOfStringsMatchingLastWord(args, playernames());
             }
-            else if (args[0].equals("roomConnections") && args[1].equals("mode"))
+            else if (args[0].equals("roomConnections"))
             {
-                return getListOfStringsMatchingLastWord(args, "twoWay", "exitOnly", "entranceOnly");
+                if (args[1].equals("mode")) return getListOfStringsMatchingLastWord(args, "twoWay", "exitOnly", "entranceOnly");
+                else if (args[1].equals("roomList")) return getListOfStringsMatchingLastWord(args, "add", "remove", "clear");
             }
         }
         else if (args.length == 4)
@@ -110,6 +111,10 @@ public class Commands extends CommandBase
             if (args[0].equals("copy"))
             {
                 return getListOfStringsMatchingLastWord(args, playernames());
+            }
+            else if (args[0].equals("roomConnections") && args[1].equals("roomList"))
+            {
+                if (args[2].equals("add") || args[2].equals("remove")) return getListOfStringsMatchingLastWord(args, InstanceHandler.instanceFolderNames(true, InstanceTypes.ROOM_TILE, false));
             }
         }
 
@@ -182,12 +187,11 @@ public class Commands extends CommandBase
                                             writer.write(block.getRegistryName() + ":" + block.getMetaFromState(blockState) + "\r\n");
                                             for (IProperty<?> property : blockState.getPropertyKeys())
                                             {
-                                                writer.write(property.getName() + "\r\n");
-                                                writer.write(blockState.getValue(property) + "\r\n");
+                                                writer.write("prop: " + property.getName() + "\r\n");
+                                                writer.write("val: " + blockState.getValue(property) + "\r\n");
                                             }
                                             TileEntity te = world.getTileEntity(pos);
-                                            if (te != null) writer.write(te.serializeNBT().toString());
-                                            writer.write("\r\n");
+                                            if (te != null) writer.write("te: " + te.serializeNBT().toString() + "\r\n");
                                         }
                                         writer.close();
                                     }
@@ -262,6 +266,172 @@ public class Commands extends CommandBase
                                 }
                                 else sender.sendMessage(new TextComponentString(getUsage(sender)));
                             }
+                        }
+                        else if (args[1].equals("blacklist") || args[1].equals("whitelist"))
+                        {
+                            BlockPos[] blocksInRay = ImprovedRayTracing.blocksInRay(player, 200, true);
+                            BlockPos pos = blocksInRay[blocksInRay.length - 1];
+                            File file = new File(MCTools.getWorldSaveDir(server) + MCTools.getSaveFolder(player.world.provider) + File.separator + "Connect " + EnumFacing.getDirectionFromEntityLiving(pos, player) + " " + pos + ".txt");
+                            if (file.exists())
+                            {
+                                try
+                                {
+                                    ArrayList<String> lines = new ArrayList<>();
+                                    BufferedReader reader = new BufferedReader(new FileReader(file));
+                                    String line = reader.readLine();
+                                    String opposite = args[1].equals("blacklist") ? "whitelist" : "blacklist";
+                                    boolean found = false;
+                                    while (line != null)
+                                    {
+                                        if (line.equals(opposite))
+                                        {
+                                            found = true;
+                                            lines.add(args[1]);
+                                        }
+                                        else
+                                        {
+                                            lines.add(line);
+                                            if (line.equals(args[1])) found = true;
+                                        }
+                                        line = reader.readLine();
+                                    }
+                                    reader.close();
+                                    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                                    for (String line2 : lines) writer.write(line2 + "\r\n");
+                                    if (!found) writer.write(args[1] + "\r\n");
+                                    writer.close();
+                                    sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Connection room list set to " + args[1] + " mode"));
+                                }
+                                catch (IOException e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
+                            else sender.sendMessage(new TextComponentString(TextFormatting.RED + "Cannot change to " + args[1] + "; no connection exists at " + pos));
+                        }
+                        else if (args[1].equals("roomList"))
+                        {
+                            if (args.length < 3) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                            else if (args[2].equals("clear"))
+                            {
+                                BlockPos[] blocksInRay = ImprovedRayTracing.blocksInRay(player, 200, true);
+                                BlockPos pos = blocksInRay[blocksInRay.length - 1];
+                                File file = new File(MCTools.getWorldSaveDir(server) + MCTools.getSaveFolder(player.world.provider) + File.separator + "Connect " + EnumFacing.getDirectionFromEntityLiving(pos, player) + " " + pos + ".txt");
+                                if (file.exists())
+                                {
+                                    try
+                                    {
+                                        ArrayList<String> lines = new ArrayList<>();
+                                        BufferedReader reader = new BufferedReader(new FileReader(file));
+                                        String line = reader.readLine();
+                                        while (line != null)
+                                        {
+                                            if (line.length() < 7 || !line.substring(0, 7).equals("ROOMS: ")) lines.add(line);
+                                            line = reader.readLine();
+                                        }
+                                        reader.close();
+                                        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                                        for (String line2 : lines) writer.write(line2 + "\r\n");
+                                        writer.close();
+                                        sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Cleared possible connecting room whitelist/blacklist for connection at " + pos));
+                                    }
+                                    catch (IOException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                else sender.sendMessage(new TextComponentString(TextFormatting.RED + "Cannot clear possible connecting room whitelist/blacklist at " + pos + "; no connection exists there"));
+                            }
+                            else if (args.length < 4) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                            else if (args[2].equals("add"))
+                            {
+                                BlockPos[] blocksInRay = ImprovedRayTracing.blocksInRay(player, 200, true);
+                                BlockPos pos = blocksInRay[blocksInRay.length - 1];
+                                File file = new File(MCTools.getWorldSaveDir(server) + MCTools.getSaveFolder(player.world.provider) + File.separator + "Connect " + EnumFacing.getDirectionFromEntityLiving(pos, player) + " " + pos + ".txt");
+                                if (file.exists())
+                                {
+                                    try
+                                    {
+                                        ArrayList<String> lines = new ArrayList<>();
+                                        BufferedReader reader = new BufferedReader(new FileReader(file));
+                                        String line = reader.readLine();
+                                        boolean found = false;
+                                        while (line != null)
+                                        {
+                                            if (line.length() >= 7 && line.substring(0, 7).equals("ROOMS: "))
+                                            {
+                                                found = true;
+                                                String[] rooms = Tools.fixedSplit(line.substring(7), ",");
+                                                if (Tools.contains(rooms, args[3])) lines.add(line);
+                                                else lines.add(line + "," + args[3]);
+                                            }
+                                            else lines.add(line);
+                                            line = reader.readLine();
+                                        }
+                                        if (!found) lines.add("ROOMS: " + args[3]);
+                                        reader.close();
+                                        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                                        for (String line2 : lines) writer.write(line2 + "\r\n");
+                                        writer.close();
+                                        sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Added " + args[3] + " to whitelist/blacklist for connection at " + pos));
+                                    }
+                                    catch (IOException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                else sender.sendMessage(new TextComponentString(TextFormatting.RED + "Cannot add possible connecting room at " + pos + "; no connection exists there"));
+                            }
+                            else if (args[2].equals("remove"))
+                            {
+                                BlockPos[] blocksInRay = ImprovedRayTracing.blocksInRay(player, 200, true);
+                                BlockPos pos = blocksInRay[blocksInRay.length - 1];
+                                File file = new File(MCTools.getWorldSaveDir(server) + MCTools.getSaveFolder(player.world.provider) + File.separator + "Connect " + EnumFacing.getDirectionFromEntityLiving(pos, player) + " " + pos + ".txt");
+                                if (file.exists())
+                                {
+                                    try
+                                    {
+                                        ArrayList<String> lines = new ArrayList<>();
+                                        BufferedReader reader = new BufferedReader(new FileReader(file));
+                                        String line = reader.readLine();
+                                        while (line != null)
+                                        {
+                                            if (line.length() >= 7 && line.substring(0, 7).equals("ROOMS: "))
+                                            {
+                                                String[] rooms = Tools.fixedSplit(line.substring(7), ",");
+                                                line = "ROOMS: ";
+                                                boolean first = true;
+                                                for (String room : rooms)
+                                                {
+                                                    if (!room.equals(args[3]))
+                                                    {
+                                                        if (first)
+                                                        {
+                                                            line += room;
+                                                            first = false;
+                                                        }
+                                                        else line += "," + room;
+                                                    }
+                                                }
+                                                if (!line.equals("ROOMS: ")) lines.add(line);
+                                            }
+                                            else lines.add(line);
+                                            line = reader.readLine();
+                                        }
+                                        reader.close();
+                                        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                                        for (String line2 : lines) writer.write(line2 + "\r\n");
+                                        writer.close();
+                                        sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Removed " + args[3] + " from whitelist/blacklist for connection at " + pos));
+                                    }
+                                    catch (IOException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                else sender.sendMessage(new TextComponentString(TextFormatting.RED + "Cannot remove possible connecting room at " + pos + "; no connection exists there"));
+                            }
+                            else sender.sendMessage(new TextComponentString(getUsage(sender)));
                         }
                         else sender.sendMessage(new TextComponentString(getUsage(sender)));
                     }
