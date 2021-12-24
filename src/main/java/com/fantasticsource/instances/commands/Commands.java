@@ -5,26 +5,35 @@ import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.savefile.Owners;
 import com.fantasticsource.instances.world.InstanceHandler;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
-import com.fantasticsource.mctools.MCTools;
-import com.fantasticsource.mctools.PlayerData;
+import com.fantasticsource.mctools.*;
 import com.fantasticsource.tools.Tools;
+import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class Commands extends CommandBase
 {
+    protected static HashMap<World, ConnectionData> pendingConnectionData = new HashMap<>();
+
     public static ArrayList<String> playernames()
     {
         ArrayList<String> strings = new ArrayList<>();
@@ -46,7 +55,7 @@ public class Commands extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner:removeOwner:joinTempCopy:roomTile:roomTags>";
+        return "Usage: /instances <library:skyroom:template:list:delete:copy:join:setOwner:removeOwner:joinTempCopy:roomTile:roomTags:roomConnections>";
     }
 
     @Override
@@ -60,7 +69,7 @@ public class Commands extends CommandBase
     {
         if (args.length == 1)
         {
-            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join", "setOwner", "joinTempCopy", "roomTile", "roomTags");
+            return getListOfStringsMatchingLastWord(args, "library", "skyroom", "template", "list", "delete", "copy", "join", "setOwner", "joinTempCopy", "roomTile", "roomTags", "roomConnections");
         }
         else if (args.length == 2)
         {
@@ -79,6 +88,10 @@ public class Commands extends CommandBase
             else if (args[0].equals("roomTags"))
             {
                 return getListOfStringsMatchingLastWord(args, "add", "remove");
+            }
+            else if (args[0].equals("roomConnections"))
+            {
+                return getListOfStringsMatchingLastWord(args, "add", "remove", "cancel");
             }
         }
         else if (args.length == 3)
@@ -112,6 +125,108 @@ public class Commands extends CommandBase
         InstanceData data;
         switch (args[0])
         {
+            case "roomConnections":
+                if (!(sender instanceof EntityPlayerMP)) sender.sendMessage(new TextComponentString(TextFormatting.RED + "This command is only usable by players"));
+                else if (args.length < 2 || !(args[1].equals("add") || args[1].equals("remove") || args[1].equals("cancel"))) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                else
+                {
+                    player = (EntityPlayerMP) sender;
+                    DimensionType type = player.world.provider.getDimensionType();
+                    if (type != InstanceTypes.ROOM_TILE) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Room tag command is only available in room tiles"));
+                    else
+                    {
+                        World world = player.world;
+                        ConnectionData connectionData = pendingConnectionData.get(world);
+                        if (args[1].equals("add"))
+                        {
+                            if (player.world.playerEntities.size() > 1) player.sendMessage(new TextComponentString(TextFormatting.RED + "To prevent conflicts, only one player may be in the room tile instance when editing connections"));
+                            else
+                            {
+                                data = InstanceData.get(world);
+                                if (connectionData == null || !connectionData.instanceData.getFullName().equals(data.getFullName()))
+                                {
+                                    //Reset pending connection status and start creating connection
+                                    connectionData = new ConnectionData(player);
+                                    pendingConnectionData.put(world, connectionData);
+
+                                    player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Started creating connection at " + connectionData.pos + " facing " + connectionData.facing));
+                                    player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Edit blocks to create any terrain differences when the connection is open, then enter the same command to finish"));
+                                    player.sendMessage(new TextComponentString(TextFormatting.GREEN + "To cancel, use this command: /instances roomConnections cancel"));
+                                    player.sendMessage(new TextComponentString(TextFormatting.GOLD + "If you didn't use this while outside the room facing in, you should cancel and do that"));
+                                }
+                                else
+                                {
+                                    pendingConnectionData.remove(world);
+                                    File file = new File(MCTools.getWorldSaveDir(server) + MCTools.getSaveFolder(player.world.provider) + File.separator + "Connect " + connectionData.facing + " " + connectionData.pos + ".txt");
+                                    try
+                                    {
+                                        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                                        for (BlockPos pos : connectionData.oldBlockStates.keySet())
+                                        {
+                                            IBlockState blockState = world.getBlockState(pos);
+                                            Block block = blockState.getBlock();
+                                            writer.write(pos.getX() + "," + pos.getY() + "," + pos.getZ() + "\r\n");
+                                            writer.write(block.getRegistryName() + ":" + block.getMetaFromState(blockState) + "\r\n");
+                                            for (IProperty<?> property : blockState.getPropertyKeys())
+                                            {
+                                                writer.write(property.getName() + "\r\n");
+                                                writer.write(blockState.getValue(property) + "\r\n");
+                                            }
+                                            TileEntity te = world.getTileEntity(pos);
+                                            if (te != null) writer.write(te.serializeNBT().toString());
+                                            writer.write("\r\n");
+                                        }
+                                        writer.close();
+                                    }
+                                    catch (IOException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                    for (Map.Entry<BlockPos, IBlockState> entry : connectionData.oldBlockStates.entrySet()) world.setBlockState(entry.getKey(), entry.getValue());
+
+                                    player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Connection saved and temporary block changes undone"));
+                                }
+                            }
+                        }
+                        else if (args[1].equals("remove"))
+                        {
+                            BlockPos[] blocksInRay = ImprovedRayTracing.blocksInRay(player, 200, true);
+                            String stringPos = blocksInRay[blocksInRay.length - 1].toString();
+                            boolean removed = false;
+                            File dir = new File(MCTools.getWorldSaveDir(server) + MCTools.getSaveFolder(player.world.provider));
+                            File[] files = dir.listFiles();
+                            if (files != null)
+                            {
+                                for (File file : files)
+                                {
+                                    if (file.getName().equals("Connect west " + stringPos + ".txt") || file.getName().equals("Connect east " + stringPos + ".txt")
+                                            || file.getName().equals("Connect north " + stringPos + ".txt") || file.getName().equals("Connect south " + stringPos + ".txt")
+                                            || file.getName().equals("Connect up " + stringPos + ".txt") || file.getName().equals("Connect down " + stringPos + ".txt"))
+                                    {
+                                        while (file.exists()) file.delete();
+                                        removed = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (removed) player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Removed connection at " + stringPos));
+                            else player.sendMessage(new TextComponentString(TextFormatting.GOLD + "Could not remove connection at " + stringPos + ": no connection exists at this position"));
+                        }
+                        else
+                        {
+                            pendingConnectionData.remove(world);
+                            if (connectionData != null)
+                            {
+                                for (Map.Entry<BlockPos, IBlockState> entry : connectionData.oldBlockStates.entrySet()) world.setBlockState(entry.getKey(), entry.getValue());
+                                player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Cancelled pending connection and undid block changes"));
+                            }
+                            else player.sendMessage(new TextComponentString(TextFormatting.GOLD + "Cannot cancel; no connection is currently in progress"));
+                        }
+                    }
+                }
+                break;
+
+
             case "roomTags":
                 if (!(sender instanceof EntityPlayerMP)) sender.sendMessage(new TextComponentString(TextFormatting.RED + "This command is only usable by players"));
                 else if (args.length < 3 || !(args[1].equals("add") || args[1].equals("remove"))) sender.sendMessage(new TextComponentString(getUsage(sender)));
@@ -388,6 +503,60 @@ public class Commands extends CommandBase
 
             default:
                 sender.sendMessage(new TextComponentString(getUsage(sender)));
+        }
+    }
+
+
+    @SubscribeEvent
+    public static void entityJoinWorld(EntityJoinWorldEvent event)
+    {
+        Entity entity = event.getEntity();
+        if (entity instanceof EntityPlayerMP)
+        {
+            if (pendingConnectionData.containsKey(event.getWorld()))
+            {
+                ServerTickTimer.schedule(1, () ->
+                {
+                    Teleport.escape(entity);
+                    entity.sendMessage(new TextComponentString(TextFormatting.GOLD + "Could not join room tile instance; someone is currently editing a room connection"));
+                });
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBlockChange(WorldEventDistributor.DBlockUpdateEvent event)
+    {
+        if (!MCTools.hosting()) return;
+
+        ConnectionData data = pendingConnectionData.get(event.getWorld());
+        if (data != null && !data.oldBlockStates.containsKey(event.pos)) data.oldBlockStates.put(event.pos, event.oldState);
+    }
+
+    @SubscribeEvent
+    public static void worldTick(TickEvent.WorldTickEvent event)
+    {
+        World world = event.world;
+        ConnectionData data = pendingConnectionData.get(world);
+        if (data != null && !world.playerEntities.contains(data.editingPlayer)) pendingConnectionData.remove(world);
+    }
+
+
+    public static class ConnectionData
+    {
+        EntityPlayerMP editingPlayer;
+        InstanceData instanceData;
+        BlockPos pos;
+        EnumFacing facing;
+        HashMap<BlockPos, IBlockState> oldBlockStates = new HashMap<>();
+
+        public ConnectionData(EntityPlayerMP player)
+        {
+            editingPlayer = player;
+            instanceData = InstanceData.get(player);
+            BlockPos[] blocksInRay = ImprovedRayTracing.blocksInRay(player, 200, true);
+            pos = blocksInRay[blocksInRay.length - 1];
+            facing = EnumFacing.getDirectionFromEntityLiving(pos, player);
         }
     }
 }

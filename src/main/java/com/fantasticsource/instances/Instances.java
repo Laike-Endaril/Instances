@@ -16,6 +16,7 @@ import com.fantasticsource.instances.world.WorldInstance;
 import com.fantasticsource.instances.world.boimes.BiomeVoid;
 import com.fantasticsource.instances.world.dimensions.InstanceTypes;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.WorldEventDistributor;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -124,6 +125,9 @@ public class Instances
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
         MinecraftForge.EVENT_BUS.register(CurrentWorldname.class);
         MinecraftForge.EVENT_BUS.register(InstanceWorldProvider.class);
+        MinecraftForge.EVENT_BUS.register(WorldEventDistributor.class);
+        MinecraftForge.EVENT_BUS.register(Commands.class);
+
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
