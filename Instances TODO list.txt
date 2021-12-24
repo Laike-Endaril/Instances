@@ -1,6 +1,7 @@
-Add commands for editing room connection points
+Room tags exist
+Room connections exist; connecting position, blockstate changes if connected, mode (entrance, exit, both)
 
-
+Add optional blacklist/whitelist for connections determining which room tiles they can connect to
 
 Add systems for modularized random dungeon generation
 All dungeons have an entrance and an exit (Once inside, either can be used to leave, with some exceptions)

@@ -91,7 +91,7 @@ public class Commands extends CommandBase
             }
             else if (args[0].equals("roomConnections"))
             {
-                return getListOfStringsMatchingLastWord(args, "add", "remove", "cancel");
+                return getListOfStringsMatchingLastWord(args, "add", "remove", "cancel", "mode");
             }
         }
         else if (args.length == 3)
@@ -99,6 +99,10 @@ public class Commands extends CommandBase
             if (args[0].equals("join") || args[0].equals("setOwner") || args[0].equals("joinTempCopy") || args[0].equals("roomTile"))
             {
                 return getListOfStringsMatchingLastWord(args, playernames());
+            }
+            else if (args[0].equals("roomConnections") && args[1].equals("mode"))
+            {
+                return getListOfStringsMatchingLastWord(args, "twoWay", "exitOnly", "entranceOnly");
             }
         }
         else if (args.length == 4)
@@ -127,12 +131,12 @@ public class Commands extends CommandBase
         {
             case "roomConnections":
                 if (!(sender instanceof EntityPlayerMP)) sender.sendMessage(new TextComponentString(TextFormatting.RED + "This command is only usable by players"));
-                else if (args.length < 2 || !(args[1].equals("add") || args[1].equals("remove") || args[1].equals("cancel"))) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                else if (args.length < 2) sender.sendMessage(new TextComponentString(getUsage(sender)));
                 else
                 {
                     player = (EntityPlayerMP) sender;
                     DimensionType type = player.world.provider.getDimensionType();
-                    if (type != InstanceTypes.ROOM_TILE) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Room tag command is only available in room tiles"));
+                    if (type != InstanceTypes.ROOM_TILE) sender.sendMessage(new TextComponentString(TextFormatting.RED + "Room connection command is only available in room tiles"));
                     else
                     {
                         World world = player.world;
@@ -145,14 +149,23 @@ public class Commands extends CommandBase
                                 data = InstanceData.get(world);
                                 if (connectionData == null || !connectionData.instanceData.getFullName().equals(data.getFullName()))
                                 {
-                                    //Reset pending connection status and start creating connection
                                     connectionData = new ConnectionData(player);
-                                    pendingConnectionData.put(world, connectionData);
-
-                                    player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Started creating connection at " + connectionData.pos + " facing " + connectionData.facing));
-                                    player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Edit blocks to create any terrain differences when the connection is open, then enter the same command to finish"));
-                                    player.sendMessage(new TextComponentString(TextFormatting.GREEN + "To cancel, use this command: /instances roomConnections cancel"));
-                                    player.sendMessage(new TextComponentString(TextFormatting.GOLD + "If you didn't use this while outside the room facing in, you should cancel and do that"));
+                                    File file = new File(MCTools.getWorldSaveDir(server) + MCTools.getSaveFolder(player.world.provider) + File.separator + "Connect " + connectionData.facing + " " + connectionData.pos + ".txt");
+                                    if (file.exists())
+                                    {
+                                        //Reset pending connection status
+                                        pendingConnectionData.remove(world);
+                                        player.sendMessage(new TextComponentString(TextFormatting.RED + "Could not create connection at " + connectionData.pos + ": a connection already exists there!"));
+                                    }
+                                    else
+                                    {
+                                        //Start creating connection
+                                        pendingConnectionData.put(world, connectionData);
+                                        player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Started creating connection at " + connectionData.pos + " facing " + connectionData.facing));
+                                        player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Edit blocks to create any terrain differences when the connection is open, then enter the same command to finish"));
+                                        player.sendMessage(new TextComponentString(TextFormatting.GREEN + "To cancel, use this command: /instances roomConnections cancel"));
+                                        player.sendMessage(new TextComponentString(TextFormatting.GOLD + "If you didn't use this while outside the room facing in, you should cancel and do that"));
+                                    }
                                 }
                                 else
                                 {
@@ -210,9 +223,9 @@ public class Commands extends CommandBase
                                 }
                             }
                             if (removed) player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Removed connection at " + stringPos));
-                            else player.sendMessage(new TextComponentString(TextFormatting.GOLD + "Could not remove connection at " + stringPos + ": no connection exists at this position"));
+                            else player.sendMessage(new TextComponentString(TextFormatting.RED + "Could not remove connection at " + stringPos + ": no connection exists at this position"));
                         }
-                        else
+                        else if (args[1].equals("cancel"))
                         {
                             pendingConnectionData.remove(world);
                             if (connectionData != null)
@@ -220,8 +233,37 @@ public class Commands extends CommandBase
                                 for (Map.Entry<BlockPos, IBlockState> entry : connectionData.oldBlockStates.entrySet()) world.setBlockState(entry.getKey(), entry.getValue());
                                 player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Cancelled pending connection and undid block changes"));
                             }
-                            else player.sendMessage(new TextComponentString(TextFormatting.GOLD + "Cannot cancel; no connection is currently in progress"));
+                            else player.sendMessage(new TextComponentString(TextFormatting.RED + "Cannot cancel; no connection is currently in progress"));
                         }
+                        else if (args[1].equals("mode"))
+                        {
+                            if (args.length < 3) sender.sendMessage(new TextComponentString(getUsage(sender)));
+                            else
+                            {
+                                if (args[2].equals("twoWay") || args[2].equals("exitOnly") || args[2].equals("entranceOnly"))
+                                {
+                                    BlockPos[] blocksInRay = ImprovedRayTracing.blocksInRay(player, 200, true);
+                                    BlockPos pos = blocksInRay[blocksInRay.length - 1];
+                                    File file = new File(MCTools.getWorldSaveDir(server) + MCTools.getSaveFolder(player.world.provider) + File.separator + "Connect " + EnumFacing.getDirectionFromEntityLiving(pos, player) + " " + pos + ".txt");
+                                    if (file.exists())
+                                    {
+                                        try
+                                        {
+                                            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+                                            writer.write(args[2] + "\r\n");
+                                            writer.close();
+                                        }
+                                        catch (IOException e)
+                                        {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    else sender.sendMessage(new TextComponentString(TextFormatting.RED + "Cannot change mode; no connection exists at " + pos));
+                                }
+                                else sender.sendMessage(new TextComponentString(getUsage(sender)));
+                            }
+                        }
+                        else sender.sendMessage(new TextComponentString(getUsage(sender)));
                     }
                 }
                 break;
@@ -518,7 +560,7 @@ public class Commands extends CommandBase
                 ServerTickTimer.schedule(1, () ->
                 {
                     Teleport.escape(entity);
-                    entity.sendMessage(new TextComponentString(TextFormatting.GOLD + "Could not join room tile instance; someone is currently editing a room connection"));
+                    entity.sendMessage(new TextComponentString(TextFormatting.RED + "Could not join room tile instance; someone is currently editing a room connection"));
                 });
             }
         }
