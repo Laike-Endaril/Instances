@@ -1,7 +1,9 @@
 Room tags exist
 Room connections exist; connecting position, blockstate changes if connected, mode (entrance, exit, both), blacklist/whitelist of possible connecting rooms
 
-Add systems for modularized random dungeon generation
+Add theme commands
+Add layout commands
+
 All dungeons have an entrance and an exit (Once inside, either can be used to leave, with some exceptions)
 All dungeons are in adventure mode
 
